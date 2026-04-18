@@ -27,11 +27,11 @@
                     Wujudkan desain impian Anda dengan fitur kustomisasi interaktif. Kualitas bahan atlet profesional, harga yang tetap rasional.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-5">
-                    <a href="#" class="px-8 py-4 bg-brand-900 border border-brand-700 text-white rounded-full font-bold text-lg hover:bg-brand-800 hover:scale-105 transition-all shadow-xl shadow-brand-950/50 flex items-center justify-center gap-2 text-decoration-none">
+                    <a href="{{ route('customizer') }}" class="px-8 py-4 bg-brand-900 border border-brand-700 text-white rounded-full font-bold text-lg hover:bg-brand-800 hover:scale-105 transition-all shadow-xl shadow-brand-950/50 flex items-center justify-center gap-2 text-decoration-none">
                         Design Now
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                     </a>
-                    <a href="#" class="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full font-bold text-lg hover:bg-white/20 transition-all flex items-center justify-center text-decoration-none">
+                    <a href="{{ route('catalog.index') }}" class="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full font-bold text-lg hover:bg-white/20 transition-all flex items-center justify-center text-decoration-none">
                         View Catalog
                     </a>
                 </div>
@@ -57,11 +57,11 @@
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 @php
                     $packages = [
-                        ['id' => 'A', 'price' => '90.000', 'desc' => 'Non-printing, Logo/Nameset DTF', 'features' => ['Bahan Standar', 'Logo DTF', 'Nameset DTF', 'Non-printing']],
-                        ['id' => 'B', 'price' => '110.000', 'desc' => 'Lengan Printing, Logo/Nameset DTF', 'features' => ['Bahan Standar', 'Lengan Full Print', 'Logo DTF', 'Nameset DTF']],
-                        ['id' => 'C', 'price' => '130.000', 'desc' => 'Jersey Full Printing, Celana Non-printing', 'features' => ['Bahan Premium', 'Jersey Full Print', 'Logo Sublime', 'Nameset Sublime']],
-                        ['id' => 'D', 'price' => '160.000', 'desc' => 'Jersey & Celana Full Printing', 'features' => ['Bahan Premium', 'Jersey Full Print', 'Celana Full Print', 'Full Sublime']],
-                        ['id' => 'E', 'price' => '170.000', 'desc' => 'Full Printing + Logo/Sponsor DTF', 'features' => ['Bahan Premium', 'Full Print Custom', 'Logo DTF Eksklusif', 'Sponsor DTF']],
+                        ['id' => 'A', 'slug' => 'paket-a-standard', 'price' => '90.000', 'desc' => 'Non-printing, Logo/Nameset DTF', 'features' => ['Bahan Standar', 'Logo DTF', 'Nameset DTF', 'Non-printing']],
+                        ['id' => 'B', 'slug' => 'paket-b-sleeve-print', 'price' => '110.000', 'desc' => 'Lengan Printing, Logo/Nameset DTF', 'features' => ['Bahan Standar', 'Lengan Full Print', 'Logo DTF', 'Nameset DTF']],
+                        ['id' => 'C', 'slug' => 'paket-c-front-print', 'price' => '130.000', 'desc' => 'Jersey Full Printing, Celana Non-printing', 'features' => ['Bahan Premium', 'Jersey Full Print', 'Logo Sublime', 'Nameset Sublime']],
+                        ['id' => 'D', 'slug' => 'paket-d-full-printing', 'price' => '160.000', 'desc' => 'Jersey & Celana Full Printing', 'features' => ['Bahan Premium', 'Jersey Full Print', 'Celana Full Print', 'Full Sublime']],
+                        ['id' => 'E', 'slug' => 'paket-e-professional', 'price' => '170.000', 'desc' => 'Full Printing + Logo/Sponsor DTF', 'features' => ['Bahan Premium', 'Full Print Custom', 'Logo DTF Eksklusif', 'Sponsor DTF']],
                     ];
                 @endphp
 
@@ -81,7 +81,7 @@
                                 </li>
                             @endforeach
                         </ul>
-                        <button class="w-full py-3 rounded-xl bg-white dark:bg-zinc-800 border dark:border-zinc-700 font-bold text-sm tracking-wide group-hover:bg-brand-900 group-hover:text-white transition-all shadow-sm">Pilih Paket</button>
+                        <a href="{{ route('catalog.show', $pkg['slug']) }}" class="block w-full py-3 rounded-xl bg-white dark:bg-zinc-800 border dark:border-zinc-700 font-bold text-sm tracking-wide group-hover:bg-brand-900 group-hover:text-white transition-all shadow-sm text-center text-decoration-none">Pilih Paket</a>
                     </div>
                 @endforeach
             </div>
@@ -106,7 +106,7 @@
                         <p class="text-zinc-400 text-lg mb-10 max-w-md">
                             Coba fitur kustomisasi interaktif kami. Pilih logo, motif, hingga gradient warna secara real-time. Rasakan pengalaman mendesain tanpa batas.
                         </p>
-                        <a href="#" class="inline-flex px-10 py-5 bg-brand-900 text-white rounded-full font-black text-lg hover:bg-brand-800 hover:scale-110 transition-all shadow-xl shadow-brand-950/50 uppercase tracking-tighter italic text-decoration-none">
+                        <a href="{{ route('customizer') }}" class="inline-flex px-10 py-5 bg-brand-900 text-white rounded-full font-black text-lg hover:bg-brand-800 hover:scale-110 transition-all shadow-xl shadow-brand-950/50 uppercase tracking-tighter italic text-decoration-none">
                             Buka Online Customizer
                         </a>
                     </div>
@@ -138,7 +138,7 @@
                     <h2 class="text-3xl md:text-5xl font-bold mb-4">Produk <span class="text-brand-900 dark:text-brand-400">Lainnya</span></h2>
                     <p class="text-gray-600 dark:text-zinc-400">Selain jersey, kami juga menyediakan apparel pendukung lainnya.</p>
                 </div>
-                <a href="#" class="font-bold text-brand-900 dark:text-brand-400 flex items-center gap-2 hover:gap-4 transition-all text-decoration-none">
+                <a href="{{ route('catalog.index') }}" class="font-bold text-brand-900 dark:text-brand-400 flex items-center gap-2 hover:gap-4 transition-all text-decoration-none">
                     Lihat Semua Produk <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                 </a>
             </div>

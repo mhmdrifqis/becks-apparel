@@ -35,7 +35,9 @@
             <x-preloader />
 
             <!-- Navigation -->
-            <x-navbar />
+            @unless(isset($hideNavFooter) && $hideNavFooter)
+                <x-navbar />
+            @endunless
 
             <!-- Page Content -->
             <main>
@@ -43,7 +45,9 @@
             </main>
 
             <!-- Footer -->
-            <x-footer />
+            @unless(isset($hideNavFooter) && $hideNavFooter)
+                <x-footer />
+            @endunless
         </div>
 
         <!-- Theme Toggle Logic -->

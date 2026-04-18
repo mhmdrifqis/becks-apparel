@@ -1,11 +1,19 @@
 <?php
 
+use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+Route::get('/catalog/{slug}', [CatalogController::class, 'show'])->name('catalog.show');
+
+Route::get('/customizer', function () {
+    return view('customizer');
+})->name('customizer');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

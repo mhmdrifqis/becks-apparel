@@ -16,8 +16,8 @@
             <!-- Desktop Menu -->
             <div class="hidden sm:flex sm:items-center sm:gap-8">
                 <a href="{{ url('/') }}" class="text-sm font-medium hover:text-brand-600 transition-colors">Home</a>
-                <a href="#" class="text-sm font-medium hover:text-brand-600 transition-colors">Katalog</a>
-                <a href="#" class="text-sm font-medium hover:text-brand-600 transition-colors">Customizer</a>
+                <a href="{{ route('catalog.index') }}" class="text-sm font-medium hover:text-brand-600 transition-colors">Katalog</a>
+                <a href="{{ route('customizer') }}" class="text-sm font-medium hover:text-brand-600 transition-colors">Customizer</a>
                 <div class="h-6 w-px bg-gray-200 dark:bg-zinc-800"></div>
                 
                 @auth
@@ -59,8 +59,8 @@
          class="sm:hidden bg-white dark:bg-zinc-900 border-b dark:border-zinc-800">
         <div class="px-4 pt-2 pb-6 space-y-1">
             <a href="{{ url('/') }}" class="block px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800">Home</a>
-            <a href="#" class="block px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800">Katalog</a>
-            <a href="#" class="block px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800">Customizer</a>
+            <a href="{{ route('catalog.index') }}" class="block px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800">Katalog</a>
+            <a href="{{ route('customizer') }}" class="block px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800">Customizer</a>
             <div class="pt-4 flex flex-col gap-2">
                  @auth
                     <a href="{{ route('dashboard') }}" class="w-full text-center bg-brand-900 text-white py-2 rounded-md font-bold">Dashboard</a>
