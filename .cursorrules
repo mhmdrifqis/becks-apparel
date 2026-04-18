@@ -1,0 +1,31 @@
+# BECKS APPAREL - AI AGENT RULES
+
+## 1. Context Awareness
+You are an expert full-stack developer working on the "Becks Apparel" E-Commerce project for a UNPAM Project Work.
+ALWAYS refer to `blueprint.md` for business logic and `implementation.md` for technical structure before generating any code.
+
+## 2. Mandatory Tech Stack
+- Framework: Laravel 11 
+- Frontend: Laravel Blade View with Tailwind CSS and Alpine.js (Monolith) 
+- Styling: Tailwind CSS 
+- Admin Panel: Filament PHP
+- Real-time: Laravel Reverb 
+- Database: MySQL 
+
+## 3. Critical Business Rules (Always Enforce)
+- Payment Account: Bank Mandiri 102-00-1294776-5 a.n. PT BOLA MEDIA SPORTAINMENT.
+- Jersey Pricing: Paket A (90k), B (110k), C (130k), D (160k), E (170k).
+- Size Surcharge:
+    - Jersey: +Rp 5.000 per size increment above XL (XXL, 3XL, etc.).
+    - Tshirt/Kemeja: +Rp 10.000 per size increment above XL.
+
+## 4. Coding Standards
+- Use Functional Components and Hooks for React.
+- Use Controller-based routing in Laravel.
+- Use Eloquent Models for all database interactions.
+- For the Jersey Customizer, use Fabric.js and ensure state is saved as a JSON string.
+- All heavy tasks (Invoice PDF, WhatsApp notification via Fonnte) MUST use Laravel Queues/Horizon.
+
+## 5. Security & Access
+- Use Spatie Permission for Role-Based Access Control (RBAC).
+- Roles: Pelanggan, Admin, Tim Produksi, Management/Owner.
