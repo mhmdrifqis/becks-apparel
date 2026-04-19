@@ -3,7 +3,7 @@
 @section('title', $package->name . ' - Becks Apparel')
 
 @section('content')
-<div class="bg-white min-h-screen pt-20 pb-24 md:pb-0">
+<div x-data="{}" class="bg-white min-h-screen pt-20 pb-24 md:pb-0">
     <div class="max-w-7xl mx-auto px-4 py-8 md:py-16">
         
         <!-- Breadcrumbs & Back -->
@@ -94,7 +94,25 @@
 
                 <!-- Desktop CTA -->
                 <div class="hidden md:flex gap-4">
-                    <a href="{{ route('customizer', ['package' => $package->slug]) }}" class="flex-1 bg-brand-900 text-white px-10 py-5 rounded-3xl text-sm font-bold uppercase tracking-widest text-center shadow-2xl shadow-brand-900/20 hover:bg-brand-800 hover:-translate-y-1 transition-all active:translate-y-0">
+                    <button 
+                        @click="
+                            fetch('{{ route('cart.add', $package->slug) }}', { 
+                                method: 'POST', 
+                                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' } 
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if(data.success) {
+                                    $dispatch('cart-updated');
+                                    window.location.href = '{{ route('customer.cart.index') }}';
+                                }
+                            })
+                        "
+                        class="flex-1 bg-white text-brand-900 border-2 border-brand-900 px-10 py-5 rounded-3xl text-sm font-bold uppercase tracking-widest text-center hover:bg-brand-50 transition-all active:scale-95"
+                    >
+                        Tambah ke Keranjang
+                    </button>
+                    <a href="{{ route('customizer', ['package' => $package->slug]) }}" class="flex-[2] bg-brand-900 text-white px-10 py-5 rounded-3xl text-sm font-bold uppercase tracking-widest text-center shadow-2xl shadow-brand-900/20 hover:bg-brand-800 hover:-translate-y-1 transition-all active:translate-y-0 text-decoration-none">
                         Buat Desain Sekarang
                     </a>
                 </div>
@@ -109,7 +127,27 @@
                 <span class="block text-[8px] text-slate-400 uppercase font-bold tracking-widest">Harga Paket</span>
                 <span class="text-lg font-bold text-brand-900">Rp {{ number_format($package->base_price, 0, ',', '.') }}</span>
             </div>
-            <a href="{{ route('customizer', ['package' => $package->slug]) }}" class="bg-brand-900 text-white px-8 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-xl shadow-brand-900/20 active:scale-95 transition-all">
+
+            <button 
+                @click="
+                    fetch('{{ route('cart.add', $package->slug) }}', { 
+                        method: 'POST', 
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' } 
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.success) {
+                            $dispatch('cart-updated');
+                            window.location.href = '{{ route('customer.cart.index') }}';
+                        }
+                    })
+                "
+                class="w-14 h-14 bg-slate-100 text-brand-900 rounded-2xl flex items-center justify-center active:scale-90 transition-all"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+            </button>
+
+            <a href="{{ route('customizer', ['package' => $package->slug]) }}" class="bg-brand-900 text-white px-8 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-xl shadow-brand-900/20 active:scale-95 transition-all text-decoration-none">
                 Kustomisasi
             </a>
         </div>

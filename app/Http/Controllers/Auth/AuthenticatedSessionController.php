@@ -28,7 +28,23 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = Auth::user();
+
+        // Redirect based on role
+        if ($user->hasRole('Admin')) {
+            return redirect()->intended(route('filament.admin.pages.dashboard', absolute: false));
+        }
+
+        if ($user->hasRole('Tim Produksi')) {
+            return redirect()->intended(route('filament.produksi.pages.dashboard', absolute: false));
+        }
+
+        if ($user->hasRole('Management/Owner')) {
+            return redirect()->intended(route('filament.owner.pages.dashboard', absolute: false));
+        }
+
+        // Default redirect for customers is Home
+        return redirect()->intended(url('/'));
     }
 
     /**

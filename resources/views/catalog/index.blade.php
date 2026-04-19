@@ -4,15 +4,15 @@
 
 @section('content')
 <div class="bg-slate-50 min-h-screen">
-    <!-- Hero Section: Full height & immersive like Home -->
+    <!-- Hero Section: Full height & immersive like Portfolio -->
     <section class="relative h-[80vh] flex items-center overflow-hidden bg-brand-950">
         <!-- Background Layer -->
         <div class="absolute inset-0 z-0">
-            <!-- <img 
-                src="https://images.unsplash.com/photo-1517603984227-aa7b60b19f42?q=80&w=2000&auto=format&fit=crop" 
+            <img 
+                src="{{ asset('assets/images/katalog/hero-katalog.png') }}" 
                 alt="Catalog Hero" 
                 class="w-full h-full object-cover"
-            /> -->
+            />
             <div class="absolute inset-0 bg-gradient-to-t from-[#06402B] via-[#06402B]/80 to-[#06402B]/60"></div>
             <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay"></div>
         </div>
@@ -21,14 +21,14 @@
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
             <div class="max-w-3xl">
                 <span class="inline-block px-4 py-1.5 rounded-full bg-brand-900/40 border border-brand-500/20 text-brand-400 font-bold text-xs tracking-[0.2em] uppercase mb-8 backdrop-blur-md">
-                    Exclusive Collection
+                    Premium Catalog
                 </span>
-                <h1 class="text-5xl md:text-8xl font-black text-white tracking-tighter leading-none mb-8">
-                    KATALOG <br/>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-green-300">PAKET PREMIUM.</span>
+                <h1 class="text-5xl md:text-8xl font-black text-white tracking-tighter leading-none mb-8 uppercase">
+                    Pilihan<br/>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-green-300">Terbaik Kita.</span>
                 </h1>
                 <p class="text-brand-100/60 text-lg md:text-xl mb-12 max-w-xl leading-relaxed">
-                    Pilih paket jersey terbaik yang sesuai dengan kebutuhan tim Anda. Dari kualitas standar hingga profesional dengan fitur full printing.
+                    Temukan paket jersey kustom yang diciptakan khusus untuk menjawab kebutuhan profesional tim Anda.
                 </p>
             </div>
         </div>
@@ -86,7 +86,7 @@
 
                             <!-- Floating Action -->
                             <div class="absolute inset-0 bg-brand-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                <a href="{{ route('catalog.show', $package->slug) }}" class="bg-white text-brand-900 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-brand-50 transition-colors shadow-2xl">Lihat Detail</a>
+                                <a href="{{ route('catalog.show', $package->slug) }}" class="bg-white text-brand-900 px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-brand-50 transition-all shadow-2xl active:scale-95">Lihat Detail</a>
                             </div>
                         </div>
 
