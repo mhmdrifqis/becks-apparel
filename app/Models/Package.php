@@ -12,6 +12,7 @@ class Package extends Model
         'slug',
         'base_price',
         'description',
+        'specification',
         'features',
         'image_path',
         'is_active',

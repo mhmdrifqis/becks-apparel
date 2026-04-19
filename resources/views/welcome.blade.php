@@ -1,185 +1,208 @@
 @extends('layouts.main')
 
-@section('title', 'Premium Sports Apparel & Jersey Customizer')
+@section('title', 'Becks Apparel - Home')
 
 @section('content')
-    <!-- Hero Section -->
-    <section class="relative h-screen flex items-center overflow-hidden">
+<div class="bg-[#fdfbf7] min-h-screen text-[#06402B] font-sans">
+    
+    <!-- SECTION 1: HERO (WEAR YOUR PRIDE) -->
+    <section class="relative min-h-[90vh] md:h-screen flex flex-col items-center justify-center overflow-hidden py-20 md:py-0">
+        <!-- Background Image Layer -->
         <div class="absolute inset-0 z-0">
             <img 
                 src="{{ asset('assets/images/hero_banner.png') }}" 
                 alt="Becks Apparel Hero" 
                 class="w-full h-full object-cover"
             />
-            <div class="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/70 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#06402B] via-[#06402B]/80 to-[#06402B]/60"></div>
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay"></div>
         </div>
 
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-            <div class="max-w-2xl">
-                <span class="inline-block px-4 py-1.5 rounded-full bg-brand-900/30 border border-brand-500/30 text-brand-400 font-bold text-xs tracking-widest uppercase mb-6 animate-fade-in shadow-lg backdrop-blur-sm">
-                    Exclusive Sportswear Engine
-                </span>
-                <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tighter leading-[0.9] mb-6">
-                    DEFINISI BARU <br/>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-green-300">JERSEY PREMIUM.</span>
-                </h1>
-                <p class="text-gray-300 text-lg md:text-xl mb-10 leading-relaxed max-w-lg">
-                    Wujudkan desain impian Anda dengan fitur kustomisasi interaktif. Kualitas bahan atlet profesional, harga yang tetap rasional.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-5">
-                    <a href="{{ route('customizer') }}" class="px-8 py-4 bg-brand-900 border border-brand-700 text-white rounded-full font-bold text-lg hover:bg-brand-800 hover:scale-105 transition-all shadow-xl shadow-brand-950/50 flex items-center justify-center gap-2 text-decoration-none">
-                        Design Now
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                    </a>
-                    <a href="{{ route('catalog.index') }}" class="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full font-bold text-lg hover:bg-white/20 transition-all flex items-center justify-center text-decoration-none">
-                        View Catalog
-                    </a>
+      
+
+        <!-- Content -->
+        <div class="relative z-10 text-center px-6">
+            <h2 class="font-['Dancing_Script'] text-white text-3xl md:text-6xl mb-4 animate-fade-in-down drop-shadow-lg">
+                Wear Your Pride
+            </h2>
+            <h1 class="text-6xl sm:text-8xl md:text-[12rem] lg:text-[16rem] font-black leading-tight tracking-[-0.05em] select-none animate-scale-up text-transparent bg-clip-text bg-gradient-to-r from-brand-300 via-brand-400 to-green-400 py-4 px-10">
+                BECKS
+            </h1>
+            
+            <div class="mt-8 md:mt-12">
+                <div class="inline-block px-6 py-3 md:px-12 md:py-4 bg-[#fdfbf7] text-[#06402B] rounded-full font-black text-[10px] md:text-base tracking-[0.1em] md:tracking-[0.2em] shadow-2xl animate-fade-in-up uppercase">
+                    PT BOLA MEDIA SPORTAINMENT
                 </div>
             </div>
         </div>
 
-        <!-- Scroller Indicator -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 hidden md:block animate-bounce">
-            <div class="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
-                <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+            <div class="w-px h-12 md:h-16 bg-gradient-to-b from-transparent to-[#fdfbf7]/40"></div>
+            <span class="text-[#fdfbf7]/40 text-[10px] uppercase font-bold tracking-[0.2em]">Scroll</span>
+        </div>
+    </section>
+
+    <!-- SECTION 2: WELCOME -->
+    <section class="min-h-screen py-20 md:py-24 flex items-center bg-[#fdfbf7]">
+        <div class="max-w-7xl mx-auto px-6 overflow-hidden">
+            <h2 class="text-4xl sm:text-7xl md:text-[15rem] font-black leading-none mb-12 tracking-tighter opacity-100 transform -translate-x-1 md:-translate-x-4">
+                WELCOME
+            </h2>
+            <div class="grid md:grid-cols-12 gap-12">
+                <div class="md:col-start-2 md:col-span-9">
+                    <p class="text-xl md:text-4xl font-bold leading-[1.2] text-[#06402B]">
+                        Becks Apparel adalah vendor jersey yang telah berkibar sejak <span class="bg-[#06402B] text-[#fdfbf7] px-2 italic">2018</span> dan bernaung di bawah PT Bola Media Sportainment. 
+                    </p>
+                    <p class="mt-8 text-lg md:text-2xl leading-relaxed text-[#06402B]/80 font-medium">
+                        Sebagai sebuah brand, Becks Apparel telah dipercaya berbagai klub Liga 3 Indonesia. Mulai dari Jakarta United FC, PSJS Jakarta Selatan, Persikota Tangerang, ACN Muara Badak, hingga PS Belitung Timur. 
+                    </p>
+                    <p class="mt-8 text-lg md:text-2xl leading-relaxed text-[#06402B]/80 font-medium">
+                        Dengan tagline <span class="font-black text-[#06402B]">#WearYourPride</span>, kamu tak perlu khawatir akan kualitas. Becks Apparel siap menciptakan jersey impianmu dengan hasil terbaik.
+                    </p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Packages Section -->
-    <section class="py-24 bg-white dark:bg-zinc-950">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-decoration-none">
-            <div class="mb-20">
-                <h2 class="text-3xl md:text-5xl font-bold mb-4 tracking-tight">Pilih Paket <span class="text-brand-900 dark:text-brand-400">Jersey Anda</span></h2>
-                <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Tersedia berbagai pilihan paket kualitas sesuai kebutuhan tim Anda, dari kasta amatir hingga pro.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+    <!-- SECTION 3: PRODUK -->
+    <section class="min-h-screen py-20 md:py-24 bg-[#fdfbf7] relative">
+        <div class="absolute top-12 right-12 hidden md:block">
+            <span class="text-[#06402B] font-black text-2xl tracking-widest opacity-20">#WEARYOURPRIDE</span>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl sm:text-7xl md:text-[15rem] font-black leading-none mb-16 md:mb-20 tracking-tighter">
+                PRODUK
+            </h2>
+            
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
                 @php
-                    $packages = [
-                        ['id' => 'A', 'slug' => 'paket-a-standard', 'price' => '90.000', 'desc' => 'Non-printing, Logo/Nameset DTF', 'features' => ['Bahan Standar', 'Logo DTF', 'Nameset DTF', 'Non-printing']],
-                        ['id' => 'B', 'slug' => 'paket-b-sleeve-print', 'price' => '110.000', 'desc' => 'Lengan Printing, Logo/Nameset DTF', 'features' => ['Bahan Standar', 'Lengan Full Print', 'Logo DTF', 'Nameset DTF']],
-                        ['id' => 'C', 'slug' => 'paket-c-front-print', 'price' => '130.000', 'desc' => 'Jersey Full Printing, Celana Non-printing', 'features' => ['Bahan Premium', 'Jersey Full Print', 'Logo Sublime', 'Nameset Sublime']],
-                        ['id' => 'D', 'slug' => 'paket-d-full-printing', 'price' => '160.000', 'desc' => 'Jersey & Celana Full Printing', 'features' => ['Bahan Premium', 'Jersey Full Print', 'Celana Full Print', 'Full Sublime']],
-                        ['id' => 'E', 'slug' => 'paket-e-professional', 'price' => '170.000', 'desc' => 'Full Printing + Logo/Sponsor DTF', 'features' => ['Bahan Premium', 'Full Print Custom', 'Logo DTF Eksklusif', 'Sponsor DTF']],
+                    $products = [
+                        ['name' => 'Jersey', 'img' => asset('assets/images/produk/jersey.png')],
+                        ['name' => 'Jacket', 'img' => asset('assets/images/produk/jacket.png')],
+                        ['name' => 'Tshirt', 'img' => asset('assets/images/produk/tshirt.png')],
+                        ['name' => 'Kemeja', 'img' => asset('assets/images/produk/kemeja.png')],
                     ];
                 @endphp
-
-                @foreach($packages as $pkg)
-                    <div class="group relative bg-gray-50 dark:bg-zinc-900/50 rounded-3xl p-8 border border-gray-100 dark:border-zinc-800 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-brand-900/20 hover:border-brand-500/30">
-                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-100 transition-opacity">
-                            <span class="text-4xl font-black text-brand-900 dark:text-brand-400">{{ $pkg['id'] }}</span>
+                
+                @foreach($products as $prod)
+                    <div class="group flex flex-col items-center text-center">
+                        <div class="aspect-square w-full rounded-2xl md:rounded-[3rem] bg-white border border-slate-100 flex items-center justify-center p-4 md:p-8 transition-all duration-500 group-hover:-translate-y-2 md:group-hover:-translate-y-4 group-hover:shadow-2xl group-hover:border-[#06402B]/20">
+                            <img src="{{ $prod['img'] }}" alt="{{ $prod['name'] }}" class="w-full h-full object-contain">
                         </div>
-                        <h3 class="text-xl font-bold mb-2">Paket {{ $pkg['id'] }}</h3>
-                        <div class="text-2xl font-black text-brand-900 dark:text-brand-400 mb-4">Rp {{ $pkg['price'] }}</div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">{{ $pkg['desc'] }}</p>
-                        <ul class="space-y-3 mb-8 text-left">
-                            @foreach($pkg['features'] as $feat)
-                                <li class="flex items-center gap-2 text-sm text-gray-700 dark:text-zinc-300">
-                                    <svg class="w-4 h-4 text-brand-600 dark:text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                    {{ $feat }}
-                                </li>
-                            @endforeach
-                        </ul>
-                        <a href="{{ route('catalog.show', $pkg['slug']) }}" class="block w-full py-3 rounded-xl bg-white dark:bg-zinc-800 border dark:border-zinc-700 font-bold text-sm tracking-wide group-hover:bg-brand-900 group-hover:text-white transition-all shadow-sm text-center text-decoration-none">Pilih Paket</a>
+                        <h3 class="mt-4 md:mt-6 text-base md:text-2xl font-black uppercase tracking-widest">{{ $prod['name'] }}</h3>
                     </div>
                 @endforeach
             </div>
         </div>
     </section>
 
-    <!-- Customizer CTA Section -->
-    <section class="py-24 bg-brand-950 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
-            <div class="absolute -top-24 -left-24 w-96 h-96 bg-brand-900/20 blur-[120px] rounded-full"></div>
-            <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-green-500/10 blur-[120px] rounded-full"></div>
+    <!-- SECTION 4: KOLABORASI -->
+    <section class="min-h-screen py-20 md:py-24 bg-[#fdfbf7] relative">
+        <div class="absolute top-0 right-0 p-8">
+            <img src="{{ asset('assets/images/logo-becks.png') }}" alt="Logo" class="h-8 md:h-12 w-auto opacity-10">
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-gradient-to-br from-zinc-900 to-black rounded-[2.5rem] p-8 md:p-20 border border-white/10 shadow-3xl text-center md:text-left relative overflow-hidden">
-                <div class="grid md:grid-cols-2 gap-12 items-center">
-                    <div>
-                        <h2 class="text-4xl md:text-6xl font-black text-white leading-tight mb-8">
-                            JADILAH DESAINER <br/>
-                            <span class="text-brand-400 uppercase italic tracking-widest">TIM SENDIRI.</span>
-                        </h2>
-                        <p class="text-zinc-400 text-lg mb-10 max-w-md">
-                            Coba fitur kustomisasi interaktif kami. Pilih logo, motif, hingga gradient warna secara real-time. Rasakan pengalaman mendesain tanpa batas.
-                        </p>
-                        <a href="{{ route('customizer') }}" class="inline-flex px-10 py-5 bg-brand-900 text-white rounded-full font-black text-lg hover:bg-brand-800 hover:scale-110 transition-all shadow-xl shadow-brand-950/50 uppercase tracking-tighter italic text-decoration-none">
-                            Buka Online Customizer
-                        </a>
-                    </div>
-                    <div class="relative group">
-                        <div class="absolute -inset-1 bg-gradient-to-r from-brand-600 to-green-400 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                        <div class="relative bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
-                            <img 
-                                src="https://images.unsplash.com/photo-1542291026-7eec264c2741?q=80&w=1200" 
-                                alt="Customizer Preview" 
-                                class="w-full h-[400px] object-cover mix-blend-overlay opacity-50 transition-all duration-700 group-hover:scale-110 group-hover:rotate-2"
-                            />
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <div class="w-24 h-24 bg-brand-900/80 rounded-full flex items-center justify-center border-4 border-white/20 animate-pulse">
-                                    <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl sm:text-7xl md:text-[12rem] font-black leading-none mb-8 md:mb-12 tracking-tighter text-right text-[#06402B]">
+                KOLABORASI
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+                <div class="space-y-6 md:space-y-8">
+                    <p class="text-xl md:text-2xl font-black uppercase tracking-tight mb-4 text-[#06402B]">Becks Apparel terbuka untuk berkolaborasi dengan:</p>
+                    <ul class="space-y-3 md:space-y-4 text-base md:text-2xl font-medium text-[#06402B]/90">
+                        @php
+                            $collabs = [
+                                'Komunitas suporter sepak bola',
+                                'Klub sepak bola amatir maupun profesional',
+                                'Sekolah sepak bola (SSB) atau akademi sepak bola',
+                                'Pondok pesantren, sekolah negeri, maupun sekolah swasta',
+                                'Perusahaan swasta maupun instansi pemerintah',
+                                'Event olahraga',
+                                'Brand sportwear maupun lifestyle'
+                            ];
+                        @endphp
+                        @foreach($collabs as $c)
+                            <li class="flex items-start gap-4">
+                                <span class="w-2 md:w-3 h-2 md:h-3 bg-[#06402B] rounded-full mt-2.5 md:mt-3 flex-shrink-0"></span>
+                                {{ $c }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+                <div class="hidden md:block">
+                     <div class="aspect-[4/5] bg-[#06402B] rounded-[3.5rem] p-1 text-white overflow-hidden shadow-2xl">
+                          <img src="{{ asset('assets/images/portofolio/portofolio3.png') }}" class="w-full h-full object-cover rounded-[3.4rem] opacity-50 contrast-125">
+                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Other Categories Section -->
-    <section class="py-24 dark:bg-zinc-950">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-                <div class="text-left">
-                    <h2 class="text-3xl md:text-5xl font-bold mb-4">Produk <span class="text-brand-900 dark:text-brand-400">Lainnya</span></h2>
-                    <p class="text-gray-600 dark:text-zinc-400">Selain jersey, kami juga menyediakan apparel pendukung lainnya.</p>
+    <!-- SECTION 5: KENAPA BECKS? -->
+    <section class="min-h-screen py-20 md:py-24 bg-[#fdfbf7]">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl sm:text-7xl md:text-[12rem] font-black leading-none mb-12 md:mb-16 tracking-tighter text-[#06402B]">
+                KENAPA<br/>BECKS?
+            </h2>
+            
+            <div class="grid md:grid-cols-12 gap-8 md:gap-12 text-[#06402B]">
+                <div class="md:col-start-2 md:col-span-10">
+                    <ul class="grid md:grid-cols-2 gap-x-12 md:gap-x-20 gap-y-8 md:gap-y-12">
+                        @php
+                            $reasons = [
+                                ['title' => 'Harga Ramah', 'desc' => 'Harga ramah kantong karena custom jersey mulai dari Rp 90 ribu.'],
+                                ['title' => 'Berpengalaman', 'desc' => 'Telah berdiri sejak 2018 dan berpengalaman memegang klub Liga 3 Indonesia.'],
+                                ['title' => 'Mesin Sendiri', 'desc' => 'Mesin milik sendiri sehingga proses produksi terpadu dan terkontrol.'],
+                                ['title' => 'Bahan Lengkap', 'desc' => 'Pilihan bahan superlengkap untuk berbagai kebutuhan gaya dan performa.'],
+                                ['title' => 'Deadline Ketat', 'desc' => 'Berpengalaman menghadapi deadline ketat tanpa mengurangi kualitas hasil.'],
+                                ['title' => 'Kapasitas Besar', 'desc' => 'Kapasitas produksi mencapai ribuan jersey per bulan.'],
+                            ];
+                        @endphp
+                        @foreach($reasons as $r)
+                            <li class="border-l-4 border-[#06402B] pl-8">
+                                <h3 class="text-xl font-black uppercase tracking-widest mb-2">{{ $r['title'] }}</h3>
+                                <p class="text-lg text-[#06402B]/70 font-medium leading-relaxed">{{ $r['desc'] }}</p>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
-                <a href="{{ route('catalog.index') }}" class="font-bold text-brand-900 dark:text-brand-400 flex items-center gap-2 hover:gap-4 transition-all text-decoration-none">
-                    Lihat Semua Produk <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                </a>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                @php
-                    $categories = [
-                        ['name' => 'Jacket', 'price' => 'Mulai 155k', 'img' => 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&auto=format&fit=crop', 'desc' => 'Custom jacket full printing & kombinasi bahan.'],
-                        ['name' => 'Kaos 24s/30s', 'price' => 'Mulai 60k', 'img' => 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800&auto=format&fit=crop', 'desc' => 'Kaos bahan katun berkualitas tinggi untuk aktivitas harian.'],
-                        ['name' => 'Kemeja', 'price' => 'Mulai 80k', 'img' => 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800&auto=format&fit=crop', 'desc' => 'Kemeja custom dengan desain formal maupun casual.'],
-                    ];
-                @endphp
-
-                @foreach($categories as $cat)
-                    <div class="group cursor-pointer">
-                        <div class="relative overflow-hidden rounded-[2rem] h-80 mb-6 bg-zinc-800">
-                            <img 
-                                src="{{ $cat['img'] }}" 
-                                alt="{{ $cat['name'] }}" 
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1"
-                            />
-                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
-                            <div class="absolute bottom-6 left-6">
-                                <p class="text-brand-400 text-sm font-black tracking-widest uppercase mb-1">{{ $cat['price'] }}</p>
-                                <h3 class="text-2xl font-bold text-white">{{ $cat['name'] }}</h3>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 dark:text-zinc-400 text-sm leading-relaxed">{{ $cat['desc'] }}</p>
-                    </div>
-                @endforeach
             </div>
         </div>
     </section>
 
-    <style>
-        @keyframes fade-in {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-            animation: fade-in 1s ease-out forwards;
-        }
-    </style>
+    <!-- FINAL CTA -->
+    <section class="py-24 bg-[#06402B] text-[#fdfbf7] text-center">
+        <h2 class="text-4xl md:text-7xl font-black mb-12 italic uppercase tracking-tighter">#WEARYOURPRIDE</h2>
+        <a href="{{ route('customizer') }}" class="inline-flex px-12 py-6 bg-[#fdfbf7] text-[#06402B] rounded-full font-black text-xl hover:scale-110 active:scale-95 transition-all shadow-3xl uppercase tracking-tighter italic text-decoration-none">
+            Mulai Kustomisasi Sekarang
+        </a>
+    </section>
+
+</div>
+
+<style>
+    @keyframes fade-in-down {
+        from { opacity: 0; transform: translateY(-40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fade-in-up {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scale-up {
+        from { opacity: 0; scale: 0.8; }
+        to { opacity: 1; scale: 1; }
+    }
+    .animate-fade-in-down { animation: fade-in-down 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-fade-in-up { animation: fade-in-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-scale-up { animation: scale-up 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    ::selection {
+        background: #06402B;
+        color: #fdfbf7;
+    }
+</style>
 @endsection

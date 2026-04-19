@@ -15,6 +15,9 @@ Route::get('/customizer', function () {
     return view('customizer');
 })->name('customizer');
 
+Route::view('/visi-misi', 'visi-misi')->name('visi-misi');
+Route::view('/portfolio', 'portfolio')->name('portfolio');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

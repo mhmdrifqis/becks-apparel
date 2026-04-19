@@ -3,16 +3,45 @@
 @section('title', 'Katalog Paket - Becks Apparel')
 
 @section('content')
-<div class="bg-slate-50 min-h-screen pt-20">
-    <!-- Hero Section -->
-    <div class="bg-white border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 py-12 md:py-20 text-center">
-            <h1 class="text-3xl md:text-5xl font-bold text-slate-900 mb-4 uppercase tracking-tight">Katalog Paket Premium</h1>
-            <p class="text-slate-500 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
-                Pilih paket jersey terbaik yang sesuai dengan kebutuhan tim Anda. Dari kualitas standar hingga profesional dengan fitur full printing.
-            </p>
+<div class="bg-slate-50 min-h-screen">
+    <!-- Hero Section: Full height & immersive like Home -->
+    <section class="relative h-[80vh] flex items-center overflow-hidden bg-brand-950">
+        <!-- Background Layer -->
+        <div class="absolute inset-0 z-0">
+            <!-- <img 
+                src="https://images.unsplash.com/photo-1517603984227-aa7b60b19f42?q=80&w=2000&auto=format&fit=crop" 
+                alt="Catalog Hero" 
+                class="w-full h-full object-cover"
+            /> -->
+            <div class="absolute inset-0 bg-gradient-to-t from-[#06402B] via-[#06402B]/80 to-[#06402B]/60"></div>
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay"></div>
         </div>
-    </div>
+
+        <!-- Content -->
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+            <div class="max-w-3xl">
+                <span class="inline-block px-4 py-1.5 rounded-full bg-brand-900/40 border border-brand-500/20 text-brand-400 font-bold text-xs tracking-[0.2em] uppercase mb-8 backdrop-blur-md">
+                    Exclusive Collection
+                </span>
+                <h1 class="text-5xl md:text-8xl font-black text-white tracking-tighter leading-none mb-8">
+                    KATALOG <br/>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-green-300">PAKET PREMIUM.</span>
+                </h1>
+                <p class="text-brand-100/60 text-lg md:text-xl mb-12 max-w-xl leading-relaxed">
+                    Pilih paket jersey terbaik yang sesuai dengan kebutuhan tim Anda. Dari kualitas standar hingga profesional dengan fitur full printing.
+                </p>
+            </div>
+        </div>
+
+        <!-- Bottom Scroller Info -->
+        <div class="absolute bottom-12 left-1/2 -translate-x-1/2 hidden md:block">
+            <div class="flex items-center gap-3 text-brand-400/40 text-[10px] uppercase font-bold tracking-[0.3em]">
+                <span class="w-8 h-px bg-current"></span>
+                Scroll to Explore
+                <span class="w-8 h-px bg-current"></span>
+            </div>
+        </div>
+    </section>
 
     <!-- Catalog Content -->
     <div class="max-w-7xl mx-auto px-4 py-12">
@@ -24,6 +53,7 @@
                 <button @click="activeCategory = 'jersey'" :class="activeCategory === 'jersey' ? 'bg-brand-900 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-200 hover:border-brand-500'" class="px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all">Jersey</button>
                 <button @click="activeCategory = 'jacket'" :class="activeCategory === 'jacket' ? 'bg-brand-900 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-200 hover:border-brand-500'" class="px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all">Jaket</button>
                 <button @click="activeCategory = 'tshirt'" :class="activeCategory === 'tshirt' ? 'bg-brand-900 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-200 hover:border-brand-500'" class="px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all">Kaos</button>
+                <button @click="activeCategory = 'kemeja'" :class="activeCategory === 'kemeja' ? 'bg-brand-900 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-200 hover:border-brand-500'" class="px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all">Kemeja</button>
             </div>
 
             <!-- Product Grids -->

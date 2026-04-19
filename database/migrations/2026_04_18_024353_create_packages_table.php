@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('packages', function (Blueprint $table) {
             $table->id();
-            $table->enum('category', ['jersey', 'jacket', 'tshirt', 'shirt', 'other'])->default('jersey');
+            $table->enum('category', ['jersey', 'jacket', 'tshirt', 'kemeja', 'other'])->default('jersey');
             $table->string('name');
             $table->string('slug')->unique();
             $table->decimal('base_price', 15, 2);
             $table->text('description')->nullable();
+            $table->text('specification')->nullable();
             $table->json('features')->nullable();
             $table->string('image_path')->nullable();
             $table->boolean('is_active')->default(true);

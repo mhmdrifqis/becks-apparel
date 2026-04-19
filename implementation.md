@@ -2,7 +2,7 @@
 
 ## 1. Core Tech Stack
 * **Backend**: Laravel 11.
-* **Frontend**: React.js, Tailwind CSS, Inertia.js (Monolith Approach).
+* **Frontend**: Laravel Blade, Tailwind CSS, Alpine.js / Vanilla JS.
 * **Autentikasi**: Laravel Breeze + Laravel Socialite (Google Login).
 * **Dashboard Admin**: Filament PHP + Spatie Permission.
 * **Real-time**: Laravel Reverb (Server) + Laravel Echo (Client).

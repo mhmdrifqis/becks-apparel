@@ -17,17 +17,17 @@ export default {
             },
             colors: {
                 brand: {
-                    '50': '#f0f9f4',
-                    '100': '#dcf1e5',
-                    '200': '#bbe2cc',
-                    '300': '#8ccca9',
-                    '400': '#58ae80',
-                    '500': '#369165',
-                    '600': '#267550',
-                    '700': '#1f5e42',
+                    '50': '#fdfbf7',   // Ivory Light
+                    '100': '#faf6ed',  // Ivory
+                    '200': '#f5ead3',
+                    '300': '#ecd29b',
+                    '400': '#e2b35a',  // Muted Gold
+                    '500': '#d4af37',  // Classic Gold
+                    '600': '#b48e2a',
+                    '700': '#8f6d22',
                     '800': '#1a4b36',
-                    '900': '#06402B', // Primary Forest Green
-                    '950': '#0d251c',
+                    '900': '#06402B',  // Forest Green
+                    '950': '#04251a',  // Deep Forest
                 },
             },
         },

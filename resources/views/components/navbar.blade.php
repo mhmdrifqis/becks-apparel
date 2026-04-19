@@ -15,10 +15,10 @@
 
             <!-- Desktop Menu -->
             <div class="hidden sm:flex sm:items-center sm:gap-8">
-                <a href="{{ url('/') }}" class="text-sm font-medium hover:text-brand-600 transition-colors">Home</a>
-                <a href="{{ route('catalog.index') }}" class="text-sm font-medium hover:text-brand-600 transition-colors">Katalog</a>
-                <a href="{{ route('customizer') }}" class="text-sm font-medium hover:text-brand-600 transition-colors">Customizer</a>
-                <div class="h-6 w-px bg-gray-200 dark:bg-zinc-800"></div>
+                <a href="{{ url('/') }}" :class="scrolled ? 'text-gray-900 dark:text-white' : 'text-gray-900 dark:text-white lg:text-white'" class="text-sm font-medium hover:text-brand-600 transition-colors">Home</a>
+                <a href="{{ route('catalog.index') }}" :class="scrolled ? 'text-gray-900 dark:text-white' : 'text-gray-900 dark:text-white lg:text-white'" class="text-sm font-medium hover:text-brand-600 transition-colors">Katalog</a>
+                <a href="{{ route('customizer') }}" :class="scrolled ? 'text-gray-900 dark:text-white' : 'text-gray-900 dark:text-white lg:text-white'" class="text-sm font-medium hover:text-brand-600 transition-colors">Customizer</a>
+                <div class="h-6 w-px" :class="scrolled ? 'bg-gray-200 dark:bg-zinc-800' : 'bg-gray-200 dark:bg-zinc-800 lg:bg-white/20'"></div>
                 
                 @auth
                     <a href="{{ route('dashboard') }}" class="text-sm font-semibold text-brand-700 dark:text-brand-400 hover:text-brand-800 transition-colors">Dashboard</a>
