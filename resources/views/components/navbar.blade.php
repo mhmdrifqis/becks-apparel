@@ -56,14 +56,16 @@
                 
                 @auth
                     <div class="flex items-center gap-6" x-data="{ userOpen: false }">
-                        <!-- Notification & Theme -->
+                        <!-- Notification & Theme (Only for Customers) -->
                         <div class="flex items-center gap-2">
-                            <button class="relative p-2 transition-colors group" :class="isTransparent ? 'text-white/80 hover:text-white' : 'text-slate-500 hover:text-brand-900'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                                <template x-if="notifCount > 0">
-                                    <span x-text="notifCount" class="absolute top-1 right-1 flex items-center justify-center min-w-[16px] h-[16px] px-1 bg-red-500 text-white text-[9px] font-black rounded-full border-2 border-white dark:border-zinc-950"></span>
-                                </template>
-                            </button>
+                            @if(!Auth::user()->hasAnyRole(['Admin', 'Tim Produksi', 'Management/Owner']))
+                                <button class="relative p-2 transition-colors group" :class="isTransparent ? 'text-white/80 hover:text-white' : 'text-slate-500 hover:text-brand-900'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                                    <template x-if="notifCount > 0">
+                                        <span x-text="notifCount" class="absolute top-1 right-1 flex items-center justify-center min-w-[16px] h-[16px] px-1 bg-red-500 text-white text-[9px] font-black rounded-full border-2 border-white dark:border-zinc-950"></span>
+                                    </template>
+                                </button>
+                            @endif
                         </div>
 
                         <!-- User Profile -->
@@ -96,36 +98,60 @@
                              x-transition:leave-start="opacity-100 scale-100"
                              x-transition:leave-end="opacity-0 scale-95"
                              class="absolute right-0 mt-3 w-64 rounded-3xl bg-white dark:bg-zinc-900 shadow-2xl border border-gray-100 dark:border-zinc-800 py-3 z-50 overflow-hidden">
-                            <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800 mb-2">
-                                <p class="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-black">Portal Pelanggan</p>
+                             <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800 mb-2">
+                                <p class="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-black">
+                                    @if(Auth::user()->hasAnyRole(['Admin', 'Tim Produksi', 'Management/Owner']))
+                                        Panel Kendali
+                                    @else
+                                        Portal Pelanggan
+                                    @endif
+                                </p>
                             </div>
 
-                            <a href="{{ route('customer.cart.index') }}" class="flex items-center justify-between px-5 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-950/30 hover:text-brand-900 dark:hover:text-brand-400 transition-colors group">
-                                <div class="flex items-center gap-3">
-                                    <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                    <span class="font-bold">Keranjang Saya</span>
-                                </div>
-                                <template x-if="cartCount > 0">
-                                    <span x-text="cartCount" class="flex items-center justify-center min-w-[20px] h-[20px] px-1.5 bg-brand-900 text-white text-[10px] font-black rounded-full"></span>
-                                </template>
-                            </a>
+                            @if(Auth::user()->hasAnyRole(['Admin', 'Tim Produksi', 'Management/Owner']))
+                                @php
+                                    $dashboardRoute = match(true) {
+                                        Auth::user()->hasRole('Admin') => route('filament.admin.pages.dashboard'),
+                                        Auth::user()->hasRole('Tim Produksi') => route('filament.produksi.pages.dashboard'),
+                                        Auth::user()->hasRole('Management/Owner') => route('filament.owner.pages.dashboard'),
+                                        default => '#'
+                                    };
+                                @endphp
+                                <a href="{{ $dashboardRoute }}" class="flex items-center gap-3 px-5 py-3 text-sm text-brand-900 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/30 transition-colors group">
+                                    <svg class="w-5 h-5" opacity="0.6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                                    <span class="font-bold">Dashboard</span>
+                                </a>
+                                <div class="h-px bg-gray-100 dark:border-zinc-800 my-2 mx-5"></div>
+                            @endif
 
-                            <a href="{{ route('customer.orders') }}" class="flex items-center justify-between px-5 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-950/30 hover:text-brand-900 dark:hover:text-brand-400 transition-colors group">
-                                <div class="flex items-center gap-3">
-                                    <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                                
-                                    <span class="font-bold">Pesanan Saya</span>
-                                </div>
-                                <template x-if="orderCount > 0">
-                                    <span x-text="orderCount" class="flex items-center justify-center min-w-[20px] h-[20px] px-1.5 bg-amber-500 text-white text-[10px] font-black rounded-full"></span>
-                                </template>
-                            </a>
-                            <div class="h-px bg-gray-100 dark:border-zinc-800 my-2 mx-5"></div>
+                            @if(!Auth::user()->hasAnyRole(['Admin', 'Tim Produksi', 'Management/Owner']))
+                                <a href="{{ route('customer.cart.index') }}" class="flex items-center justify-between px-5 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-950/30 hover:text-brand-900 dark:hover:text-brand-400 transition-colors group">
+                                    <div class="flex items-center gap-3">
+                                        <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                                        <span class="font-bold">Keranjang Saya</span>
+                                    </div>
+                                    <template x-if="cartCount > 0">
+                                        <span x-text="cartCount" class="flex items-center justify-center min-w-[20px] h-[20px] px-1.5 bg-brand-900 text-white text-[10px] font-black rounded-full"></span>
+                                    </template>
+                                </a>
 
-                            <a href="{{ route('customer.designs') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-950/30 hover:text-brand-900 dark:hover:text-brand-400 transition-colors">
-                                <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                    <span class="font-bold">Desain Saya</span>
-                            </a>
+                                <a href="{{ route('customer.orders') }}" class="flex items-center justify-between px-5 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-950/30 hover:text-brand-900 dark:hover:text-brand-400 transition-colors group">
+                                    <div class="flex items-center gap-3">
+                                        <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                                    
+                                        <span class="font-bold">Pesanan Saya</span>
+                                    </div>
+                                    <template x-if="orderCount > 0">
+                                        <span x-text="orderCount" class="flex items-center justify-center min-w-[20px] h-[20px] px-1.5 bg-amber-500 text-white text-[10px] font-black rounded-full"></span>
+                                    </template>
+                                </a>
+                                <div class="h-px bg-gray-100 dark:border-zinc-800 my-2 mx-5"></div>
+
+                                <a href="{{ route('customer.designs') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-950/30 hover:text-brand-900 dark:hover:text-brand-400 transition-colors">
+                                    <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                        <span class="font-bold">Desain Saya</span>
+                                </a>
+                            @endif
 
                             <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-950/30 hover:text-brand-900 dark:hover:text-brand-400 transition-colors">
                                 <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
@@ -200,28 +226,46 @@
                         </div>
                     </div>
                     <div class="space-y-1">
-                        <a href="{{ route('customer.cart.index') }}" class="flex items-center justify-between px-3 py-3 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 group">
-                            <div class="flex items-center gap-3">
-                                <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                                <span>Keranjang Saya</span>
-                            </div>
-                            <template x-if="cartCount > 0">
-                                <span x-text="cartCount" class="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 bg-brand-900 text-white text-[11px] font-black rounded-full"></span>
-                            </template>
-                        </a>
-                        <a href="{{ route('customer.orders') }}" class="flex items-center justify-between px-3 py-3 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 group">
-                            <div class="flex items-center gap-3">
-                                <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                <span>Monitor Pesanan</span>
-                            </div>
-                            <template x-if="orderCount > 0">
-                                <span x-text="orderCount" class="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 bg-amber-500 text-white text-[11px] font-black rounded-full"></span>
-                            </template>
-                        </a>
-                        <a href="{{ route('customer.designs') }}" class="block px-3 py-3 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center gap-3">
-                            <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                            Design Saya
-                        </a>
+                        @if(Auth::user()->hasAnyRole(['Admin', 'Tim Produksi', 'Management/Owner']))
+                            @php
+                                $dashboardRoute = match(true) {
+                                    Auth::user()->hasRole('Admin') => route('filament.admin.pages.dashboard'),
+                                    Auth::user()->hasRole('Tim Produksi') => route('filament.produksi.pages.dashboard'),
+                                    Auth::user()->hasRole('Management/Owner') => route('filament.owner.pages.dashboard'),
+                                    default => '#'
+                                };
+                            @endphp
+                            <a href="{{ $dashboardRoute }}" class="block px-3 py-4 text-base font-black text-brand-900 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/20 rounded-xl flex items-center gap-3">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                                BUKA DASHBOARD
+                            </a>
+                        @endif
+
+                        @if(!Auth::user()->hasAnyRole(['Admin', 'Tim Produksi', 'Management/Owner']))
+                            <a href="{{ route('customer.cart.index') }}" class="flex items-center justify-between px-3 py-3 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 group">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                                    <span>Keranjang Saya</span>
+                                </div>
+                                <template x-if="cartCount > 0">
+                                    <span x-text="cartCount" class="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 bg-brand-900 text-white text-[11px] font-black rounded-full"></span>
+                                </template>
+                            </a>
+                            <a href="{{ route('customer.orders') }}" class="flex items-center justify-between px-3 py-3 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 group">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                                    <span>Monitor Pesanan</span>
+                                </div>
+                                <template x-if="orderCount > 0">
+                                    <span x-text="orderCount" class="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 bg-amber-500 text-white text-[11px] font-black rounded-full"></span>
+                                </template>
+                            </a>
+                            <a href="{{ route('customer.designs') }}" class="block px-3 py-3 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center gap-3">
+                                <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                Design Saya
+                            </a>
+                        @endif
+
                         <a href="{{ route('profile.edit') }}" class="block px-3 py-3 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center gap-3">
                             <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                             Pengaturan Profil
@@ -245,7 +289,4 @@
             </div>
         </div>
     </div>
-    
-    <!-- Auth Modal -->
-    <x-login-modal />
 </nav>

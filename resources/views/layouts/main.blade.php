@@ -50,6 +50,9 @@
             @endunless
         </div>
 
+        <!-- Auth Modal (Global) -->
+        <x-login-modal />
+
         <!-- Theme Toggle Logic -->
         <script>
             function toggleTheme() {
