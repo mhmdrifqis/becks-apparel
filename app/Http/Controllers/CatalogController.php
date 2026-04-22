@@ -23,6 +23,8 @@ class CatalogController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
-        return view('catalog.show', compact('package'));
+        $materials = \App\Models\Material::all();
+
+        return view('catalog.show', compact('package', 'materials'));
     }
 }

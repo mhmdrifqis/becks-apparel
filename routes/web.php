@@ -24,8 +24,18 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/pesanan', function () {
-        return view('customer.orders.index');
+        $orders = Auth::user()->orders()->with('orderItems.package')->latest()->get();
+        return view('customer.orders.index', compact('orders'));
     })->name('customer.orders');
+    
+    Route::get('/pesanan/{order:order_number}', [App\Http\Controllers\OrderController::class, 'show'])->name('customer.orders.show');
+    Route::get('/pesanan/{order:order_number}/edit', [App\Http\Controllers\OrderController::class, 'edit'])->name('customer.orders.edit');
+    Route::post('/pesanan/{order}/update-detailed', [App\Http\Controllers\OrderController::class, 'updateDetailed'])->name('customer.orders.update-detailed');
+    Route::post('/pesanan/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel'])->name('customer.orders.cancel');
+    Route::patch('/order-item/{item}/roster', [App\Http\Controllers\OrderController::class, 'updateRoster'])->name('customer.order-item.update-roster');
+    Route::patch('/pesanan/{order}/address', [App\Http\Controllers\OrderController::class, 'updateAddress'])->name('customer.orders.update-address');
+    
+    Route::post('/payment/{order}/create', [App\Http\Controllers\PaymentController::class, 'createPayment'])->name('payment.create');
 
     Route::get('/desain', function () {
         return view('customer.designs.index');
@@ -37,7 +47,16 @@ Route::middleware('auth')->group(function () {
     // Cart Routes
     Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('customer.cart.index');
     Route::post('/cart/add/{package}', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+    Route::patch('/cart/{cartItem}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{cartItem}', [App\Http\Controllers\CartController::class, 'destroy'])->name('cart.destroy');
     Route::get('/cart/counts', [App\Http\Controllers\CartController::class, 'getCounts'])->name('cart.counts');
+
+    // Checkout Routes
+    Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('customer.checkout.index');
+    Route::post('/checkout/process', [App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
 });
 
 require __DIR__.'/auth.php';
+
+// Webhook for Midtrans (No Authentication Required)
+Route::post('/midtrans/callback', [App\Http\Controllers\PaymentController::class, 'callback'])->name('midtrans.callback');

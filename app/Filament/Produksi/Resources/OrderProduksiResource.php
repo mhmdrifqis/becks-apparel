@@ -23,6 +23,8 @@ class OrderProduksiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Antrean Produksi';
 
+    protected static ?string $navigationGroup = 'Workshop';
+
     public static function form(Form $form): Form
     {
         return $form

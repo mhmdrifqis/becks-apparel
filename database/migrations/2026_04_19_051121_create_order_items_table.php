@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('package_id')->constrained()->onDelete('cascade');
             $table->foreignId('material_id')->constrained()->onDelete('cascade');
             $table->foreignId('design_id')->nullable()->constrained()->onDelete('set null');
-            $table->string('size');
+            $table->json('roster')->nullable();
             $table->decimal('size_surcharge', 15, 2)->default(0);
             $table->integer('quantity');
             $table->decimal('subtotal', 15, 2);

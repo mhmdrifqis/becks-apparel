@@ -16,6 +16,8 @@ class MaterialResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-beaker';
 
+    protected static ?string $navigationGroup = 'Data Master';
+
     protected static ?string $navigationLabel = 'Stok Bahan Baku';
 
     protected static ?string $modelLabel = 'Bahan Baku';

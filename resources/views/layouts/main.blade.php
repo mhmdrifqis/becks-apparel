@@ -25,7 +25,7 @@
     </head>
     <body 
         x-data="{ 
-            showAuthModal: @if($errors->any()) true @else false @endif, 
+            showAuthModal: @if(session('show_auth_modal') || $errors->has('login_error')) true @else false @endif, 
             authMode: 'login' 
         }" 
         class="font-sans antialiased bg-gray-50 text-gray-900 dark:bg-zinc-950 dark:text-zinc-100 transition-colors duration-500"
@@ -52,6 +52,9 @@
 
         <!-- Auth Modal (Global) -->
         <x-login-modal />
+
+        <!-- Toast Notifications (Global) -->
+        <x-toast />
 
         <!-- Theme Toggle Logic -->
         <script>

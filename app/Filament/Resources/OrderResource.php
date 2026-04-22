@@ -16,6 +16,8 @@ class OrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
+    protected static ?string $navigationGroup = 'Operasional';
+
     protected static ?string $navigationLabel = 'Manajemen Pesanan';
 
     protected static ?string $modelLabel = 'Pesanan';
@@ -80,6 +82,88 @@ class OrderResource extends Resource
                             ->numeric(),
                     ])
                     ->columns(2),
+
+                Forms\Components\Section::make('Informasi Pengiriman')
+                    ->description('Isi data ini ketika pesanan siap dikirim')
+                    ->schema([
+                        Forms\Components\Select::make('courier_name')
+                            ->label('Ekspedisi / Kurir')
+                            ->options([
+                                'JNE' => 'JNE',
+                                'J&T' => 'J&T',
+                                'Sicepat' => 'Sicepat',
+                                'POS' => 'POS Indonesia',
+                                'Wahana' => 'Wahana',
+                                'Ninja' => 'Ninja Xpress',
+                                'Lalamove' => 'Lalamove',
+                                'Grab' => 'Grab Express',
+                                'Gojek' => 'GoSend',
+                                'Self Pickup' => 'Ambil Sendiri',
+                            ])
+                            ->searchable(),
+
+                        Forms\Components\TextInput::make('tracking_number')
+                            ->label('Nomor Resi')
+                            ->placeholder('Masukkan nomor resi pengiriman')
+                            ->helperText('Notifikasi WA akan menyertakan nomor resi ini'),
+                    ])
+                    ->columns(2)
+                    ->collapsed(fn ($record) => $record && $record->status !== 'shipped'),
+                Forms\Components\Section::make('Rincian Produk')
+                    ->description('Daftar paket dan roster pemain yang dipesan')
+                    ->schema([
+                        Forms\Components\Repeater::make('orderItems')
+                            ->relationship()
+                            ->label('Item Pesanan')
+                            ->schema([
+                                Forms\Components\Grid::make(3)
+                                    ->schema([
+                                        Forms\Components\Select::make('package_id')
+                                            ->relationship('package', 'name')
+                                            ->label('Paket')
+                                            ->disabled(),
+                                        Forms\Components\Select::make('material_id')
+                                            ->relationship('material', 'name')
+                                            ->label('Bahan')
+                                            ->disabled(),
+                                        Forms\Components\TextInput::make('quantity')
+                                            ->label('Qty (Pcs)')
+                                            ->disabled(),
+                                    ]),
+                                
+                                Forms\Components\CheckboxList::make('upgrades')
+                                    ->relationship('upgrades', 'name')
+                                    ->label('Ekstra Upgrade')
+                                    ->columns(3)
+                                    ->disabled(),
+
+                                Forms\Components\Repeater::make('roster')
+                                    ->label('Daftar Roster Pemain')
+                                    ->schema([
+                                        Forms\Components\Grid::make(4)
+                                            ->schema([
+                                                Forms\Components\TextInput::make('name')->label('Nama'),
+                                                Forms\Components\TextInput::make('number')->label('No'),
+                                                Forms\Components\TextInput::make('size')->label('Size'),
+                                                Forms\Components\Toggle::make('isLongSleeve')->label('Lengan Panjang'),
+                                            ]),
+                                    ])
+                                    ->reorderable(false)
+                                    ->addable(false)
+                                    ->deletable(false)
+                                    ->columnSpanFull(),
+                                Forms\Components\Placeholder::make('design_preview')
+                                    ->label('Desain & Referensi')
+                                    ->content(fn ($record) => $record && $record->design ? 
+                                        new \Illuminate\Support\HtmlString('<img src="' . ($record->design->preview_path ? asset($record->design->preview_path) : (isset($record->design->design_json['file']) ? Storage::url($record->design->design_json['file']) : '')) . '" class="w-full max-w-[200px] rounded-xl border border-slate-200 shadow-sm" />') : 
+                                        'Tidak ada file desain.'
+                                    ),
+                            ])
+                            ->addable(false)
+                            ->deletable(false)
+                            ->reorderable(false)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -176,8 +260,14 @@ class OrderResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->label('Detail'),
-                Tables\Actions\EditAction::make()->label('Update'),
+                Tables\Actions\ViewAction::make()
+                    ->label('Detail')
+                    ->slideOver()
+                    ->modalWidth(\Filament\Support\Enums\MaxWidth::ExtraLarge),
+                Tables\Actions\EditAction::make()
+                    ->label('Update')
+                    ->slideOver()
+                    ->modalWidth(\Filament\Support\Enums\MaxWidth::ExtraLarge),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

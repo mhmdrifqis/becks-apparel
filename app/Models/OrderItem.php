@@ -11,13 +11,14 @@ class OrderItem extends Model
         'package_id',
         'material_id',
         'design_id',
-        'size',
+        'roster',
         'size_surcharge',
         'quantity',
         'subtotal',
     ];
 
     protected $casts = [
+        'roster' => 'array',
         'size_surcharge' => 'decimal:2',
         'subtotal' => 'decimal:2',
     ];

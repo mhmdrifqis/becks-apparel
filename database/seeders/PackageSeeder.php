@@ -21,7 +21,7 @@ class PackageSeeder extends Seeder
                 'base_price' => 90000,
                 'description' => 'Pilihan ekonomis untuk tim Anda. Kualitas bahan tetap premium dengan teknik cetak DTF.',
                 'features' => ['Non-printing (Bahan Warna Solid)', 'Logo DTF', 'Nameset DTF', 'Bahan Dry-Fit Premium'],
-                'image_path' => 'assets/images/packages/standard_jersey.png'
+                'images' => ['assets/images/packages/standard_jersey.png']
             ],
             [
                 'category' => 'jersey',
@@ -30,7 +30,7 @@ class PackageSeeder extends Seeder
                 'base_price' => 110000,
                 'description' => 'Sentuhan desain di lengan untuk tampilan yang lebih dinamis.',
                 'features' => ['Lengan Full Printing', 'Badan Depan/Belakang Non-printing', 'Logo DTF', 'Nameset DTF'],
-                'image_path' => 'assets/images/packages/standard_jersey.png'
+                'images' => ['assets/images/packages/standard_jersey.png']
             ],
             [
                 'category' => 'jersey',
@@ -39,7 +39,7 @@ class PackageSeeder extends Seeder
                 'base_price' => 130000,
                 'description' => 'Visual maksimal di bagian badan jersey dengan celana solid yang elegan.',
                 'features' => ['Jersey Full Printing', 'Celana Non-printing', 'Logo Full Print/DTF', 'Nameset Full Print/DTF'],
-                'image_path' => 'assets/images/packages/pro_jersey.png'
+                'images' => ['assets/images/packages/pro_jersey.png']
             ],
             [
                 'category' => 'jersey',
@@ -48,7 +48,7 @@ class PackageSeeder extends Seeder
                 'base_price' => 160000,
                 'description' => 'Tampilan profesional menyeluruh dari jersey hingga celana.',
                 'features' => ['Jersey Full Printing', 'Celana Full Printing', 'Kebebasan Desain Tak Terbatas', 'Bahan High-Performance'],
-                'image_path' => 'assets/images/packages/pro_jersey.png'
+                'images' => ['assets/images/packages/pro_jersey.png']
             ],
             [
                 'category' => 'jersey',
@@ -57,7 +57,7 @@ class PackageSeeder extends Seeder
                 'base_price' => 170000,
                 'description' => 'Paket lengkap dengan detail sponsor dan logo berkualitas tinggi.',
                 'features' => ['Full Printing Jersey & Celana', 'Detail Logo/Sponsor DTF Premium', 'Exclusive Finish', 'Cocok untuk Kompetisi'],
-                'image_path' => 'assets/images/packages/pro_jersey.png'
+                'images' => ['assets/images/packages/pro_jersey.png']
             ],
 
             // JACKET PACKAGES
@@ -68,7 +68,7 @@ class PackageSeeder extends Seeder
                 'base_price' => 170000,
                 'description' => 'Jaket dengan grafis tajam di seluruh bagian.',
                 'features' => ['Sublimation Full Printing', 'Bahan Lotto/Parachute Premium', 'Resleting Kualitas Ekspor', 'Saku Kiri-Kanan'],
-                'image_path' => 'assets/images/packages/premium_jacket.png'
+                'images' => ['assets/images/packages/premium_jacket.png']
             ],
             [
                 'category' => 'jacket',
@@ -77,7 +77,7 @@ class PackageSeeder extends Seeder
                 'base_price' => 155000,
                 'description' => 'Kombinasi bahan solid dengan aksen grafis printing.',
                 'features' => ['Aksen Printing di Bagian Tertentu', 'Bahan Kombinasi Premium', 'Desain Semi-Custom', 'Tahan Lama'],
-                'image_path' => 'assets/images/packages/premium_jacket.png'
+                'images' => ['assets/images/packages/premium_jacket.png']
             ],
             [
                 'category' => 'jacket',
@@ -86,7 +86,7 @@ class PackageSeeder extends Seeder
                 'base_price' => 250000,
                 'description' => 'Setelan lengkap jaket dan celana training untuk tim profesional.',
                 'features' => ['Satu Set Jaket & Celana Training', 'Logo Bordir/DTF', 'Karet Pinggang Elastis', 'Full Custom Designs'],
-                'image_path' => 'assets/images/packages/premium_jacket.png'
+                'images' => ['assets/images/packages/premium_jacket.png']
             ],
 
             // T-SHIRT PACKAGES
@@ -97,7 +97,7 @@ class PackageSeeder extends Seeder
                 'base_price' => 80000,
                 'description' => 'Bahan katun tebal dan nyaman untuk penggunaan sehari-hari.',
                 'features' => ['Bahan Cotton Combed 24s', 'Sablon DTF/Screen Print', 'Tekstur Lembut', 'Menyerap Keringat'],
-                'image_path' => 'assets/images/packages/cotton_tshirt.png'
+                'images' => ['assets/images/packages/cotton_tshirt.png']
             ],
             [
                 'category' => 'tshirt',
@@ -106,7 +106,7 @@ class PackageSeeder extends Seeder
                 'base_price' => 60000,
                 'description' => 'Bahan katun yang lebih tipis dan adem, sangat populer.',
                 'features' => ['Bahan Cotton Combed 30s', 'Sablon DTF/Screen Print', 'Warna Awet', 'Jahitan Rantai'],
-                'image_path' => 'assets/images/packages/cotton_tshirt.png'
+                'images' => ['assets/images/packages/cotton_tshirt.png']
             ],
         ];
 

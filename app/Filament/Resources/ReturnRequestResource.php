@@ -16,6 +16,8 @@ class ReturnRequestResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-arrow-path';
 
+    protected static ?string $navigationGroup = 'Operasional';
+
     protected static ?string $navigationLabel = 'Manajemen Retur';
 
     protected static ?string $modelLabel = 'Pengajuan Retur';

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('package_id')->constrained('packages')->onDelete('cascade');
             $table->integer('quantity')->default(1);
-            $table->json('options')->nullable(); // For future customizer options
+            $table->json('roster')->nullable(); // Stores array of name, number, size, upgrades
             $table->timestamps();
         });
     }

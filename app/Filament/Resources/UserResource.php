@@ -17,6 +17,8 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
+    protected static ?string $navigationGroup = 'Sistem';
+
     protected static ?string $navigationLabel = 'Manajemen User';
 
     protected static ?string $modelLabel = 'User';
@@ -49,7 +51,13 @@ class UserResource extends Resource
                             ->dehydrated(fn ($state) => filled($state))
                             ->required(fn (string $operation): bool => $operation === 'create'),
 
-                        Forms\Components\Select::make('roles')
+                        \Filament\Forms\Components\TextInput::make('phone')
+                            ->label('Nomor WhatsApp')
+                            ->tel()
+                            ->placeholder('Contoh: 08123456789')
+                            ->helperText('Gunakan format 08 atau 62'),
+
+                        \Filament\Forms\Components\Select::make('roles')
                             ->label('Role / Jabatan')
                             ->multiple()
                             ->relationship('roles', 'name')
@@ -62,14 +70,19 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                \Filament\Tables\Columns\TextColumn::make('name')
                     ->label('Nama')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('email')
+                \Filament\Tables\Columns\TextColumn::make('email')
                     ->label('Email')
                     ->searchable(),
+
+                \Filament\Tables\Columns\TextColumn::make('phone')
+                    ->label('WhatsApp')
+                    ->searchable()
+                    ->copyable(),
 
                 Tables\Columns\TextColumn::make('roles.name')
                     ->label('Role')

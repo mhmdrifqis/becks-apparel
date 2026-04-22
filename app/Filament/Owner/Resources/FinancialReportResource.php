@@ -24,7 +24,7 @@ class FinancialReportResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Laporan Transaksi';
 
-    protected static ?string $navigationGroup = 'Financial Reporting';
+    protected static ?string $navigationGroup = 'Analitik & Laporan';
 
     public static function table(Table $table): Table
     {

@@ -26,9 +26,19 @@ class ProduksiPanelProvider extends PanelProvider
             ->id('produksi')
             ->path('produksi')
             ->login()
+            ->homeUrl('/')
+            ->navigationItems([
+                \Filament\Navigation\NavigationItem::make('Halaman Utama')
+                    ->url('/')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->sort(100),
+            ])
             ->colors([
                 'primary' => '#06402B',
             ])
+            ->brandLogo(fn () => view('filament.components.logo'))
+            ->brandLogoHeight('2.5rem')
+            ->favicon(asset('favicon.ico'))
             ->discoverResources(in: app_path('Filament/Produksi/Resources'), for: 'App\\Filament\\Produksi\\Resources')
             ->discoverPages(in: app_path('Filament/Produksi/Pages'), for: 'App\\Filament\\Produksi\\Pages')
             ->pages([

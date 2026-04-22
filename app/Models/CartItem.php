@@ -9,12 +9,13 @@ class CartItem extends Model
     protected $fillable = [
         'user_id',
         'package_id',
+        'material_id',
         'quantity',
-        'options'
+        'roster'
     ];
 
     protected $casts = [
-        'options' => 'array'
+        'roster' => 'array'
     ];
 
     public function user()
@@ -25,5 +26,10 @@ class CartItem extends Model
     public function package()
     {
         return $this->belongsTo(Package::class);
+    }
+
+    public function material()
+    {
+        return $this->belongsTo(Material::class);
     }
 }

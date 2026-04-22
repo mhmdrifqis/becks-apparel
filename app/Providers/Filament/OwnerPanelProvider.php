@@ -26,9 +26,19 @@ class OwnerPanelProvider extends PanelProvider
             ->id('owner')
             ->path('owner')
             ->login()
+            ->homeUrl('/')
+            ->navigationItems([
+                \Filament\Navigation\NavigationItem::make('Halaman Utama')
+                    ->url('/')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->sort(100),
+            ])
             ->colors([
                 'primary' => '#06402B',
             ])
+            ->brandLogo(fn () => view('filament.components.logo'))
+            ->brandLogoHeight('2.5rem')
+            ->favicon(asset('favicon.ico'))
             ->discoverResources(in: app_path('Filament/Owner/Resources'), for: 'App\\Filament\\Owner\\Resources')
             ->discoverPages(in: app_path('Filament/Owner/Pages'), for: 'App\\Filament\\Owner\\Pages')
             ->pages([

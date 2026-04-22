@@ -17,6 +17,8 @@ class PackageResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
     
+    protected static ?string $navigationGroup = 'Data Master';
+
     protected static ?string $navigationLabel = 'Katalog Paket';
 
     protected static ?string $modelLabel = 'Paket';
@@ -59,9 +61,13 @@ class PackageResource extends Resource
                             ->prefix('Rp')
                             ->required(),
 
-                        Forms\Components\FileUpload::make('image_path')
+                        Forms\Components\FileUpload::make('images')
                             ->label('Gambar Produk')
                             ->image()
+                            ->multiple()
+                            ->reorderable()
+                            ->appendFiles()
+                            ->columnSpanFull()
                             ->directory('packages'),
 
                         Forms\Components\Toggle::make('is_active')
@@ -86,8 +92,10 @@ class PackageResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image_path')
-                    ->label('Foto'),
+                Tables\Columns\ImageColumn::make('images')
+                            ->label('Foto')
+                            ->stacked()
+                            ->limit(3),
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Paket')

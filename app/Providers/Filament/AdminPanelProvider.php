@@ -27,9 +27,19 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->homeUrl('/')
+            ->navigationItems([
+                \Filament\Navigation\NavigationItem::make('Halaman Utama')
+                    ->url('/')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->sort(100),
+            ])
             ->colors([
                 'primary' => '#06402B',
             ])
+            ->brandLogo(fn () => view('filament.components.logo'))
+            ->brandLogoHeight('2.5rem')
+            ->favicon(asset('favicon.ico'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([

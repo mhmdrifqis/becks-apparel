@@ -14,13 +14,19 @@ class Package extends Model
         'description',
         'specification',
         'features',
-        'image_path',
+        'images',
         'is_active',
     ];
 
     protected $casts = [
         'features' => 'array',
+        'images' => 'array',
         'is_active' => 'boolean',
         'base_price' => 'decimal:2',
     ];
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }
