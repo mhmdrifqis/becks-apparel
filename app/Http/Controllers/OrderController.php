@@ -147,8 +147,14 @@ class OrderController extends Controller
 
         $order->load(['orderItems.package', 'orderItems.material', 'orderItems.design', 'orderItems.upgrades']);
         $upgrades = \App\Models\Upgrade::all()->groupBy('category');
+        
+        // Fetch user designs for the Web Design option
+        $userDesigns = \App\Models\Design::where('user_id', Auth::id())
+            ->whereNotNull('preview_path')
+            ->latest()
+            ->get();
 
-        return view('customer.orders.edit', compact('order', 'upgrades'));
+        return view('customer.orders.edit', compact('order', 'upgrades', 'userDesigns'));
     }
 
     /**
@@ -224,12 +230,22 @@ class OrderController extends Controller
                 'subtotal' => $subtotal
             ]);
 
-            // Handle Design update if a new file is provided
-            if ($request->hasFile("designs.{$item->id}.file")) {
-                $path = $request->file("designs.{$item->id}.file")->store('orders/designs', 'public');
+            // Handle Design update - Customizer Selection
+            $itemDesignInput = $request->input("designs.{$item->id}");
+            if (isset($itemDesignInput['design_id'])) {
+                $item->update(['design_id' => $itemDesignInput['design_id']]);
+            }
+
+            // Handle Design update - Multiple File Uploads
+            if ($request->hasFile("designs.{$item->id}.files")) {
+                $filePaths = [];
+                foreach ($request->file("designs.{$item->id}.files") as $file) {
+                    $filePaths[] = $file->store('orders/designs', 'public');
+                }
+                
                 $design = \App\Models\Design::create([
                     'user_id' => Auth::id(),
-                    'design_json' => ['type' => 'uploaded', 'file' => $path]
+                    'design_json' => ['type' => 'uploaded', 'files' => $filePaths]
                 ]);
                 $item->update(['design_id' => $design->id]);
             }

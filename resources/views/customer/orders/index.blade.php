@@ -4,14 +4,20 @@
 
 @section('content')
 <div class="min-h-screen bg-slate-50">
-    <div class="max-w-5xl mx-auto px-4 py-24 md:py-32">
-        <!-- Header -->
-        <div class="mb-10">
-            <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter uppercase">
+    <!-- Header: Pure White & Minimal -->
+    <div class="bg-white border-b border-slate-100 pt-28 pb-6 md:pt-36 md:pb-10">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between">
+            <h1 class="text-xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
+                <svg class="w-8 h-8 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                 Pesanan <span class="text-brand-600">Saya</span>
             </h1>
-            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-2">Pantau status produksi jersey kustom Anda</p>
+            <div class="hidden md:flex items-center gap-4">
+                <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Total {{ count($orders) }} Pesanan</span>
+            </div>
         </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-12 md:py-16">
 
         @if($orders->isEmpty())
             <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-12 text-center">
@@ -83,14 +89,11 @@
                         <div x-show="currentTab === 'semua' || currentTab === '{{ $category }}'" x-transition 
                              class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden relative group">
                             
-                            <!-- Brand Ribbon -->
-                            <div class="h-1 w-full bg-[repeating-linear-gradient(45deg,#064e3b,#064e3b_10px,#fff_10px,#fff_20px,#ca8a04_20px,#ca8a04_30px,#fff_30px,#fff_40px)]"></div>
-                            
                             <!-- Card Header -->
                             <div class="px-6 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[10px] font-black text-slate-900 uppercase tracking-widest">Jersey Custom</span>
-                                    <span class="px-2 py-0.5 bg-brand-900 text-white text-[8px] font-black rounded uppercase tracking-tighter shadow-sm shadow-brand-900/10 hover:scale-105 transition-transform cursor-default">Official Store</span>
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">No. Pesanan:</span>
+                                    <span class="text-[10px] font-black text-slate-900 uppercase tracking-widest">{{ $order->order_number }}</span>
                                 </div>
                                 <div class="text-[10px] font-black tracking-widest uppercase {{ $category === 'unpaid' ? 'text-red-500' : ($category === 'dibatalkan' ? 'text-slate-400' : 'text-brand-600') }}">
                                     {{ $statusText }}
@@ -109,11 +112,10 @@
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <h4 class="text-sm md:text-lg font-black text-slate-900 uppercase tracking-tight truncate">{{ $item->package->name }}</h4>
-                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Varian: {{ $item->material->name }}</p>
+                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Bahan: {{ $item->material->name }}</p>
                                             <p class="text-[10px] font-bold text-slate-900 mt-1 uppercase">x{{ $item->quantity }}</p>
                                         </div>
                                         <div class="text-right flex flex-col justify-end">
-                                            <p class="text-xs font-bold text-slate-400 line-through">Rp {{ number_format(($item->subtotal / $item->quantity) * 1.2, 0, ',', '.') }}</p>
                                             <p class="text-sm md:text-base font-black text-brand-900">Rp {{ number_format($item->subtotal / $item->quantity, 0, ',', '.') }}</p>
                                         </div>
                                     </div>
@@ -123,9 +125,9 @@
                             <!-- Card Footer -->
                             <div class="px-6 py-6 border-t border-slate-50 bg-slate-50/10">
                                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">No. Pesanan:</span>
-                                        <span class="text-[10px] font-black text-slate-600">{{ $order->order_number }}</span>
+                                    <div class="flex items-center gap-2 text-slate-400">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span class="text-[10px] font-bold uppercase tracking-widest">Informasi status tersedia di rincian</span>
                                     </div>
                                     <div class="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
                                         <div class="text-right">

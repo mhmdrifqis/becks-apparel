@@ -3,21 +3,21 @@
 @section('title', 'Koleksi Desain Saya - Becks Apparel')
 
 @section('content')
-    <div class="min-h-screen bg-[#fdfbf7] py-20 md:py-32">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
-            <!-- Header -->
-            <div class="mb-12 md:mb-20">
-                <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div class="flex-1">
-                        <h1 class="text-4xl md:text-7xl font-black text-brand-900 tracking-tighter uppercase mb-4">
-                            Desain <span class="text-brand-600">Saya</span>
-                        </h1>
-                        <p class="text-lg text-gray-600 max-w-2xl">
-                            Kelola koleksi rancangan jersey kustom Anda. Anda dapat melihat kembali, mengedit, atau menghapus desain yang telah Anda simpan.
-                        </p>
-                    </div>
+    <div class="min-h-screen bg-slate-50">
+        <!-- Header: Pure White & Minimal -->
+        <div class="bg-white border-b border-slate-100 pt-28 pb-6 md:pt-36 md:pb-10">
+            <div class="max-w-7xl mx-auto px-4 flex items-center justify-between">
+                <h1 class="text-xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
+                    <svg class="w-8 h-8 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                    Desain <span class="text-brand-600">Saya</span>
+                </h1>
+                <div class="hidden md:flex items-center gap-4">
+                    <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Total {{ count($designs ?? []) }} Desain</span>
                 </div>
             </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
 
             <!-- Content -->
             <div class="bg-white rounded-[2rem] md:rounded-[3rem] shadow-xl border border-gray-100 overflow-hidden min-h-[400px]">

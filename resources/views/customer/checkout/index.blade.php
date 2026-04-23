@@ -4,9 +4,9 @@
 
 @section('content')
 <div x-data="checkoutWizard()" class="min-h-screen bg-slate-50 pb-40">
-    <!-- Header -->
+    <!-- Header: Pure White & Minimal -->
     <div class="bg-white border-b border-slate-100 pt-28 pb-6 md:pt-36 md:pb-10">
-        <div class="max-w-5xl mx-auto px-4">
+        <div class="max-w-7xl mx-auto px-4">
             <h1 class="text-xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
                 <svg class="w-8 h-8 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 Checkout <span class="text-brand-600">Pesanan</span>
@@ -14,20 +14,20 @@
         </div>
     </div>
 
-    <div class="max-w-5xl mx-auto px-4 py-8">
-        <form action="{{ route('checkout.process') }}" method="POST" enctype="multipart/form-data" id="checkoutForm">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <form action="{{ route('checkout.process') }}" method="POST" enctype="multipart/form-data" id="checkoutForm" @submit.prevent="submitForm">
             @csrf
             
             <div class="space-y-6">
                 <!-- 1. Alamat Pengiriman (Editable Becks Style) -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative" x-data="{ editing: false, tempName: '{{ Auth::user()->name }}', tempPhone: '{{ Auth::user()->phone ?? "" }}', tempAddress: '' }">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
                     <!-- Becks Ribbon decoration (Green & Gold) -->
                     <div class="h-1 w-full bg-[repeating-linear-gradient(45deg,#064e3b,#064e3b_10px,#fff_10px,#fff_20px,#ca8a04_20px,#ca8a04_30px,#fff_30px,#fff_40px)]"></div>
                     
                     <!-- Persistent Address Inputs (Hidden when not editing, but always submitted) -->
-                    <input type="hidden" name="recipient_name" :value="tempName" required>
-                    <input type="hidden" name="recipient_phone" :value="tempPhone" required>
-                    <input type="hidden" name="shipping_address" :value="tempAddress" required>
+                    <input type="hidden" name="recipient_name" :value="recipient_name" required>
+                    <input type="hidden" name="recipient_phone" :value="recipient_phone" required>
+                    <input type="hidden" name="shipping_address" :value="shipping_address" required>
 
                     <div class="p-6 md:p-8">
                         <div class="flex items-center justify-between mb-6">
@@ -35,43 +35,39 @@
                                 <svg class="w-5 h-5 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <h2 class="text-xs font-black text-brand-900 uppercase tracking-widest">Alamat Pengiriman</h2>
                             </div>
-                            <button type="button" @click="editing = true" x-show="!editing" class="text-[10px] font-black text-brand-900 uppercase tracking-widest hover:underline">Ubah</button>
+                            <button type="button" @click="addressEditing = true" x-show="!addressEditing" class="text-[10px] font-black text-brand-900 uppercase tracking-widest hover:underline">Ubah</button>
                         </div>
 
                         <!-- View Mode -->
-                        <div x-show="!editing" class="space-y-1">
+                        <div x-show="!addressEditing" class="space-y-1">
                             <div class="flex items-center gap-2">
-                                <span class="text-sm font-black text-slate-900 uppercase" x-text="tempName"></span>
+                                <span class="text-sm font-black text-slate-900 uppercase" x-text="recipient_name || 'Nama Belum Diisi'"></span>
                                 <span class="text-slate-300">|</span>
-                                <span class="text-sm font-bold text-slate-500" x-text="tempPhone || 'No. Telp Belum Diisi'"></span>
+                                <span class="text-sm font-bold text-slate-500" x-text="recipient_phone || 'No. Telp Belum Diisi'"></span>
                             </div>
-                            <p class="text-sm text-slate-600 leading-relaxed" x-text="tempAddress || 'Silakan lengkapi alamat pengiriman Anda.'"></p>
+                            <p class="text-sm text-slate-600 leading-relaxed" x-text="shipping_address || 'Silakan lengkapi alamat pengiriman Anda.'"></p>
                         </div>
 
                         <!-- Edit Mode -->
-                        <div x-show="editing" x-transition class="space-y-6">
+                        <div x-show="addressEditing" x-transition class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Nama Penerima</label>
-                                    <input type="text" x-model="tempName" required class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900">
+                                    <input type="text" x-model="recipient_name" class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">No. Telepon / WA</label>
-                                    <input type="text" x-model="tempPhone" required class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900">
+                                    <input type="text" x-model="recipient_phone" class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Alamat Lengkap</label>
-                                <textarea x-model="tempAddress" required rows="3" class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900"></textarea>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Alamat Lengkap (Jl, No Rumah, Kec, Kota)</label>
+                                <textarea x-model="shipping_address" rows="3" class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900"></textarea>
                             </div>
-                            <div class="flex gap-2">
-                                <button type="button" @click="editing = false" class="px-6 py-2.5 text-[10px] font-black uppercase text-slate-400 hover:text-slate-900 transition-colors">Batal</button>
-                                <button type="button" @click="editing = false" class="px-6 py-2.5 bg-brand-900 text-white text-[10px] font-black uppercase rounded-xl shadow-lg shadow-brand-900/20 active:scale-95 transition-all">Simpan Alamat</button>
+                            <div class="flex justify-end">
+                                <button type="button" @click="addressEditing = false" class="px-6 py-2 bg-brand-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand-900/20">Simpan Alamat</button>
                             </div>
                         </div>
-                        <input type="hidden" name="recipient_name" :value="tempName">
-                        <input type="hidden" name="recipient_phone" :value="tempPhone">
-                        <input type="hidden" name="shipping_address" :value="tempAddress">
                     </div>
                 </div>
 
@@ -297,18 +293,28 @@
                             <span class="text-sm md:text-lg font-black text-slate-900 uppercase tracking-tight">Total Pembayaran</span>
                             <span class="text-xl md:text-3xl font-black text-brand-900 tracking-tighter" x-text="formatRupiah(grandTotal)"></span>
                         </div>
+                        <div class="h-px bg-slate-100 w-full my-4"></div>
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="text-xs font-black text-slate-900 uppercase tracking-widest">Total Bayar</span>
+                            <span class="text-2xl font-black text-brand-900 tracking-tighter" x-text="formatRupiah(grandTotal)"></span>
+                        </div>
+
+                        <!-- Desktop Submit Button -->
+                        <button type="submit" class="hidden md:block w-full py-5 bg-brand-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-brand-800 transition-all shadow-xl shadow-brand-900/20 active:scale-95">
+                            Pesan Sekarang
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Sticky Bottom Payment Bar -->
-            <div class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-                <div class="max-w-5xl mx-auto px-4 h-20 md:h-24 flex items-center justify-between gap-4">
+            <!-- Sticky Bottom Payment Bar (Mobile Only) -->
+            <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+                <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
                     <div class="flex flex-col">
                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Bayar</span>
-                        <span class="text-xl md:text-3xl font-black text-brand-900 tracking-tighter" x-text="formatRupiah(grandTotal)"></span>
+                        <span class="text-xl font-black text-brand-900 tracking-tighter" x-text="formatRupiah(grandTotal)"></span>
                     </div>
-                    <button type="submit" form="checkoutForm" class="h-12 md:h-16 px-8 md:px-14 bg-brand-900 text-white rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs hover:bg-brand-800 active:scale-95 transition-all shadow-xl shadow-brand-900/20 whitespace-nowrap">
+                    <button type="submit" class="h-12 px-8 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 active:scale-95 transition-all shadow-xl shadow-brand-900/20 whitespace-nowrap">
                         Pesan Sekarang
                     </button>
                 </div>
@@ -320,6 +326,12 @@
 <script>
     function checkoutWizard() {
         return {
+            recipient_name: '{{ Auth::user()->name }}',
+            recipient_phone: '{{ Auth::user()->phone ?? "" }}',
+            shipping_address: '',
+            addressEditing: false,
+            isSubmitting: false,
+
             availableUpgrades: {
                 @foreach(\App\Models\Upgrade::all() as $u)
                 "{{ $u->id }}": {{ $u->price }},
@@ -414,6 +426,33 @@
             
             get grandTotal() {
                 return this.subtotal + this.totalRosterSurcharge;
+            },
+
+            async submitForm() {
+                if (this.isSubmitting) return;
+
+                // Validation
+                if (!this.recipient_name || !this.recipient_phone || !this.shipping_address) {
+                    this.addressEditing = true;
+                    
+                    // Use SweetAlert if available, otherwise fallback to alert
+                    if (window.Swal) {
+                        Swal.fire({
+                            title: 'Data Belum Lengkap',
+                            text: 'Silakan isi Nama, Nomor HP, dan Alamat Pengiriman Anda.',
+                            icon: 'warning',
+                            confirmButtonColor: '#064e3b',
+                            confirmButtonText: 'OKE'
+                        });
+                    } else {
+                        alert('Silakan lengkapi Nama, Nomor HP, dan Alamat Pengiriman Anda sebelum membuat pesanan.');
+                    }
+                    return;
+                }
+
+                // Proceed to submit
+                this.isSubmitting = true;
+                document.getElementById('checkoutForm').submit();
             }
         }
     }

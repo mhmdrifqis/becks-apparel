@@ -3,16 +3,23 @@
 @section('title', 'Edit Pesanan ' . $order->order_number . ' - Becks Apparel')
 
 @section('content')
-<div class="min-h-screen bg-[#fdfbf7] py-20 md:py-32" x-data="editOrderWizard()">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
-        <!-- Header -->
-        <div class="mb-12 text-center">
-            <h1 class="text-4xl md:text-6xl font-black text-brand-900 tracking-tighter uppercase mb-4">
+<div class="min-h-screen bg-slate-50 pb-32" x-data="editOrderWizard()">
+    <!-- Header: Pure White & Minimal -->
+    <div class="bg-white border-b border-slate-100 pt-28 pb-6 md:pt-36 md:pb-10">
+        <div class="max-w-7xl mx-auto px-4">
+            <a href="{{ route('customer.orders.show', $order->order_number) }}" class="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-brand-900 transition-colors mb-6">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Kembali ke Rincian Pesanan
+            </a>
+            <h1 class="text-xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
+                <svg class="w-8 h-8 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 Edit <span class="text-brand-600">Pesanan</span>
             </h1>
-            <p class="text-lg text-gray-500 font-medium">Ubah data roster, desain, atau alamat pengiriman Anda.</p>
+            <p class="text-xs font-bold text-slate-300 uppercase tracking-widest mt-2">#{{ $order->order_number }}</p>
         </div>
+    </div>
 
+    <div class="max-w-7xl mx-auto px-4 py-12 md:py-16">
         <form action="{{ route('customer.orders.update-detailed', $order->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             
@@ -62,7 +69,13 @@
 
                             <!-- Desain Input -->
                             <div class="p-6 md:p-8 border-b border-slate-100">
-                                <h5 class="text-xs font-black text-slate-900 uppercase tracking-widest mb-4">1. Manajemen Desain</h5>
+                                <div class="flex items-center justify-between mb-6">
+                                    <h5 class="text-xs font-black text-slate-900 uppercase tracking-widest">1. Manajemen Desain</h5>
+                                    <div class="flex gap-2 p-1 bg-slate-100 rounded-xl">
+                                        <button type="button" @click="item.designMethod = 'upload'" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-lg transition-all" :class="item.designMethod === 'upload' ? 'bg-white shadow-sm text-brand-900' : 'text-slate-400'">Upload</button>
+                                        <button type="button" @click="item.designMethod = 'customizer'" class="px-4 py-1.5 text-[9px] font-black uppercase rounded-lg transition-all" :class="item.designMethod === 'customizer' ? 'bg-white shadow-sm text-brand-900' : 'text-slate-400'">Web Design</button>
+                                    </div>
+                                </div>
                                 
                                 <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 mb-6 flex items-center gap-6">
                                     <div class="w-24 h-24 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm shrink-0">
@@ -73,13 +86,40 @@
                                     </div>
                                     <div>
                                         <p class="text-xs font-black text-slate-900 uppercase tracking-widest">Desain Saat Ini</p>
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Klik tombol di bawah jika ingin mengganti file desain.</p>
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase mt-1" x-text="item.designMethod === 'upload' ? 'Anda dapat mengunggah beberapa file desain sekaligus.' : 'Pilih desain yang sudah Anda buat di Customizer.'"></p>
                                     </div>
                                 </div>
 
-                                <div class="mt-4">
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Ganti File Desain (.zip / .cdr / .ai / .jpg)</label>
-                                    <input type="file" :name="'designs['+item.id+'][file]'" class="block w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:bg-slate-50 file:text-brand-900 hover:file:bg-slate-100 transition-all border border-slate-100 rounded-xl p-2 cursor-pointer">
+                                <!-- Upload Method -->
+                                <div x-show="item.designMethod === 'upload'" x-transition>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Upload File Desain (.zip / .cdr / .ai / .jpg - Bisa pilih banyak)</label>
+                                    <input type="file" :name="'designs['+item.id+'][files][]'" multiple class="block w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:bg-slate-50 file:text-brand-900 hover:file:bg-slate-100 transition-all border border-slate-100 rounded-xl p-2 cursor-pointer">
+                                </div>
+
+                                <!-- Customizer Method -->
+                                <div x-show="item.designMethod === 'customizer'" x-transition>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Pilih Desain dari Customizer</label>
+                                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-64 overflow-y-auto p-2">
+                                        @foreach($userDesigns as $d)
+                                            <label class="relative cursor-pointer group">
+                                                <input type="radio" :name="'designs['+item.id+'][design_id]'" value="{{ $d->id }}" class="peer absolute opacity-0" @change="item.designPreview = '{{ Storage::url($d->preview_path) }}'">
+                                                <div class="bg-white border-2 border-slate-100 rounded-xl p-2 group-hover:border-brand-900 peer-checked:border-brand-900 peer-checked:bg-brand-50/50 transition-all">
+                                                    <div class="aspect-square bg-slate-50 rounded-lg overflow-hidden mb-2">
+                                                        <img src="{{ Storage::url($d->preview_path) }}" class="w-full h-full object-cover">
+                                                    </div>
+                                                    <p class="text-[9px] font-black text-slate-900 uppercase truncate text-center">{{ $d->name }}</p>
+                                                </div>
+                                                <div class="absolute top-3 right-3 w-5 h-5 bg-brand-900 text-white rounded-full flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-all">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                </div>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                    @if(count($userDesigns) === 0)
+                                        <div class="p-6 bg-slate-50 rounded-xl text-center border border-dashed border-slate-200">
+                                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Belum ada desain tersimpan</p>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 
@@ -157,8 +197,8 @@
                     </template>
                 </div>
 
-                <!-- Summary Card -->
-                <div class="lg:col-span-1">
+                <!-- Desktop Summary Card -->
+                <div class="hidden lg:block lg:col-span-1">
                     <div class="bg-white rounded-[2.5rem] p-8 md:p-10 border border-slate-100 shadow-2xl sticky top-32">
                         <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-8 pb-4 border-b border-slate-50">Ringkasan Update</h3>
                         
@@ -188,6 +228,24 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Sticky Bottom Payment Bar (Mobile Only) -->
+            <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+                <div class="max-w-7xl mx-auto px-4 h-20 md:h-24 flex items-center justify-between gap-4">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Baru</span>
+                        <span class="text-xl font-black text-brand-900 tracking-tighter" x-text="'Rp ' + formatRupiah(grandTotal)"></span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('customer.orders.show', $order->order_number) }}" class="flex px-4 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">
+                            Batal
+                        </a>
+                        <button type="submit" class="h-12 px-8 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 active:scale-95 transition-all shadow-xl shadow-brand-900/20 whitespace-nowrap">
+                            Simpan
+                        </button>
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -214,6 +272,7 @@
                     qty: {{ $item->quantity }},
                     img: '{{ $src }}',
                     designPreview: '{{ $designPreview }}',
+                    designMethod: 'upload',
                     roster: @json($item->roster),
                     upgrades: @json($item->upgrades->pluck('id'))
                 },

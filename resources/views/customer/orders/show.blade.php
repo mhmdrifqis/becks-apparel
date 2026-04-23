@@ -4,12 +4,9 @@
 
 @section('content')
 <div class="min-h-screen bg-slate-50 pb-40">
-    <!-- Header Hero Section -->
-    <div class="bg-white border-b border-slate-100 pt-28 pb-10 md:pt-36 md:pb-16 relative overflow-hidden">
-        <!-- Abstract Background Decoration -->
-        <div class="absolute top-0 right-0 w-1/3 h-full bg-brand-50/20 skew-x-12 translate-x-20 pointer-events-none"></div>
-        
-        <div class="max-w-5xl mx-auto px-4 relative z-10">
+    <!-- Header: Pure White & Minimal -->
+    <div class="bg-white border-b border-slate-100 pt-28 pb-6 md:pt-36 md:pb-10">
+        <div class="max-w-7xl mx-auto px-4">
             <a href="{{ route('customer.orders') }}" class="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-brand-900 transition-colors mb-6">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 Kembali ke Daftar Pesanan
@@ -17,16 +14,14 @@
 
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
                 <div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="px-3 py-1 bg-brand-900 text-white text-[9px] font-black uppercase tracking-widest rounded-lg">Invoice</span>
-                        <span class="text-sm font-bold text-slate-400 uppercase tracking-widest">#{{ $order->order_number }}</span>
-                    </div>
-                    <h1 class="text-3xl md:text-6xl font-black text-slate-900 tracking-tighter uppercase leading-none">
-                        Rincian <span class="text-brand-600">Pesanan</span> Anda
+                    <h1 class="text-xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
+                        <svg class="w-8 h-8 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                        Rincian <span class="text-brand-600">Pesanan</span>
                     </h1>
-                    <p class="mt-4 text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                    <p class="text-xs font-bold text-slate-300 uppercase tracking-widest mt-2">#{{ $order->order_number }}</p>
+                    <p class="mt-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        {{ $order->created_at->format('d F Y, H:i') }} WIB
+                        Dibuat pada {{ $order->created_at->format('d F Y, H:i') }}
                     </p>
                 </div>
                 
@@ -46,7 +41,87 @@
         </div>
     </div>
 
-    <div class="max-w-5xl mx-auto px-4 py-10">
+    <div class="max-w-7xl mx-auto px-4 py-10">
+        <!-- Shopee-style Horizontal Tracking (TOP) -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 mb-8 p-6 md:p-12 overflow-hidden relative">
+            <div class="overflow-x-auto no-scrollbar -mx-6 px-6">
+                <div class="flex items-start justify-between min-w-[600px] md:min-w-0 relative py-4">
+                    <!-- Global Connecting Line (Horizontal) -->
+                    <div class="absolute top-[48px] left-[10%] right-[10%] h-0.5 bg-slate-100 z-0"></div>
+                    
+                    @php
+                        $isCancelled = $order->status === 'cancelled';
+                        
+                        if ($isCancelled) {
+                            $trackingStages = [
+                                ['key' => 'created', 'label' => 'Dibuat', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
+                                ['key' => 'cancelled', 'label' => 'Dibatalkan', 'icon' => 'M6 18L18 6M6 6l12 12']
+                            ];
+                            $currentStageKey = 'cancelled';
+                        } else {
+                            $trackingStages = [
+                                ['key' => 'created', 'label' => 'Dibuat', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
+                                ['key' => 'paid', 'label' => 'Dibayar', 'icon' => 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z'],
+                                ['key' => 'production', 'label' => 'Produksi', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'],
+                                ['key' => 'shipped', 'label' => 'Dikirim', 'icon' => 'M13 10V3L4 14h7v7l9-11h-7z'],
+                                ['key' => 'completed', 'label' => 'Selesai', 'icon' => 'M5 13l4 4L19 7']
+                            ];
+                            
+                            $currentStageKey = 'created';
+                            if ($order->status === 'completed') $currentStageKey = 'completed';
+                            elseif (in_array($order->status, ['ready', 'shipped'])) $currentStageKey = 'shipped';
+                            elseif (in_array($order->status, ['printing', 'sewing', 'qc'])) $currentStageKey = 'production';
+                            elseif ($order->payment_status !== 'unpaid') $currentStageKey = 'paid';
+                        }
+
+                        $foundCurrent = false;
+                    @endphp
+
+                    @foreach($trackingStages as $idx => $stage)
+                        @php
+                            $isCompleted = false;
+                            $isCurrent = false;
+                            
+                            if (!$foundCurrent) {
+                                if ($currentStageKey === $stage['key']) {
+                                    $isCurrent = true;
+                                    $foundCurrent = true;
+                                } else {
+                                    $isCompleted = true;
+                                }
+                            }
+                            
+                            $isStageCancelled = $stage['key'] === 'cancelled';
+                        @endphp
+                        <div class="flex flex-col items-center text-center w-32 relative z-10">
+                            <!-- Progress Line Overfill -->
+                            @if($idx > 0 && ($isCompleted || $isCurrent))
+                                <div class="absolute top-[32px] -left-1/2 w-full h-0.5 {{ $isStageCancelled ? 'bg-red-500' : 'bg-brand-900' }} -z-10"></div>
+                            @endif
+
+                            <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-4 flex items-center justify-center transition-all duration-700
+                                {{ $isCompleted ? 'bg-brand-900 border-white text-white shadow-xl shadow-brand-900/20' : 
+                                   ($isCurrent ? ($isStageCancelled ? 'bg-red-500 border-white text-white shadow-xl shadow-red-500/20 scale-110' : 'bg-white border-brand-900 text-brand-900 shadow-xl shadow-brand-900/10 scale-110') : 'bg-white border-slate-100 text-slate-200') }}">
+                                <svg class="w-5 h-5 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{{ $stage['icon'] }}"></path>
+                                </svg>
+                            </div>
+                            <div class="mt-4 px-2">
+                                <p class="text-[9px] md:text-[10px] font-black uppercase tracking-widest {{ $isCompleted || $isCurrent ? ($isStageCancelled ? 'text-red-500' : 'text-slate-900') : 'text-slate-300' }}">{{ $stage['label'] }}</p>
+                                @if($isCurrent)
+                                    <p class="text-[7px] md:text-[8px] font-bold {{ $isStageCancelled ? 'text-red-400' : 'text-brand-600' }} uppercase mt-1">
+                                        {{ $isStageCancelled ? 'Terhenti' : 'Berlangsung' }}
+                                    </p>
+                                @elseif($isCompleted)
+                                    <p class="text-[7px] md:text-[8px] font-bold text-slate-400 uppercase mt-1">{{ $order->updated_at->format('d/m') }}</p>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <!-- Left Column: Order Content -->
@@ -210,47 +285,6 @@
                         </p>
                     </div>
                 </div>
-
-                <!-- 4. Lacak Produksi (Timeline) -->
-                @if(in_array($order->payment_status, ['partial', 'paid']))
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 md:p-10">
-                    <h3 class="text-xs font-black text-slate-900 uppercase tracking-widest mb-10 pb-4 border-b border-slate-50 flex items-center gap-3">
-                         <svg class="w-5 h-5 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        Tracking Produksi Pabrik
-                    </h3>
-                    
-                    <div class="relative pl-8 space-y-12 border-l-2 border-slate-100 ml-4">
-                        @php
-                            $stages = ['pending' => 'Konfirmasi Admin', 'printing' => 'Printing Sublimasi', 'sewing' => 'Proses Penjahitan', 'qc' => 'Quality Control', 'ready' => 'Siap Dikirim', 'shipped' => 'Dalam Pengiriman', 'completed' => 'Selesai'];
-                            $currentStageIdx = array_search($order->status, array_keys($stages));
-                            if ($currentStageIdx === false) $currentStageIdx = 0;
-                        @endphp
-                        
-                        @foreach($stages as $stageKey => $stageName)
-                            @php
-                                $thisIdx = array_search($stageKey, array_keys($stages));
-                                $isCompleted = $thisIdx < $currentStageIdx;
-                                $isCurrent = $thisIdx === $currentStageIdx;
-                            @endphp
-                            <div class="relative">
-                                <!-- Node -->
-                                <div class="absolute -left-[45px] top-0 w-8 h-8 rounded-2xl border-4 transition-all duration-500
-                                    {{ $isCompleted ? 'bg-brand-900 border-white shadow-xl shadow-brand-900/20' : ($isCurrent ? 'bg-amber-500 border-white shadow-lg shadow-amber-500/30 animate-pulse' : 'bg-slate-200 border-white') }}">
-                                    @if($isCompleted)
-                                        <svg class="w-full h-full p-1 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                    @endif
-                                </div>
-                                <div class="flex flex-col">
-                                    <p class="text-xs font-black tracking-widest uppercase {{ $isCompleted || $isCurrent ? 'text-slate-900' : 'text-slate-300' }}">{{ $stageName }}</p>
-                                    @if($isCurrent)
-                                        <span class="mt-2 inline-flex items-center text-[9px] font-black bg-amber-100 text-amber-700 px-2 py-0.5 rounded uppercase tracking-tighter w-fit">Tahap Aktif</span>
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-                @endif
             </div>
 
             <!-- Right Column: Final Invoice Widget -->
@@ -271,14 +305,31 @@
                             <span class="text-green-600">- Rp {{ number_format($order->deposit_amount, 0, ',', '.') }}</span>
                         </div>
                         <div class="h-px bg-slate-100 w-full"></div>
-                        <div class="pt-2">
-                            <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Tagihan Tersisa</p>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tagihan Tersisa</span>
                             <p class="text-4xl font-black text-brand-900 tracking-tighter leading-none">Rp {{ number_format($order->total_amount - $order->deposit_amount, 0, ',', '.') }}</p>
                         </div>
+
+                        <!-- Cancel Button Inside Summary Card -->
+                        @if($order->payment_status !== 'unpaid' && $order->status !== 'cancelled' && $order->status !== 'completed')
+                            <div class="mt-6 pt-6 border-t border-slate-50">
+                                <form action="{{ route('customer.orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')">
+                                    @csrf
+                                    <button type="submit" class="w-full text-center text-[9px] font-black uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors py-2">
+                                        Batalkan Pesanan
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
                     </div>
 
                     @if($order->payment_status === 'unpaid' && $order->status !== 'cancelled')
-                        <div class="space-y-4">
+                        <div class="space-y-4 hidden md:block">
+                            <a href="{{ route('customer.orders.edit', $order->order_number) }}" class="w-full flex items-center justify-center gap-2 py-4 bg-white border-2 border-slate-100 text-slate-600 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-50 transition-all active:scale-95 mb-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                Edit Detail Pesanan
+                            </a>
+                            <div class="h-px bg-slate-50 w-full my-4"></div>
                             <form action="{{ route('payment.create', $order->id) }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="type" value="dp">
@@ -294,38 +345,60 @@
                                 </button>
                             </form>
                         </div>
-                        <div class="mt-8 flex flex-col gap-2">
-                             <form action="{{ route('customer.orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')">
-                                @csrf
-                                <button type="submit" class="w-full text-center text-[9px] font-black uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors py-2">
-                                    Batalkan Pesanan
-                                </button>
-                            </form>
-                        </div>
                     @elseif($order->payment_status === 'partial')
-                        <div class="p-6 bg-brand-50 border border-brand-100 rounded-3xl text-center">
+                        <div class="p-6 bg-brand-50 border border-brand-100 rounded-3xl text-center hidden md:block">
                             <p class="text-xs font-black text-brand-900 uppercase tracking-widest leading-relaxed">Deposit Diterima</p>
                             <p class="text-[10px] font-bold text-slate-500 mt-2">Pelunasan dapat dibayarkan saat barang selesai diproduksi.</p>
                         </div>
-                        @if(in_array($order->status, ['ready', 'shipped', 'completed']))
-                            <form action="{{ route('payment.create', $order->id) }}" method="POST" class="mt-4">
-                                @csrf
-                                <input type="hidden" name="type" value="rest">
-                                <button type="submit" class="w-full py-5 bg-brand-900 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-xl shadow-brand-900/30 active:scale-95">
-                                    Lunasi Tagihan Akhir
-                                </button>
-                            </form>
-                        @endif
-                    @elseif($order->payment_status === 'paid')
-                        <div class="p-8 bg-green-50 border border-green-100 rounded-[2rem] text-center">
-                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                            </div>
-                            <p class="text-sm font-black text-green-700 uppercase tracking-widest">Tagihan Lunas</p>
-                            <p class="text-[10px] text-green-600/70 font-bold mt-1 uppercase">Terima Kasih!</p>
-                        </div>
                     @endif
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. MOBILE BOTTOM ACTIONS (Sticky Bar - Mobile Only) -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] pb-safe" x-data="{ showPayOptions: false }">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
+            <div class="flex flex-col">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tagihan</span>
+                <span class="text-lg font-black text-brand-900 tracking-tighter leading-none">Rp {{ number_format($order->total_amount - $order->deposit_amount, 0, ',', '.') }}</span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                @if($order->payment_status === 'unpaid' && $order->status !== 'cancelled')
+                    <!-- Options Menu (DP/Lunas) -->
+                    <div x-show="showPayOptions" x-transition class="absolute bottom-24 left-4 right-4 bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 space-y-3">
+                        <form action="{{ route('payment.create', $order->id) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="type" value="dp">
+                            <button type="submit" class="w-full py-4 bg-white border-2 border-brand-900 text-brand-900 rounded-xl font-black uppercase tracking-widest text-[10px]">
+                                Bayar DP 50%
+                            </button>
+                        </form>
+                        <form action="{{ route('payment.create', $order->id) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="type" value="full">
+                            <button type="submit" class="w-full py-4 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px]">
+                                Bayar Lunas
+                            </button>
+                        </form>
+                        
+                        <button @click="showPayOptions = false" class="w-full text-center text-[9px] font-black text-slate-400 uppercase tracking-widest py-2">Batal</button>
+                    </div>
+
+                    <a href="{{ route('customer.orders.edit', $order->order_number) }}" class="flex items-center gap-2 px-3 py-3 bg-slate-50 text-slate-500 rounded-xl">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        <span class="text-[9px] font-black uppercase tracking-widest">Edit</span>
+                    </a>
+                    
+                    <button @click="showPayOptions = !showPayOptions" class="h-12 px-6 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-brand-900/20 active:scale-95 transition-all">
+                        Bayar
+                    </button>
+                @elseif($order->status !== 'cancelled')
+                    <a href="https://wa.me/628123456789" target="_blank" class="h-12 px-8 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2">
+                        Bantuan
+                    </a>
+                @endif
             </div>
         </div>
     </div>
