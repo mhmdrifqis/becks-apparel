@@ -77,6 +77,17 @@
                         preloader.style.display = 'none';
                     }, 700);
                 }
+
+                // Flash Messages to Toast
+                @if(session('success'))
+                    window.dispatchEvent(new CustomEvent('notify', { detail: { message: "{{ session('success') }}", type: 'success' } }));
+                @endif
+                @if(session('error'))
+                    window.dispatchEvent(new CustomEvent('notify', { detail: { message: "{{ session('error') }}", type: 'error' } }));
+                @endif
+                @if(session('info'))
+                    window.dispatchEvent(new CustomEvent('notify', { detail: { message: "{{ session('info') }}", type: 'warning' } }));
+                @endif
             };
         </script>
     </body>

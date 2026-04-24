@@ -52,9 +52,15 @@ class MaterialResource extends Resource
                             ->default(0),
 
                         Forms\Components\TextInput::make('stock')
-                            ->label('Stok Tersedia (Meter/Pcs)')
+                            ->label('Stok Tersedia')
                             ->numeric()
                             ->default(0),
+
+                        Forms\Components\TextInput::make('unit')
+                            ->label('Satuan')
+                            ->placeholder('Meter, Kg, Roll, dll')
+                            ->default('Meter')
+                            ->required(),
                     ])->columns(2),
             ]);
     }
@@ -83,6 +89,7 @@ class MaterialResource extends Resource
 
                 Tables\Columns\TextColumn::make('stock')
                     ->label('Stok')
+                    ->formatStateUsing(fn ($state, $record) => $state . ' ' . $record->unit)
                     ->sortable(),
             ])
             ->filters([

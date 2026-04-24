@@ -23,8 +23,9 @@ class CheckoutController extends Controller
         }
 
         $upgrades = \App\Models\Upgrade::all()->groupBy('category');
+        $userDesigns = \App\Models\Design::where('user_id', Auth::id())->whereNotNull('name')->latest()->get();
 
-        return view('customer.checkout.index', compact('cartItems', 'upgrades'));
+        return view('customer.checkout.index', compact('cartItems', 'upgrades', 'userDesigns'));
     }
 
     public function process(Request $request)
@@ -38,7 +39,7 @@ class CheckoutController extends Controller
             'shipping_address' => 'required|string',
             'notes' => 'nullable|string',
             'roster' => 'required|array',
-            'designs' => 'required|array'
+            'designs' => 'nullable|array'
         ]);
 
         $allUpgrades = \App\Models\Upgrade::all()->pluck('price', 'id');
@@ -136,35 +137,31 @@ class CheckoutController extends Controller
                 $orderItem->upgrades()->sync($itemUpgrades);
             }
             
-            // 5. Handle design (Multiple files)
+            // 5. Handle design
             $designData = $request->designs[$item->id] ?? null;
             if ($designData) {
-                $filePaths = [];
-                
-                // Handle multiple files
-                if ($request->hasFile("designs.{$item->id}.files")) {
+                // Option A: Saved Design from Customizer
+                if (isset($designData['saved_id']) && !empty($designData['saved_id'])) {
+                    $orderItem->update(['design_id' => $designData['saved_id']]);
+                } 
+                // Option B: New Uploaded Files
+                else if ($request->hasFile("designs.{$item->id}.files")) {
+                    $filePaths = [];
                     $files = $request->file("designs.{$item->id}.files");
                     foreach ($files as $file) {
                         $path = $file->store('orders/designs', 'public');
                         $filePaths[] = $path;
                     }
-                }
 
-                if (count($filePaths) > 0 || (isset($designData['saved_id']) && !empty($designData['saved_id']))) {
-                    $designJson = [
-                        'type' => count($filePaths) > 0 ? 'upload' : 'customizer',
-                        'files' => $filePaths,
-                    ];
-                    
-                    if (isset($designData['saved_id']) && !empty($designData['saved_id'])) {
-                        $designJson['saved_id'] = $designData['saved_id'];
+                    if (count($filePaths) > 0) {
+                        $design = \App\Models\Design::create([
+                            'user_id' => $user->id,
+                            'name' => 'Upload Desain #' . $order->order_number,
+                            'preview_path' => $filePaths[0], // Gunakan file pertama sebagai preview
+                            'design_json' => ['type' => 'upload', 'files' => $filePaths]
+                        ]);
+                        $orderItem->update(['design_id' => $design->id]);
                     }
-
-                    $design = \App\Models\Design::create([
-                        'user_id' => $user->id,
-                        'design_json' => json_encode($designJson)
-                    ]);
-                    $orderItem->update(['design_id' => $design->id]);
                 }
             }
         }

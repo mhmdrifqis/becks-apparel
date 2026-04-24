@@ -11,6 +11,8 @@ class Material extends Model
         'category',
         'status',
         'additional_price',
+        'stock',
+        'unit',
     ];
 
     protected $casts = [

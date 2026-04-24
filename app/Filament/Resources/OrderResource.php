@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Storage;
 
 class OrderResource extends Resource
 {
@@ -46,7 +47,7 @@ class OrderResource extends Resource
                             ->label('Status Produksi')
                             ->options([
                                 'pending'   => 'Pending',
-                                'paid'      => 'Lunas / Antrean',
+                                'paid'      => 'Antrean Masuk',
                                 'printing'  => 'Proses Cetak',
                                 'sewing'    => 'Proses Jahit',
                                 'qc'        => 'Quality Control',
@@ -155,7 +156,15 @@ class OrderResource extends Resource
                                 Forms\Components\Placeholder::make('design_preview')
                                     ->label('Desain & Referensi')
                                     ->content(fn ($record) => $record && $record->design ? 
-                                        new \Illuminate\Support\HtmlString('<img src="' . ($record->design->preview_path ? asset($record->design->preview_path) : (isset($record->design->design_json['file']) ? Storage::url($record->design->design_json['file']) : '')) . '" class="w-full max-w-[200px] rounded-xl border border-slate-200 shadow-sm" />') : 
+                                        new \Illuminate\Support\HtmlString('
+                                            <div class="space-y-2">
+                                                <img src="' . Storage::url($record->design->preview_path) . '" class="w-full max-w-[200px] rounded-xl border border-slate-200 shadow-sm" />
+                                                <a href="' . Storage::url($record->design->preview_path) . '" target="_blank" class="inline-flex items-center text-xs font-bold text-primary-600 hover:underline">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                                    Download File Asli
+                                                </a>
+                                            </div>
+                                        ') : 
                                         'Tidak ada file desain.'
                                     ),
                             ])
@@ -207,7 +216,7 @@ class OrderResource extends Resource
                     ->label('Status')
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'pending'   => 'Pending',
-                        'paid'      => 'Antrean',
+                        'paid'      => 'Antrean Masuk',
                         'printing'  => 'Cetak',
                         'sewing'    => 'Jahit',
                         'qc'        => 'QC',
@@ -241,7 +250,7 @@ class OrderResource extends Resource
                     ->label('Status Produksi')
                     ->options([
                         'pending'   => 'Pending',
-                        'paid'      => 'Antrean',
+                        'paid'      => 'Antrean Masuk',
                         'printing'  => 'Cetak',
                         'sewing'    => 'Jahit',
                         'qc'        => 'QC',

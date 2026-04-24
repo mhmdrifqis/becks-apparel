@@ -140,14 +140,52 @@
                                             <p class="text-[8px] text-slate-400 mt-4 italic">* Anda dapat memilih lebih dari satu file (Gambar, PDF, Zip).</p>
                                         </div>
                                     </div>
-                                    <div x-show="item.designMethod === 'customizer'" x-transition>
-                                        <select :name="'designs['+item.id+'][saved_id]'" class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-[10px] font-bold rounded-xl px-4 py-3 focus:ring-brand-900 uppercase">
-                                            <option value="">-- Pilih Desain Tersimpan --</option>
-                                            @foreach(\App\Models\Design::where('user_id', Auth::id())->latest()->get() as $design)
-                                                <option value="{{ $design->id }}">Design #{{ $design->id }} ({{ $design->created_at->format('d M') }})</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                     <div x-show="item.designMethod === 'customizer'" x-transition class="space-y-4">
+                                         <div class="flex items-center justify-between">
+                                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pilih Desain Tersimpan</label>
+                                             <button type="button" 
+                                                     x-show="item.saved_id" 
+                                                     @click="item.saved_id = null" 
+                                                     class="text-[9px] font-black text-rose-500 uppercase tracking-widest hover:underline flex items-center gap-1">
+                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                 Hapus Pilihan
+                                             </button>
+                                         </div>
+                                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-[320px] overflow-y-auto p-1 custom-scrollbar">
+                                             @foreach($userDesigns as $design)
+                                                 <label class="relative cursor-pointer group">
+                                                     <input type="radio" 
+                                                            :name="'designs['+item.id+'][saved_id]'" 
+                                                            value="{{ $design->id }}" 
+                                                            x-model="item.saved_id"
+                                                            class="peer absolute opacity-0">
+                                                     <div class="bg-white border-2 border-slate-100 rounded-2xl p-2 group-hover:border-brand-900 peer-checked:border-brand-900 peer-checked:bg-brand-50/50 transition-all duration-300 h-full flex flex-col">
+                                                         <div class="aspect-square bg-slate-50 rounded-xl overflow-hidden mb-2 relative shrink-0">
+                                                             @if($design->preview_path)
+                                                                 <img src="{{ asset('storage/' . $design->preview_path) }}" class="w-full h-full object-contain">
+                                                             @else
+                                                                 <div class="w-full h-full flex items-center justify-center text-slate-300">
+                                                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                                                 </div>
+                                                             @endif
+                                                             <div class="absolute inset-0 bg-brand-900/0 group-hover:bg-brand-900/5 transition-colors"></div>
+                                                         </div>
+                                                         <p class="text-[9px] font-black text-slate-900 uppercase truncate text-center mt-auto" title="{{ $design->name }}">{{ $design->name }}</p>
+                                                     </div>
+                                                     <!-- Checkmark -->
+                                                     <div class="absolute -top-1 -right-1 w-5 h-5 bg-brand-900 text-white rounded-full flex items-center justify-center scale-0 peer-checked:scale-100 transition-transform duration-300 shadow-lg z-10">
+                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                     </div>
+                                                 </label>
+                                             @endforeach
+                                         </div>
+                                         @if(count($userDesigns) === 0)
+                                             <div class="p-8 bg-slate-50 rounded-2xl text-center border border-dashed border-slate-200">
+                                                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Belum ada desain tersimpan</p>
+                                                 <a href="{{ route('customizer') }}" target="_blank" class="text-[9px] font-black text-brand-900 uppercase tracking-widest hover:underline">Buka Customizer →</a>
+                                             </div>
+                                         @endif
+                                     </div>
                                 </div>
 
                                 <!-- 2. Upgrade Global (Untuk Seluruh Pemain) -->
@@ -265,10 +303,10 @@
                     </div>
                 </div>
 
-                <!-- 3. Catatan Pesanan -->
+                <!--  Catatan Pesanan -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <div class="px-6 py-4 bg-slate-50/50 border-b border-slate-100">
-                        <h2 class="text-xs font-black text-slate-900 uppercase tracking-widest">3. Catatan Pesanan</h2>
+                        <h2 class="text-xs font-black text-slate-900 uppercase tracking-widest">Catatan Pesanan</h2>
                     </div>
                     <div class="p-6 md:p-8">
                         <textarea name="notes" rows="4" class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-6 py-4 focus:ring-brand-900 focus:border-brand-900" placeholder="Tulis instruksi khusus untuk kami di sini (Contoh: Titip logo di bagian depan, kerah warna hitam, dll)"></textarea>
@@ -350,6 +388,7 @@
                     matName: '{{ $item->material->name ?? "-" }}',
                     img: '{{ $src }}',
                     designMethod: 'upload',
+                    saved_id: null,
                     globalUpgrades: [],
                     designFiles: [], // List of File objects
                     roster: Array.from({ length: {{ $item->quantity }} }, () => ({

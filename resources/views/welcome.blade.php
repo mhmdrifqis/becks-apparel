@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Becks Apparel - Home')
+@section('title', 'Home')
 
 @section('content')
 <div class="bg-[#fdfbf7] min-h-screen text-[#06402B] font-sans">

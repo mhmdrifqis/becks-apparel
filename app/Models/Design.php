@@ -8,6 +8,7 @@ class Design extends Model
 {
     protected $fillable = [
         'user_id',
+        'name',
         'design_json',
         'preview_path',
     ];

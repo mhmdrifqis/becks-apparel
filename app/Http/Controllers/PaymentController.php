@@ -58,6 +58,12 @@ class PaymentController extends Controller
         try {
             $snapToken = \Midtrans\Snap::getSnapToken($params);
 
+            // Save the midtrans_order_id to the order so we can sync it later
+            $order->update([
+                'midtrans_order_id' => $midtransOrderId,
+                'payment_token' => $snapToken // Optional: reuse this column for the token
+            ]);
+
             // Return to the invoice view with flash session snapToken
             return redirect()->route('customer.orders.show', $order->order_number)
                 ->with('snapToken', $snapToken);
@@ -75,6 +81,11 @@ class PaymentController extends Controller
 
         try {
             $notification = new \Midtrans\Notification();
+            Log::info('Midtrans Callback Received', [
+                'order_id' => $notification->order_id,
+                'transaction_status' => $notification->transaction_status,
+                'custom_field2' => $notification->custom_field2,
+            ]);
         } catch (\Exception $e) {
             Log::error('Midtrans Callback Error: ' . $e->getMessage());
             return response()->json(['message' => 'Error processing notification'], 500);
@@ -84,6 +95,11 @@ class PaymentController extends Controller
         $orderId = $notification->custom_field2; // We mapped Original Order ID here
         $paymentType = $notification->custom_field1;
         $grossAmount = $notification->gross_amount;
+
+        Log::info('Processing Order Update', [
+            'order_id_from_custom' => $orderId,
+            'payment_type' => $paymentType
+        ]);
 
         $order = Order::find($orderId);
         if (!$order) {
@@ -97,14 +113,15 @@ class PaymentController extends Controller
                 if ($paymentType === 'dp') {
                     $order->payment_status = 'partial';
                     $order->deposit_amount = $grossAmount;
-                    $order->status = 'printing'; // Automate move to production!
-                } elseif ($paymentType === 'full') {
+                    if ($order->status === 'unpaid' || $order->status === 'pending') {
+                        $order->status = 'paid';
+                    }
+                } elseif ($paymentType === 'full' || $paymentType === 'rest') {
                     $order->payment_status = 'paid';
-                    $order->deposit_amount = $grossAmount;
-                    $order->status = 'printing';
-                } elseif ($paymentType === 'rest') {
-                    $order->payment_status = 'paid';
-                    $order->deposit_amount += $grossAmount; // Pelunasan
+                    $order->deposit_amount = $order->total_amount;
+                    if ($order->status === 'unpaid' || $order->status === 'pending') {
+                        $order->status = 'paid';
+                    }
                 }
             } elseif ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
                 // If expire on a pending order, we might just let it be, 
@@ -121,6 +138,65 @@ class PaymentController extends Controller
             DB::rollBack();
             Log::error('Callback DB Error: ' . $e->getMessage());
             return response()->json(['message' => 'Server Error'], 500);
+        }
+    }
+
+    /**
+     * Manual Sync Status (for missing webhooks or local development)
+     */
+    public function syncStatus(Order $order)
+    {
+        $this->initMidtrans();
+
+        $midtransOrderId = $order->midtrans_order_id;
+
+        if (!$midtransOrderId) {
+            return back()->with('error', 'ID Transaksi Midtrans tidak ditemukan untuk pesanan ini.');
+        }
+
+        try {
+            $status = \Midtrans\Transaction::status($midtransOrderId);
+            Log::info('Midtrans Sync Status Response', (array) $status);
+            
+            $transactionStatus = $status->transaction_status;
+            $paymentType = isset($status->custom_field1) ? $status->custom_field1 : null;
+            $grossAmount = $status->gross_amount;
+
+            Log::info("Manual Sync Debug: Order ID: {$order->id}, Midtrans ID: {$midtransOrderId}, Status: {$transactionStatus}, Type: {$paymentType}");
+
+            DB::beginTransaction();
+            
+            if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
+                if ($paymentType === 'dp') {
+                    $order->payment_status = 'partial';
+                    $order->deposit_amount = $grossAmount;
+                    // Initial status after payment should be 'paid' (Antrean Masuk)
+                    if ($order->status === 'unpaid' || $order->status === 'pending') {
+                        $order->status = 'paid';
+                    }
+                } elseif ($paymentType === 'full' || $paymentType === 'rest') {
+                    $order->payment_status = 'paid';
+                    $order->deposit_amount = $order->total_amount;
+                    
+                    // Set to 'paid' if it was unpaid or pending
+                    if ($order->status === 'unpaid' || $order->status === 'pending') {
+                        $order->status = 'paid';
+                    }
+                }
+                
+                $order->save();
+                DB::commit();
+                Log::info("Order {$order->order_number} successfully synced to PAID/PARTIAL");
+                return back()->with('success', 'Status pembayaran berhasil diperbarui: ' . strtoupper($transactionStatus));
+            } else {
+                DB::rollBack();
+                Log::info("Order {$order->order_number} sync skipped. Midtrans Status: {$transactionStatus}");
+                return back()->with('info', 'Status pembayaran di Midtrans saat ini: ' . strtoupper($transactionStatus) . '. Silakan selesaikan pembayaran di simulator.');
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Manual Sync Error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal sinkronisasi: ' . $e->getMessage());
         }
     }
 }

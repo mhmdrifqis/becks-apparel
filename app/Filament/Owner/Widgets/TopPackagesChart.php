@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 class TopPackagesChart extends ChartWidget
 {
     protected static ?string $heading = 'Produk & Paket Terlaris';
+    protected static ?int $sort = 11;
 
     protected static ?string $maxHeight = '300px';
 

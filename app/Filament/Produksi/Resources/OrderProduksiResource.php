@@ -9,6 +9,9 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Storage;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Illuminate\Database\Eloquent\Builder;
 
 class OrderProduksiResource extends Resource
@@ -24,6 +27,46 @@ class OrderProduksiResource extends Resource
     protected static ?string $pluralModelLabel = 'Antrean Produksi';
 
     protected static ?string $navigationGroup = 'Workshop';
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make('Detail Pesanan')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('order_number')->label('No. Order'),
+                        Infolists\Components\TextEntry::make('user.name')->label('Nama Pemesan'),
+                        Infolists\Components\TextEntry::make('status')->badge(),
+                    ])->columns(3),
+
+                Infolists\Components\Section::make('Detail Teknis & Desain')
+                    ->schema([
+                        Infolists\Components\RepeatableEntry::make('orderItems')
+                            ->label('Daftar Produk')
+                            ->schema([
+                                Infolists\Components\Grid::make(3)
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('package.name')->label('Paket'),
+                                        Infolists\Components\TextEntry::make('material.name')->label('Bahan'),
+                                        Infolists\Components\TextEntry::make('quantity')->label('Qty'),
+                                    ]),
+                                Infolists\Components\TextEntry::make('design.preview_path')
+                                    ->label('Preview & Link Desain')
+                                    ->formatStateUsing(fn ($record) => $record && $record->design ? 
+                                        new \Illuminate\Support\HtmlString('
+                                            <div class="space-y-2">
+                                                <img src="' . Storage::url($record->design->preview_path) . '" class="w-full max-w-[200px] rounded-xl border border-slate-200 shadow-sm" />
+                                                <a href="' . Storage::url($record->design->preview_path) . '" target="_blank" class="inline-flex items-center text-xs font-bold text-primary-600 hover:underline">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                                    Download File Desain (HQ)
+                                                </a>
+                                            </div>
+                                        ') : 'Tidak ada desain'
+                                    ),
+                            ])
+                    ])
+            ]);
+    }
 
     public static function form(Form $form): Form
     {
@@ -55,7 +98,7 @@ class OrderProduksiResource extends Resource
             ->query(
                 Order::query()
                     ->whereIn('status', ['paid', 'printing', 'sewing', 'qc', 'ready'])
-                    ->where('payment_status', 'paid')
+                    ->whereIn('payment_status', ['paid', 'partial'])
             )
             ->columns([
                 Tables\Columns\TextColumn::make('order_number')
@@ -103,8 +146,42 @@ class OrderProduksiResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->label('Lihat Detail Teknis'),
-                Tables\Actions\EditAction::make()->label('Update Status'),
+                Tables\Actions\ViewAction::make()->label('Detail'),
+                Tables\Actions\EditAction::make()->label('Update'),
+                
+                // FITUR: Catat Pemakaian Bahan
+                Tables\Actions\Action::make('log_material_usage')
+                    ->label('Log Bahan')
+                    ->icon('heroicon-m-beaker')
+                    ->color('info')
+                    ->form([
+                        Forms\Components\Select::make('order_item_id')
+                            ->label('Pilih Produk (Item)')
+                            ->options(fn ($record) => $record->orderItems->mapWithKeys(function ($item) {
+                                return [$item->id => $item->package->name . ' (' . $item->material->name . ')'];
+                            }))
+                            ->required(),
+                        Forms\Components\TextInput::make('usage')
+                            ->label('Jumlah Pemakaian')
+                            ->numeric()
+                            ->required()
+                            ->helperText('Angka ini akan langsung memotong stok di gudang.'),
+                    ])
+                    ->action(function (\App\Models\Order $record, array $data) {
+                        $item = \App\Models\OrderItem::find($data['order_item_id']);
+                        if ($item && $item->material) {
+                            $item->increment('material_usage', $data['usage']);
+                            $item->material->decrement('stock', $data['usage']);
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Stok Terpotong')
+                                ->body("Pemakaian {$data['usage']} {$item->material->unit} tercatat.")
+                                ->success()
+                                ->send();
+                        }
+                    })
+                    ->modalHeading('Input Pemakaian Bahan Baku')
+                    ->modalSubmitActionLabel('Potong Stok Sekarang'),
             ])
             ->bulkActions([]);
     }

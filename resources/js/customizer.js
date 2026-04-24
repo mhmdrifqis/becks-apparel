@@ -245,6 +245,13 @@ export default () => ({
     undoStack: [],
     redoStack: [],
     isHistoryAction: false,
+    
+    // SAVE & LOAD STATE
+    showSaveModal: false,
+    showBackModal: false,
+    designName: '',
+    saveDesignUrl: '',
+    updateDesignUrl: '',
 
     menus: [
         { id: 'mockup', label: 'Mockup', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/></svg>' },
@@ -324,7 +331,28 @@ export default () => ({
 
     init() {
         this.$nextTick(() => {
-            this.initCanvas().catch(err => {
+            this.initCanvas().then(async () => {
+                // Initialize URLs from DOM
+                this.saveDesignUrl = document.getElementById('save-design-url')?.value || '';
+                this.updateDesignUrl = document.getElementById('update-design-url')?.value || '';
+                
+                // Load existing design if available
+                const existingData = document.getElementById('existing-design-data')?.value;
+                const existingName = document.getElementById('existing-design-name')?.value;
+                
+                if (existingData) {
+                    try {
+                        const state = JSON.parse(existingData);
+                        await this.applyState(state);
+                        this.designName = existingName || '';
+                        // Clear history and save this as base state
+                        this.undoStack = [];
+                        this.saveHistory();
+                    } catch (e) {
+                        console.error('Failed to load existing design:', e);
+                    }
+                }
+            }).catch(err => {
                 console.error('Initialization failed:', err);
                 this.isLoading = false;
             });
@@ -1181,8 +1209,20 @@ export default () => ({
         this.activeObjectElement = !!obj._element;
 
         const rect = obj.getBoundingRect(); const vpt = this.canvas.viewportTransform;
-        this.toolbarPos = { top: (rect.top * vpt[0] + vpt[5]) - 70, left: (rect.left * vpt[0] + vpt[4]) + (rect.width * vpt[0] / 2) };
+        // Pindah lebih ke atas agar tidak menutupi handle rotasi
+        this.toolbarPos = { top: (rect.top * vpt[0] + vpt[5]) - 110, left: (rect.left * vpt[0] + vpt[4]) + (rect.width * vpt[0] / 2) };
         this.showToolbar = true;
+    },
+
+    rotateObject(deg) {
+        const obj = this.canvas.getActiveObject();
+        if (obj) {
+            obj.set('angle', (obj.angle || 0) + deg);
+            obj.setCoords();
+            this.canvas.renderAll();
+            this.saveHistory();
+            this.updateToolbarPos();
+        }
     },
 
     async duplicateSelected() {
@@ -1335,6 +1375,7 @@ export default () => ({
         this.renderLayers();
         this.saveHistory();
         this.cancelCrop();
+        this.updateToolbarPos(); // Refresh bar untuk objek baru
     },
 
     cancelCrop() {
@@ -1346,6 +1387,97 @@ export default () => ({
     },
     setActiveMenu(menuId) { if (this.activeMenu === menuId) this.togglePanel(); else { this.activeMenu = menuId; this.isPanelOpen = true; setTimeout(() => this.resizeCanvas(), 350); } },
     deleteSelected() { const obj = this.canvas.getActiveObject(); if (obj) { this.canvas.remove(obj); this.designObjects = this.designObjects.filter(o => o !== obj); this.showToolbar = false; } },
-    resizeCanvas() { try { const container = document.querySelector('main .relative'); if (!container || !this.canvas || this.currentZoom !== 1) return; const size = Math.min(container.clientWidth - 40, 600); this.canvas.setDimensions({ width: size, height: size }); this.canvas.setZoom(size / 600); } catch (err) { } },
-    togglePanel() { this.isPanelOpen = !this.isPanelOpen; setTimeout(() => this.resizeCanvas(), 350); }
+    resizeCanvas() { try { const container = document.getElementById('canvas-container'); if (!container || !this.canvas || this.currentZoom !== 1) return; const size = Math.min(container.clientWidth - 40, 600); this.canvas.setDimensions({ width: size, height: size }); this.canvas.setZoom(size / 600); } catch (err) { } },
+    togglePanel() { this.isPanelOpen = !this.isPanelOpen; setTimeout(() => this.resizeCanvas(), 350); },
+
+    // SAVE LOGIC
+    triggerSave() {
+        this.showBackModal = false;
+        this.showSaveModal = true;
+    },
+
+    handleBack() {
+        // If there are changes (undoStack > 1), ask to save
+        if (this.undoStack.length > 1) {
+            this.showBackModal = true;
+        } else {
+            window.history.back();
+        }
+    },
+
+    async saveDesign() {
+        if (!this.designName) return;
+        this.isLoading = true;
+        this.showSaveModal = false;
+
+        try {
+            // 1. Prepare Export State (JSON)
+            const exportState = {
+                viewStates: JSON.parse(JSON.stringify(this.viewStates)),
+                textState: { 
+                    input: this.textInput, 
+                    font: this.activeFont, 
+                    color: this.activeColor, 
+                    size: this.textFontSize, 
+                    spacing: this.textCharSpacing, 
+                    arc: this.textArc 
+                },
+                designObjects: this.designObjects.map(obj => obj.toObject(['clipPath', 'isSystemLayer', 'view', 'arc'])),
+                currentModel: this.currentModel,
+                currentView: this.currentView
+            };
+
+            // 2. Capture Preview Image
+            // Reset zoom and viewport for clean export
+            const originalZoom = this.canvas.getZoom();
+            const originalVPT = this.canvas.viewportTransform.slice();
+            
+            this.resetZoom();
+            this.canvas.renderAll();
+            
+            const previewImage = this.canvas.toDataURL({
+                format: 'png',
+                quality: 0.8,
+                multiplier: 1 // Keep it 600x600
+            });
+            
+            // Restore zoom
+            this.canvas.setZoom(originalZoom);
+            this.canvas.viewportTransform = originalVPT;
+            this.canvas.renderAll();
+
+            // 3. Send to Server
+            const url = this.updateDesignUrl || this.saveDesignUrl;
+            const method = this.updateDesignUrl ? 'PATCH' : 'POST';
+            const csrfToken = document.getElementById('csrf-token').value;
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: this.designName,
+                    design_json: JSON.stringify(exportState),
+                    preview_image: previewImage
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Redirect to designs list
+                window.location.href = result.redirect;
+            } else {
+                alert('Gagal menyimpan desain: ' + result.message);
+                this.isLoading = false;
+            }
+        } catch (error) {
+            console.error('Error saving design:', error);
+            alert('Terjadi kesalahan saat menyimpan desain.');
+            this.isLoading = false;
+        }
+    }
 });

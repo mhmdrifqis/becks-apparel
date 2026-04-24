@@ -15,6 +15,7 @@ class OrderItem extends Model
         'size_surcharge',
         'quantity',
         'subtotal',
+        'material_usage',
     ];
 
     protected $casts = [

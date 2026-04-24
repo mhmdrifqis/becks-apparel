@@ -21,6 +21,7 @@ class Order extends Model
         'payment_status',
         'payment_token',
         'snap_url',
+        'midtrans_order_id',
     ];
 
     protected $casts = [
@@ -36,5 +37,35 @@ class Order extends Model
     public function orderItems(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function statusLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderStatusLog::class);
+    }
+
+    protected static function booted()
+    {
+        static::updated(function ($order) {
+            if ($order->isDirty('status')) {
+                $statusLabels = [
+                    'paid'      => 'Antrean Masuk',
+                    'printing'  => 'Proses Cetak',
+                    'sewing'    => 'Proses Jahit',
+                    'qc'        => 'Quality Control',
+                    'ready'     => 'Selesai Produksi (Siap Kirim)',
+                    'shipped'   => 'Pesanan Dikirim',
+                    'completed' => 'Pesanan Selesai',
+                    'cancelled' => 'Pesanan Dibatalkan',
+                ];
+
+                $label = $statusLabels[$order->status] ?? $order->status;
+
+                $order->statusLogs()->create([
+                    'status' => $order->status,
+                    'description' => $label
+                ]);
+            }
+        });
     }
 }

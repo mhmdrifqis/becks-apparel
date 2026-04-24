@@ -72,6 +72,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(CartItem::class);
     }
 
+    public function designs()
+    {
+        return $this->hasMany(Design::class);
+    }
+
     public function activeOrdersCount()
     {
         return $this->orders()->whereNotIn('status', ['cancelled', 'completed'])->count();

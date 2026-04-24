@@ -150,7 +150,7 @@ class OrderController extends Controller
         
         // Fetch user designs for the Web Design option
         $userDesigns = \App\Models\Design::where('user_id', Auth::id())
-            ->whereNotNull('preview_path')
+            ->whereNotNull('name')
             ->latest()
             ->get();
 
@@ -174,13 +174,16 @@ class OrderController extends Controller
             'recipient_name' => 'required|string|max:255',
             'recipient_phone' => 'required|string|max:20',
             'shipping_address' => 'required|string',
+            'notes' => 'nullable|string',
             'roster' => 'required|array',
         ]);
 
         // 1. Update recipient info
-        $order->update($request->only(['recipient_name', 'recipient_phone', 'shipping_address']));
+        $order->update($request->only(['recipient_name', 'recipient_phone', 'shipping_address', 'notes']));
 
         $grandTotal = 0;
+
+        $allUpgrades = \App\Models\Upgrade::all()->pluck('price', 'id');
 
         // 2. Update each OrderItem
         foreach ($order->orderItems as $item) {
@@ -191,19 +194,33 @@ class OrderController extends Controller
             $itemSurcharge = 0;
 
             foreach ($inputs as $idx => $player) {
-                $isLongSleeve = isset($player['long_sleeve']) && $player['long_sleeve'] == 1;
                 $size = $player['size'] ?? 'L';
-                
                 $playerSurcharge = 0;
-                if ($isLongSleeve) $playerSurcharge += 20000;
+                
+                // Size surcharges
                 if ($size === 'XXL') $playerSurcharge += 5000;
                 if ($size === 'XXXL') $playerSurcharge += 10000;
 
+                // Player Upgrades (from the new UI)
+                $playerUpgradeIds = $player['upgrades'] ?? [];
+                $playerUpgradeNames = [];
+                if (is_array($playerUpgradeIds)) {
+                    foreach ($playerUpgradeIds as $uId) {
+                        $price = $allUpgrades->get($uId) ?? 0;
+                        $playerSurcharge += $price;
+                        
+                        $uModel = \App\Models\Upgrade::find($uId);
+                        if ($uModel) $playerUpgradeNames[] = $uModel->name;
+                    }
+                }
+
                 $rosterData[] = [
+                    'ref_name' => $player['ref_name'] ?? '',
                     'name' => $player['name'] ?? '',
                     'number' => $player['number'] ?? '',
                     'size' => $size,
-                    'isLongSleeve' => $isLongSleeve,
+                    'upgrades' => $playerUpgradeIds,
+                    'upgrade_names' => $playerUpgradeNames,
                     'surcharge' => $playerSurcharge
                 ];
                 $itemSurcharge += $playerSurcharge;
@@ -230,24 +247,38 @@ class OrderController extends Controller
                 'subtotal' => $subtotal
             ]);
 
-            // Handle Design update - Customizer Selection
+            // Handle Design update
             $itemDesignInput = $request->input("designs.{$item->id}");
-            if (isset($itemDesignInput['design_id'])) {
-                $item->update(['design_id' => $itemDesignInput['design_id']]);
+            
+            // 1. If saved design from customizer is selected
+            if (isset($itemDesignInput['saved_id']) && $itemDesignInput['saved_id']) {
+                $item->update(['design_id' => $itemDesignInput['saved_id']]);
             }
-
-            // Handle Design update - Multiple File Uploads
+            
+            // 2. If new files are uploaded
             if ($request->hasFile("designs.{$item->id}.files")) {
-                $filePaths = [];
-                foreach ($request->file("designs.{$item->id}.files") as $file) {
-                    $filePaths[] = $file->store('orders/designs', 'public');
+                $files = $request->file("designs.{$item->id}.files");
+                $paths = [];
+                foreach ($files as $file) {
+                    $paths[] = $file->store('designs', 'public');
                 }
                 
-                $design = \App\Models\Design::create([
-                    'user_id' => Auth::id(),
-                    'design_json' => ['type' => 'uploaded', 'files' => $filePaths]
-                ]);
-                $item->update(['design_id' => $design->id]);
+                // Create or Update Design record
+                $design = $item->design;
+                if (!$design) {
+                    $design = \App\Models\Design::create([
+                        'user_id' => Auth::id(),
+                        'name' => 'Design for Order #' . $order->order_number,
+                        'design_json' => ['files' => $paths]
+                    ]);
+                    $item->update(['design_id' => $design->id]);
+                } else {
+                    $currentJson = $design->design_json ?? [];
+                    $currentFiles = $currentJson['files'] ?? [];
+                    $design->update([
+                        'design_json' => ['files' => array_merge($currentFiles, $paths)]
+                    ]);
+                }
             }
         }
 

@@ -36,10 +36,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/pesanan/{order}/address', [App\Http\Controllers\OrderController::class, 'updateAddress'])->name('customer.orders.update-address');
     
     Route::post('/payment/{order}/create', [App\Http\Controllers\PaymentController::class, 'createPayment'])->name('payment.create');
+    Route::post('/payment/{order}/sync', [App\Http\Controllers\PaymentController::class, 'syncStatus'])->name('payment.sync');
 
-    Route::get('/desain', function () {
-        return view('customer.designs.index');
-    })->name('customer.designs');
+    Route::get('/desain', [App\Http\Controllers\DesignController::class, 'index'])->name('customer.designs');
+    Route::post('/desain', [App\Http\Controllers\DesignController::class, 'store'])->name('customer.designs.store');
+    Route::get('/desain/{design}/edit', [App\Http\Controllers\DesignController::class, 'edit'])->name('customer.designs.edit');
+    Route::patch('/desain/{design}', [App\Http\Controllers\DesignController::class, 'update'])->name('customer.designs.update');
+    Route::delete('/desain/{design}', [App\Http\Controllers\DesignController::class, 'destroy'])->name('customer.designs.destroy');
     
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

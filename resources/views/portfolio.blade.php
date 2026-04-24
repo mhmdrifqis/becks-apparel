@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Portfolio - Becks Apparel')
+@section('title', 'Portfolio')
 
 @section('content')
 <div class="bg-slate-50 min-h-screen">

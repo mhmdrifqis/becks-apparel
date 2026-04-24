@@ -23,10 +23,10 @@ class AdminStatsOverview extends BaseWidget
         // Pesanan baru bulan ini
         $ordersThisMonth = Order::where('created_at', '>=', $thisMonth)->count();
 
-        // Pendapatan bulan ini (hanya yang sudah paid)
+        // Pendapatan bulan ini (Termasuk DP)
         $revenueThisMonth = Order::where('created_at', '>=', $thisMonth)
-            ->where('payment_status', 'paid')
-            ->sum('total_amount');
+            ->whereIn('payment_status', ['paid', 'partial'])
+            ->sum('deposit_amount');
 
         // Pesanan pending pembayaran
         $pendingPayment = Order::where('payment_status', 'unpaid')
