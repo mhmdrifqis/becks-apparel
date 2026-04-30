@@ -244,7 +244,7 @@
                 if (!it) return;
                 
                 let newQty = it.qty + delta;
-                if (newQty < 1) return;
+                if (newQty < 12) return;
 
                 // Optimistic UI
                 const oldQty = it.qty;

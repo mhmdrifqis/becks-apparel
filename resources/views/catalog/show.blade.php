@@ -4,10 +4,13 @@
 
 @section('content')
 <div x-data="{ 
-    qty: 1, 
+    qty: 12, 
     selectedMaterialId: '{{ $materials->first()?->id ?? 0 }}',
     materials: @js($materials),
     openDetail: false,
+    get selectedMaterial() {
+        return this.materials.find(m => m.id == this.selectedMaterialId) || null;
+    },
     {{-- Carousel State --}}
     activeSlide: 0,
     slidesCount: {{ count($package->images ?: []) > 0 ? count($package->images) : 1 }},
@@ -183,7 +186,7 @@
                     <div class="flex flex-col lg:flex-row lg:items-start">
                         <span class="w-32 text-xs font-black text-slate-400 uppercase tracking-widest pt-2">Pilihan Bahan</span>
                         <div class="flex-1">
-                            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
                                 @foreach($materials as $material)
                                 <button @click="selectedMaterialId = '{{ $material->id }}'" 
                                         class="p-4 text-[10px] font-black uppercase tracking-widest border-2 rounded-2xl transition-all relative text-left group"
@@ -195,6 +198,22 @@
                                 </button>
                                 @endforeach
                             </div>
+                            
+                            <!-- Detail Bahan -->
+                            <div x-show="selectedMaterial" x-transition class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex gap-4 items-center">
+                                <div class="w-16 h-16 md:w-20 md:h-20 bg-white border border-slate-100 rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
+                                    <template x-if="selectedMaterial.image_url">
+                                        <img :src="selectedMaterial.image_url" class="w-full h-full object-cover">
+                                    </template>
+                                    <template x-if="!selectedMaterial.image_url">
+                                        <svg class="w-6 h-6 md:w-8 md:h-8 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    </template>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-xs font-black text-slate-900 uppercase tracking-widest mb-1" x-text="'Bahan ' + selectedMaterial.name"></h4>
+                                    <p class="text-[10px] text-slate-500 font-medium leading-relaxed" x-text="selectedMaterial.description || 'Deskripsi bahan ini belum tersedia.'"></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -203,7 +222,7 @@
                         <span class="w-32 text-xs font-black text-slate-400 uppercase tracking-widest">Jumlah</span>
                         <div class="flex items-center gap-4">
                             <div class="flex items-center gap-1 p-1 bg-slate-50 rounded-2xl border border-slate-100">
-                                <button @click="if(qty > 1) qty--" class="w-10 h-10 flex items-center justify-center bg-white text-slate-400 rounded-xl hover:text-brand-900 transition-colors border border-slate-100">
+                                <button @click="if(qty > 12) qty--" class="w-10 h-10 flex items-center justify-center bg-white text-slate-400 rounded-xl hover:text-brand-900 transition-colors border border-slate-100">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/></svg>
                                 </button>
                                 <input type="number" x-model="qty" class="w-12 text-center bg-transparent border-none text-lg font-black p-0 focus:ring-0 text-slate-800" readonly>

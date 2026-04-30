@@ -27,7 +27,7 @@ class CartController extends Controller
 
         $user = Auth::user();
         $materialId = $request->input('material_id');
-        $quantity = $request->input('quantity', 1);
+        $quantity = max(12, (int) $request->input('quantity', 12));
         
         $cartItem = $user->cartItems()
             ->where('package_id', $package->id)
@@ -101,8 +101,8 @@ class CartController extends Controller
             }
         }
 
-        if ($quantity < 1) {
-            $quantity = 1;
+        if ($quantity < 12) {
+            $quantity = 12;
         }
 
         $data = ['quantity' => $quantity];
