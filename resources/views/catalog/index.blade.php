@@ -105,6 +105,9 @@
                             <!-- Content -->
                             <div class="p-6">
                                 <h3 class="text-lg font-black text-slate-900 uppercase tracking-tight group-hover:text-brand-900 transition-colors line-clamp-1 mb-1">{{ $package->name }}</h3>
+                                <p class="text-[11px] text-slate-500 line-clamp-2 mb-4 leading-relaxed">
+                                    {{ $package->description ?? 'Deskripsi belum tersedia.' }}
+                                </p>
                                 <div class="flex items-center justify-between items-end">
                                     <div>
                                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Mulai Dari</p>

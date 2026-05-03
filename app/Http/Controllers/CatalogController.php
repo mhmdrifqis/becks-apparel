@@ -23,7 +23,9 @@ class CatalogController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
-        $materials = \App\Models\Material::all();
+        $materials = \App\Models\Material::whereJsonContains('allowed_categories', $package->category)
+            ->orWhereNull('allowed_categories') // Fallback temporarily until the admin updates the materials
+            ->get();
 
         return view('catalog.show', compact('package', 'materials'));
     }

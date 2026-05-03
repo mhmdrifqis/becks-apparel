@@ -38,10 +38,21 @@ class MaterialResource extends Resource
                             ->maxLength(255),
 
                         Forms\Components\Select::make('category')
-                            ->label('Kategori')
+                            ->label('Kualitas')
                             ->options([
                                 'standard' => 'Standard',
                                 'premium' => 'Premium',
+                            ])
+                            ->required(),
+
+                        Forms\Components\Select::make('allowed_categories')
+                            ->label('Tersedia Untuk Produk')
+                            ->multiple()
+                            ->options([
+                                'jersey' => 'Jersey',
+                                'jacket' => 'Jacket',
+                                'tshirt' => 'T-Shirt',
+                                'kemeja' => 'Kemeja',
                             ])
                             ->required(),
 
@@ -62,6 +73,20 @@ class MaterialResource extends Resource
                             ->default('Meter')
                             ->required(),
                     ])->columns(2),
+
+                Forms\Components\Section::make('Deskripsi & Media')
+                    ->schema([
+                        Forms\Components\FileUpload::make('image_path')
+                            ->label('Foto Bahan')
+                            ->image()
+                            ->directory('materials')
+                            ->columnSpanFull(),
+                            
+                        Forms\Components\Textarea::make('description')
+                            ->label('Deskripsi Singkat')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -69,6 +94,10 @@ class MaterialResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('image_path')
+                    ->label('Foto')
+                    ->circular(),
+
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Bahan')
                     ->searchable()
