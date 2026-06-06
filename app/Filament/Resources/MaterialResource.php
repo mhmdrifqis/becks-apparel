@@ -61,6 +61,18 @@ class MaterialResource extends Resource
                             ->placeholder('Meter, Kg, Roll, dll')
                             ->default('Meter')
                             ->required(),
+                            
+                        Forms\Components\CheckboxList::make('product_types')
+                            ->label('Berlaku untuk Produk')
+                            ->options([
+                                'jersey'  => 'Jersey',
+                                'jacket'  => 'Jaket',
+                                'tshirt'  => 'Kaos (T-Shirt)',
+                                'kemeja'  => 'Kemeja',
+                            ])
+                            ->helperText('Kosongkan = berlaku untuk semua produk')
+                            ->columns(2)
+                            ->columnSpanFull(),
                     ])->columns(2),
             ]);
     }
@@ -82,6 +94,11 @@ class MaterialResource extends Resource
                         'premium' => 'warning',
                         default => 'gray',
                     }),
+                    
+                Tables\Columns\TextColumn::make('product_types')
+                    ->label('Tipe Produk')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', array_map('ucfirst', $state)) : 'Semua'),
 
                 Tables\Columns\TextColumn::make('additional_price')
                     ->label('Extra Price')
@@ -98,6 +115,15 @@ class MaterialResource extends Resource
                         'standard' => 'Standard',
                         'premium' => 'Premium',
                     ]),
+                Tables\Filters\SelectFilter::make('product_types')
+                    ->label('Jenis Produk')
+                    ->options([
+                        'jersey' => 'Jersey',
+                        'jacket' => 'Jaket',
+                        'tshirt' => 'Kaos',
+                        'kemeja' => 'Kemeja',
+                    ])
+                    ->query(fn ($query, $data) => $data['value'] ? $query->whereJsonContains('product_types', $data['value']) : $query),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -53,9 +53,9 @@
 
             <div class="hidden sm:flex sm:items-center sm:gap-10">
                 <div class="flex items-center gap-8">
-                    <a href="{{ url('/') }}" :class="isTransparent ? 'text-white/90 hover:text-white' : 'text-slate-600 dark:text-zinc-400 hover:text-brand-900'" class="text-xs font-black uppercase tracking-widest transition-all">Home</a>
-                    <a href="{{ route('catalog.index') }}" :class="isTransparent ? 'text-white/90 hover:text-white' : 'text-slate-600 dark:text-zinc-400 hover:text-brand-900'" class="text-xs font-black uppercase tracking-widest transition-all">Katalog</a>
-                    <a href="{{ route('customizer') }}" :class="isTransparent ? 'text-white/90 hover:text-white' : 'text-slate-600 dark:text-zinc-400 hover:text-brand-900'" class="text-xs font-black uppercase tracking-widest transition-all">Customizer</a>
+                    <a href="{{ url('/') }}" :class="isTransparent ? 'text-white/90 hover:text-white' : 'text-slate-600 dark:text-zinc-400 hover:text-brand-900'" class="text-xs font-black uppercase tracking-widest transition-all {{ request()->is('/') ? 'border-b-2 border-brand-500 pb-1 text-brand-900 dark:text-brand-400' : '' }}">Beranda</a>
+                    <a href="{{ route('catalog.index') }}" :class="isTransparent ? 'text-white/90 hover:text-white' : 'text-slate-600 dark:text-zinc-400 hover:text-brand-900'" class="text-xs font-black uppercase tracking-widest transition-all {{ request()->routeIs('catalog.*') ? 'border-b-2 border-brand-500 pb-1 text-brand-900 dark:text-brand-400' : '' }}">Katalog</a>
+                    <a href="{{ route('customizer') }}" :class="isTransparent ? 'text-white/90 hover:text-white' : 'text-slate-600 dark:text-zinc-400 hover:text-brand-900'" class="text-xs font-black uppercase tracking-widest transition-all {{ request()->routeIs('customizer') ? 'border-b-2 border-brand-500 pb-1 text-brand-900 dark:text-brand-400' : '' }}">Customizer</a>
                 </div>
 
                 <div class="h-6 w-px bg-slate-200 dark:bg-zinc-800 transition-opacity" :class="isTransparent ? 'opacity-20' : 'opacity-100'"></div>
@@ -221,9 +221,9 @@
          x-transition:leave-end="opacity-0 -translate-y-4"
          class="sm:hidden absolute top-full left-0 right-0 mt-3 mx-auto w-[calc(100%-2rem)] bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden z-40">
         <div class="px-4 pt-4 pb-6 space-y-1">
-            <a href="{{ url('/') }}" class="block px-3 py-2 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800">Home</a>
-            <a href="{{ route('catalog.index') }}" class="block px-3 py-2 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800">Katalog</a>
-            <a href="{{ route('customizer') }}" class="block px-3 py-2 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800">Customizer</a>
+            <a href="{{ url('/') }}" class="block px-3 py-2 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 {{ request()->is('/') ? 'bg-brand-50 dark:bg-brand-950/30 text-brand-900 dark:text-brand-400 font-black' : '' }}">Beranda</a>
+            <a href="{{ route('catalog.index') }}" class="block px-3 py-2 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 {{ request()->routeIs('catalog.*') ? 'bg-brand-50 dark:bg-brand-950/30 text-brand-900 dark:text-brand-400 font-black' : '' }}">Katalog</a>
+            <a href="{{ route('customizer') }}" class="block px-3 py-2 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 {{ request()->routeIs('customizer') ? 'bg-brand-50 dark:bg-brand-950/30 text-brand-900 dark:text-brand-400 font-black' : '' }}">Customizer</a>
             
             <div class="pt-4 flex flex-col gap-2">
                  @auth

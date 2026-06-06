@@ -25,5 +25,18 @@ class AppServiceProvider extends ServiceProvider
     {
         \App\Models\Order::observe(\App\Observers\OrderStatusObserver::class);
         Vite::prefetch(concurrency: 3);
+
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('payment_settings')) {
+                $setting = \App\Models\PaymentSetting::first();
+                if ($setting) {
+                    config([
+                        'services.midtrans.server_key' => $setting->midtrans_server_key,
+                        'services.midtrans.client_key' => $setting->midtrans_client_key,
+                        'services.midtrans.is_production' => $setting->is_production,
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {}
     }
 }

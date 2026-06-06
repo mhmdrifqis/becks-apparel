@@ -68,6 +68,7 @@ class PackageResource extends Resource
                             ->reorderable()
                             ->appendFiles()
                             ->columnSpanFull()
+                            ->disk('public')
                             ->directory('packages'),
 
                         Forms\Components\Toggle::make('is_active')

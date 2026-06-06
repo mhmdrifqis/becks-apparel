@@ -23,7 +23,9 @@ class CatalogController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
-        $materials = \App\Models\Material::all();
+        // Filter bahan sesuai kategori produk (jersey, jaket, kaos, kemeja)
+        $productType = strtolower($package->category);
+        $materials = \App\Models\Material::forProductType($productType)->get();
 
         return view('catalog.show', compact('package', 'materials'));
     }

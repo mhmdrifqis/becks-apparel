@@ -183,17 +183,19 @@
                     <div class="flex flex-col lg:flex-row lg:items-start">
                         <span class="w-32 text-xs font-black text-slate-400 uppercase tracking-widest pt-2">Pilihan Bahan</span>
                         <div class="flex-1">
-                            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                                @foreach($materials as $material)
-                                <button @click="selectedMaterialId = '{{ $material->id }}'" 
-                                        class="p-4 text-[10px] font-black uppercase tracking-widest border-2 rounded-2xl transition-all relative text-left group"
-                                        :class="selectedMaterialId == '{{ $material->id }}' ? 'border-brand-900 bg-brand-50 text-brand-900 shadow-lg shadow-brand-900/5' : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'">
-                                    {{ $material->name }}
-                                    <div x-show="selectedMaterialId == '{{ $material->id }}'" class="absolute bottom-1 right-1 text-brand-900">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                    </div>
-                                </button>
-                                @endforeach
+                            <div class="max-h-[220px] overflow-y-auto custom-scrollbar pr-2 pb-2 rounded-2xl">
+                                <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                                    @foreach($materials as $material)
+                                    <button @click="selectedMaterialId = '{{ $material->id }}'" 
+                                            class="p-4 text-[10px] font-black uppercase tracking-widest border-2 rounded-2xl transition-all relative text-left group flex items-center justify-between"
+                                            :class="selectedMaterialId == '{{ $material->id }}' ? 'border-brand-900 bg-brand-50 text-brand-900 shadow-lg shadow-brand-900/5' : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'">
+                                        <span class="truncate pr-4">{{ $material->name }}</span>
+                                        <div x-show="selectedMaterialId == '{{ $material->id }}'" class="absolute bottom-2 right-2 text-brand-900">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                        </div>
+                                    </button>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>

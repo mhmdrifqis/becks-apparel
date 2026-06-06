@@ -196,18 +196,35 @@ export default () => ({
     activePatternPart: 'body',
 
     availableFonts: [
-        { id: 'sans-serif', name: 'Standard' },
-        { id: 'AC Milan 4th', name: 'AC Milan' },
-        { id: 'Brøndby IF', name: 'Brøndby' },
-        { id: 'Girondins Bordeaux', name: 'Bordeaux' },
-        { id: 'Iraq 2025', name: 'Iraq' },
-        { id: 'Osasuna 25-26', name: 'Osasuna' },
-        { id: 'PSG Fourth', name: 'PSG' },
-        { id: 'Palermo FC', name: 'Palermo' },
-        { id: 'Portugal WC 2026', name: 'Portugal' },
-        { id: 'SC Freiburg', name: 'Freiburg' },
-        { id: 'South Africa', name: 'South Africa' },
-        { id: 'Spain WC 2026', name: 'Spain' }
+        { id: 'sans-serif', name: 'Standard', family: 'sans-serif' },
+        { id: 'all-star', name: 'All Star', family: "'All Star', sans-serif" },
+        { id: 'barcelona-24-25', name: 'Barcelona 24-25', family: "'Barcelona 24-25', sans-serif" },
+        { id: 'bayern-munich-24-25', name: 'Bayern Munich 24-25', family: "'Bayern Munich 24-25', sans-serif" },
+        { id: 'boca-juniors-24', name: 'Boca Juniors 24', family: "'Boca Juniors 24', sans-serif" },
+        { id: 'brasil-24', name: 'Brasil 24', family: "'Brasil 24', sans-serif" },
+        { id: 'dortmund-cup-24-25', name: 'Dortmund Cup 24-25', family: "'Dortmund Cup 24-25', sans-serif" },
+        { id: 'england-24', name: 'England 24', family: "'England 24', sans-serif" },
+        { id: 'fiorentina-24-25', name: 'Fiorentina 24-25', family: "'Fiorentina 24-25', sans-serif" },
+        { id: 'france-24', name: 'France 24', family: "'France 24', sans-serif" },
+        { id: 'inter-milan-24-25', name: 'Inter Milan 24-25', family: "'Inter Milan 24-25', sans-serif" },
+        { id: 'juventus-24-25', name: 'Juventus 24-25', family: "'Juventus 24-25', sans-serif" },
+        { id: 'liga-portugal-24-25', name: 'Liga Portugal 24-25', family: "'Liga Portugal 24-25', sans-serif" },
+        { id: 'lyon-24-25', name: 'Lyon 24-25', family: "'Lyon 24-25', sans-serif" },
+        { id: 'man-utd-cup-24-25', name: 'Man Utd Cup 24-25', family: "'Man Utd Cup 24-25', sans-serif" },
+        { id: 'monaco-24-25', name: 'Monaco 24-25', family: "'Monaco 24-25', sans-serif" },
+        { id: 'napoli-24-25', name: 'Napoli 24-25', family: "'Napoli 24-25', sans-serif" },
+        { id: 'netherlands-24', name: 'Netherlands 24', family: "'Netherlands 24', sans-serif" },
+        { id: 'newcastle-cup-24-25', name: 'Newcastle Cup 24-25', family: "'Newcastle Cup 24-25', sans-serif" },
+        { id: 'portugal-24', name: 'Portugal 24', family: "'Portugal 24', sans-serif" },
+        { id: 'premier-league-23-24', name: 'Premier League 23-24', family: "'Premier League 23-24', sans-serif" },
+        { id: 'psg-24-25', name: 'PSG 24-25', family: "'PSG 24-25', sans-serif" },
+        { id: 'puma-24', name: 'Puma 24', family: "'Puma 24', sans-serif" },
+        { id: 'real-madrid-24-25', name: 'Real Madrid 24-25', family: "'Real Madrid 24-25', sans-serif" },
+        { id: 'river-plate-24-25', name: 'River Plate 24-25', family: "'River Plate 24-25', sans-serif" },
+        { id: 'roma-24-25', name: 'Roma 24-25', family: "'Roma 24-25', sans-serif" },
+        { id: 'sc-freiburg', name: 'SC Freiburg', family: "'SC Freiburg', sans-serif" },
+        { id: 'south-africa', name: 'South Africa', family: "'South Africa', sans-serif" },
+        { id: 'spain-wc-2026', name: 'Spain WC 2026', family: "'Spain WC 2026', sans-serif" },
     ],
 
     // UNIVERSAL TEXT STATE
@@ -249,6 +266,11 @@ export default () => ({
     // SAVE & LOAD STATE
     showSaveModal: false,
     showBackModal: false,
+    showPreviewModal: false,
+    // Auto-snapshot: setiap view di-capture otomatis saat renderLayers()
+    viewSnapshots: { jersey_front: null, jersey_back: null, pants: null },
+    // Toggle visibilitas setiap sisi di preview
+    previewVisibility: { jersey_front: true, jersey_back: true, pants: true },
     designName: '',
     saveDesignUrl: '',
     updateDesignUrl: '',
@@ -339,7 +361,6 @@ export default () => ({
                 // Load existing design if available
                 const existingData = document.getElementById('existing-design-data')?.value;
                 const existingName = document.getElementById('existing-design-name')?.value;
-                
                 if (existingData) {
                     try {
                         const state = JSON.parse(existingData);
@@ -350,6 +371,29 @@ export default () => ({
                         this.saveHistory();
                     } catch (e) {
                         console.error('Failed to load existing design:', e);
+                    }
+                } else {
+                    // Check pending design in localStorage (from Unauthenticated redirect)
+                    const pendingDesignStr = localStorage.getItem('becks_pending_design');
+                    const isAuthenticated = document.getElementById('is-authenticated')?.value === '1';
+                    
+                    if (pendingDesignStr && isAuthenticated) {
+                        try {
+                            const pendingDesign = JSON.parse(pendingDesignStr);
+                            if (confirm("Lanjutkan menyimpan desain Anda sebelumnya (" + pendingDesign.name + ")?")) {
+                                await this.applyState(pendingDesign.design_json);
+                                this.designName = pendingDesign.name;
+                                this.undoStack = [];
+                                this.saveHistory();
+                                
+                                // Auto show save modal
+                                this.showSaveModal = true;
+                            }
+                            localStorage.removeItem('becks_pending_design');
+                        } catch (e) {
+                            console.error('Failed to load pending design:', e);
+                            localStorage.removeItem('becks_pending_design');
+                        }
                     }
                 }
             }).catch(err => {
@@ -379,6 +423,10 @@ export default () => ({
             this.setupToolbarEvents();
             this.setupHistoryEvents();
             this.isLoading = false;
+            
+            // Capture snapshot awal setelah render selesai
+            await this._waitForRender();
+            this.captureSnapshot();
         } catch (error) { console.error('Error in initCanvas:', error); this.isLoading = false; }
     },
 
@@ -510,6 +558,94 @@ export default () => ({
         this.isLoading = false;
     },
 
+    async setViewSilently(view) {
+        if (this.currentView === view) return;
+        this.currentView = view;
+        const mockup = this.availableMockups.find(m => m.id === this.currentModel);
+        const viewParts = mockup?.parts[view] || [];
+        if (view === 'pants') {
+            this.activePart = viewParts.includes('left') ? 'left' : viewParts[0];
+        } else {
+            this.activePart = viewParts.includes('body') ? 'body' : viewParts[0];
+        }
+        this.activePatternPart = this.activePart;
+        const wasHistoryAction = this.isHistoryAction;
+        this.isHistoryAction = true;
+        await this.loadInitialLayers();
+        await this.updatePattern();
+        this.renderLayers();
+        this.isHistoryAction = wasHistoryAction;
+    },
+
+    openPreview() {
+        // Instantly open modal — snapshots are already captured by renderLayers()
+        this.showPreviewModal = true;
+    },
+
+    // Wait 2 animation frames so Fabric.js finishes painting
+    _waitForRender() {
+        return new Promise(resolve => {
+            requestAnimationFrame(() => requestAnimationFrame(resolve));
+        });
+    },
+
+    togglePreviewLayer(view) {
+        this.previewVisibility[view] = !this.previewVisibility[view];
+    },
+
+    async exportDesignHD(format) {
+        const views = ['jersey_front', 'jersey_back', 'pants'];
+        const visibleViews = views.filter(v => this.previewVisibility[v] && this.viewSnapshots[v]);
+        if (visibleViews.length === 0) return;
+
+        const mult = 4; // HD: 2400x2400 per view
+        const w = 600 * mult;
+        const h = 600 * mult;
+        const gap = 20 * mult;
+
+        // Build layout based on visible views
+        const offscreen = document.createElement('canvas');
+        const hasFront = this.previewVisibility.jersey_front && this.viewSnapshots.jersey_front;
+        const hasBack  = this.previewVisibility.jersey_back  && this.viewSnapshots.jersey_back;
+        const hasPants = this.previewVisibility.pants         && this.viewSnapshots.pants;
+
+        const rightCount = (hasBack ? 1 : 0) + (hasPants ? 1 : 0);
+        const leftWidth  = hasFront ? (rightCount > 0 ? w + gap : w) : 0;
+        const rightWidth = rightCount > 0 ? w : 0;
+        const rightHeight = h / (rightCount > 1 ? 2 : 1) - (rightCount > 1 ? gap/2 : 0);
+
+        offscreen.width  = leftWidth + rightWidth;
+        offscreen.height = h;
+
+        const ctx = offscreen.getContext('2d');
+        if (format === 'jpeg') { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, offscreen.width, offscreen.height); }
+
+        const loadImg = src => new Promise(res => { const i = new window.Image(); i.onload = () => res(i); i.src = src; });
+
+        // Left: front
+        if (hasFront) {
+            const img = await loadImg(this.viewSnapshots.jersey_front);
+            ctx.drawImage(img, 0, 0, w, h);
+        }
+        // Right top/bottom
+        let rightY = 0;
+        if (hasBack) {
+            const img = await loadImg(this.viewSnapshots.jersey_back);
+            ctx.drawImage(img, leftWidth, 0, rightWidth, rightHeight);
+            rightY = rightHeight + gap;
+        }
+        if (hasPants) {
+            const img = await loadImg(this.viewSnapshots.pants);
+            ctx.drawImage(img, leftWidth, rightY, rightWidth, h - rightY);
+        }
+
+        const dataUrl = offscreen.toDataURL(`image/${format === 'jpeg' ? 'jpeg' : 'png'}`, 1.0);
+        const link = document.createElement('a');
+        link.download = `${this.designName || 'becks_design'}_HD.${format}`;
+        link.href = dataUrl;
+        link.click();
+    },
+
     async loadInitialLayers() {
         const assetPath = `/assets/mockups/${this.currentModel}/${this.currentView}/`;
 
@@ -532,13 +668,17 @@ export default () => ({
 
             // Load actual layers
             for (const pid of potentialPartIds) {
-                const layer = await this.loadImage(assetPath + pid + '.png', { isSystemLayer: true, selectable: false, evented: false });
+                const src = assetPath + pid + '.png';
+                const layer = await this.loadImage(src, { isSystemLayer: true, selectable: false, evented: false });
                 if (layer) this.layers[pid] = layer;
             }
 
             // Load shadows & highlights (always expected)
-            this.layers.shadows = await this.loadImage(assetPath + 'shadows.png', { isSystemLayer: true, selectable: false, evented: false, globalCompositeOperation: 'multiply' });
-            this.layers.highlights = await this.loadImage(assetPath + 'highlights.png', { isSystemLayer: true, selectable: false, evented: false, globalCompositeOperation: 'screen' });
+            const shadowSrc = assetPath + 'shadows.png';
+            const highlightSrc = assetPath + 'highlights.png';
+
+            this.layers.shadows = await this.loadImage(shadowSrc, { isSystemLayer: true, selectable: false, evented: false, globalCompositeOperation: 'multiply' });
+            this.layers.highlights = await this.loadImage(highlightSrc, { isSystemLayer: true, selectable: false, evented: false, globalCompositeOperation: 'screen' });
 
             // Re-apply colors to new layers
             Object.keys(this.layers).forEach(pid => {
@@ -935,6 +1075,27 @@ export default () => ({
 
         this.canvas.renderAll();
         this.isHistoryAction = wasHistoryAction;
+
+        // AUTO-SNAPSHOT: simpan gambar view saat ini untuk Preview
+        this.captureSnapshot();
+    },
+
+    captureSnapshot() {
+        // Gunakan requestAnimationFrame agar pixel benar-benar sudah dilukis
+        const viewToCapture = this.currentView;
+        requestAnimationFrame(() => {
+            if (this.canvas && this.viewSnapshots.hasOwnProperty(viewToCapture)) {
+                try {
+                    this.viewSnapshots[viewToCapture] = this.canvas.toDataURL({ format: 'png', multiplier: 1 });
+                } catch(e) { /* ignore */ }
+            }
+        });
+    },
+
+    _waitForRender() {
+        return new Promise(resolve => {
+            requestAnimationFrame(() => requestAnimationFrame(resolve));
+        });
     },
 
     async updateLogoProperty(key, val) {
@@ -1466,6 +1627,18 @@ export default () => ({
             });
 
             const result = await response.json();
+
+            if (response.status === 401 || result.message === 'Unauthenticated.') {
+                // Simpan desain sementara ke localStorage
+                localStorage.setItem('becks_pending_design', JSON.stringify({
+                    name: this.designName,
+                    design_json: exportState,
+                    preview_image: previewImage
+                }));
+                // Redirect ke halaman login
+                window.location.href = '/login?redirect_to=customizer';
+                return;
+            }
 
             if (result.success) {
                 // Redirect to designs list

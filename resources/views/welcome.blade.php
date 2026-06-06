@@ -25,12 +25,12 @@
             <h2 class="font-['Dancing_Script'] text-white text-3xl md:text-6xl mb-4 animate-fade-in-down drop-shadow-lg">
                 Wear Your Pride
             </h2>
-            <h1 class="text-6xl sm:text-5xl md:text-[12rem] lg:text-[16rem] font-black leading-tight tracking-[-0.05em] select-none animate-scale-up text-transparent bg-clip-text bg-gradient-to-r from-brand-300 via-brand-400 to-green-400 py-4 px-10">
+            <h1 class="text-6xl sm:text-7xl md:text-[6rem] lg:text-[8rem] font-display font-extrabold leading-tight tracking-tight select-none animate-scale-up text-transparent bg-clip-text bg-gradient-to-r from-brand-300 via-brand-400 to-green-400 py-4 px-10">
                 BECKS
             </h1>
             
             <div class="mt-8 md:mt-12">
-                <div class="inline-block px-6 py-3 md:px-12 md:py-4 bg-[#fdfbf7] text-[#06402B] rounded-full font-black text-[10px] md:text-base tracking-[0.1em] md:tracking-[0.2em] shadow-2xl animate-fade-in-up uppercase">
+                <div class="inline-block px-6 py-3 md:px-12 md:py-4 bg-[#fdfbf7] text-[#06402B] rounded-full font-bold text-xs md:text-sm tracking-widest shadow-2xl animate-fade-in-up uppercase">
                     PT BOLA MEDIA SPORTAINMENT
                 </div>
             </div>
@@ -46,19 +46,19 @@
     <!-- SECTION 2: WELCOME -->
     <section class="min-h-screen py-20 md:py-24 flex items-center bg-[#fdfbf7]">
         <div class="max-w-7xl mx-auto px-6 overflow-hidden">
-            <h2 class="text-4xl sm:text-7xl md:text-[10rem] font-black leading-none mb-12 tracking-tighter opacity-100 transform -translate-x-1 md:-translate-x-4">
+            <h2 class="text-3xl sm:text-5xl md:text-7xl font-display font-bold leading-none mb-10 tracking-tight opacity-100 transform -translate-x-1 md:-translate-x-2 text-[#06402B]">
                 WELCOME
             </h2>
             <div class="grid md:grid-cols-12 gap-12">
                 <div class="md:col-start-2 md:col-span-9">
-                    <p class="text-xl md:text-4xl font-bold leading-[1.2] text-[#06402B]">
+                    <p class="text-lg md:text-2xl font-semibold leading-[1.4] text-[#06402B]">
                         Becks Apparel adalah vendor jersey yang telah berkibar sejak <span class="bg-[#06402B] text-[#fdfbf7] px-2 italic">2018</span> dan bernaung di bawah PT Bola Media Sportainment. 
                     </p>
-                    <p class="mt-8 text-lg md:text-2xl leading-relaxed text-[#06402B]/80 font-medium">
+                    <p class="mt-6 text-base md:text-lg leading-relaxed text-[#06402B]/80 font-normal">
                         Sebagai sebuah brand, Becks Apparel telah dipercaya berbagai klub Liga 3 Indonesia. Mulai dari Jakarta United FC, PSJS Jakarta Selatan, Persikota Tangerang, ACN Muara Badak, hingga PS Belitung Timur. 
                     </p>
-                    <p class="mt-8 text-lg md:text-2xl leading-relaxed text-[#06402B]/80 font-medium">
-                        Dengan tagline <span class="font-black text-[#06402B]">#WearYourPride</span>, kamu tak perlu khawatir akan kualitas. Becks Apparel siap menciptakan jersey impianmu dengan hasil terbaik.
+                    <p class="mt-6 text-base md:text-lg leading-relaxed text-[#06402B]/80 font-normal">
+                        Dengan tagline <span class="font-bold text-[#06402B] italic">#WearYourPride</span>, kamu tak perlu khawatir akan kualitas. Becks Apparel siap menciptakan jersey impianmu dengan hasil terbaik.
                     </p>
                 </div>
             </div>
@@ -72,7 +72,7 @@
         </div>
         
         <div class="max-w-7xl mx-auto px-6">
-            <h2 class="text-4xl sm:text-7xl md:text-[10rem] font-black leading-none mb-16 md:mb-20 tracking-tighter">
+            <h2 class="text-3xl sm:text-5xl md:text-7xl font-display font-bold leading-none mb-12 md:mb-16 tracking-tight text-[#06402B]">
                 PRODUK
             </h2>
             
@@ -87,12 +87,12 @@
                 @endphp
                 
                 @foreach($products as $prod)
-                    <div class="group flex flex-col items-center text-center">
+                    <a href="{{ route('catalog.index', ['category' => strtolower($prod['name'])]) }}" class="group flex flex-col items-center text-center text-decoration-none">
                         <div class="aspect-square w-full rounded-2xl md:rounded-[3rem] bg-white border border-slate-100 flex items-center justify-center p-4 md:p-8 transition-all duration-500 group-hover:-translate-y-2 md:group-hover:-translate-y-4 group-hover:shadow-2xl group-hover:border-[#06402B]/20">
                             <img src="{{ $prod['img'] }}" alt="{{ $prod['name'] }}" class="w-full h-full object-contain">
                         </div>
-                        <h3 class="mt-4 md:mt-6 text-base md:text-2xl font-black uppercase tracking-widest">{{ $prod['name'] }}</h3>
-                    </div>
+                        <h3 class="mt-4 md:mt-6 text-sm md:text-lg font-bold uppercase tracking-wider text-[#06402B] group-hover:text-brand-500 transition-colors">{{ $prod['name'] }}</h3>
+                    </a>
                 @endforeach
             </div>
         </div>
@@ -105,13 +105,13 @@
         </div>
 
         <div class="max-w-7xl mx-auto px-6">
-            <h2 class="text-4xl sm:text-7xl md:text-[10rem] font-black leading-none mb-8 md:mb-12 tracking-tighter text-right text-[#06402B]">
+            <h2 class="text-3xl sm:text-5xl md:text-7xl font-display font-bold leading-none mb-8 md:mb-12 tracking-tight text-right text-[#06402B]">
                 KOLABORASI
             </h2>
             
             <div class="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
                 <div class="space-y-6 md:space-y-8">
-                    <p class="text-xl md:text-2xl font-black uppercase tracking-tight mb-8 text-[#06402B]">Becks Apparel terbuka untuk berkolaborasi dengan:</p>
+                    <p class="text-lg md:text-xl font-semibold uppercase tracking-wide mb-8 text-[#06402B]">Becks Apparel terbuka untuk berkolaborasi dengan:</p>
                     <div class="grid sm:grid-cols-2 gap-4">
                         @php
                             $collabs = [
@@ -131,7 +131,7 @@
                                         {!! $item['icon'] !!}
                                     </svg>
                                 </div>
-                                <span class="font-bold text-sm md:text-base leading-tight">{{ $item['label'] }}</span>
+                                <span class="font-medium text-sm md:text-base leading-tight">{{ $item['label'] }}</span>
                             </div>
                         @endforeach
                     </div>
@@ -149,7 +149,7 @@
     <!-- SECTION 5: KENAPA BECKS? -->
     <section class="min-h-screen py-20 md:py-24 bg-[#fdfbf7]">
         <div class="max-w-7xl mx-auto px-6">
-            <h2 class="text-4xl sm:text-7xl md:text-[10rem] font-black leading-none mb-12 md:mb-16 tracking-tighter text-[#06402B]">
+            <h2 class="text-3xl sm:text-5xl md:text-7xl font-display font-bold leading-none mb-12 md:mb-16 tracking-tight text-[#06402B]">
                 KENAPA<br/>BECKS?
             </h2>
             
@@ -174,8 +174,8 @@
                                         {!! $r['icon'] !!}
                                     </svg>
                                 </div>
-                                <h3 class="text-xl font-black uppercase tracking-widest mb-3 transition-colors duration-300 group-hover:text-[#06402B]">{{ $r['title'] }}</h3>
-                                <p class="text-lg text-[#06402B]/60 font-medium leading-relaxed">{{ $r['desc'] }}</p>
+                                <h3 class="text-lg font-bold uppercase tracking-wider mb-2 transition-colors duration-300 group-hover:text-[#06402B]">{{ $r['title'] }}</h3>
+                                <p class="text-base text-[#06402B]/70 font-normal leading-relaxed">{{ $r['desc'] }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -186,8 +186,8 @@
 
     <!-- FINAL CTA -->
     <section class="py-24 bg-[#06402B] text-[#fdfbf7] text-center">
-        <h2 class="text-4xl md:text-7xl font-black mb-12 italic uppercase tracking-tighter">#WEARYOURPRIDE</h2>
-        <a href="{{ route('customizer') }}" class="inline-flex px-12 py-6 bg-[#fdfbf7] text-[#06402B] rounded-full font-black text-xl hover:scale-110 active:scale-95 transition-all shadow-3xl uppercase tracking-tighter italic text-decoration-none">
+        <h2 class="text-3xl md:text-5xl font-display font-bold mb-10 italic uppercase tracking-widest">#WEARYOURPRIDE</h2>
+        <a href="{{ route('customizer') }}" class="inline-flex px-10 py-5 bg-[#fdfbf7] text-[#06402B] rounded-full font-bold text-lg hover:scale-105 active:scale-95 transition-all shadow-2xl uppercase tracking-wider text-decoration-none">
             Mulai Kustomisasi Sekarang
         </a>
     </section>

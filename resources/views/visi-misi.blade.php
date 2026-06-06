@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Visi & Misi - Becks Apparel')
+@section('title', 'Visi & Misi')
 
 @section('content')
 <div class="bg-slate-50 min-h-screen">

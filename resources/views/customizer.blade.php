@@ -44,7 +44,7 @@
         @font-face { font-family: 'Spain WC 2026'; src: url('/assets/fonts/Spain WC 2026_Nero Design.woff2') format('woff2'); }
         
         /* Cropper CSS disesuaikan dengan tema gelap */
-        .cropper-container { background-color: #121212 !important; }
+        .cropper-container { background-color: #04251a !important; }
         .cropper-modal { background-color: #000 !important; opacity: 0.8 !important; }
         .cropper-view-box { outline: 2px solid #f97316 !important; }
         .cropper-face { background-color: transparent !important; }
@@ -81,7 +81,7 @@
 
         <aside 
             :class="isPanelOpen ? 'md:w-80 h-[45%] md:h-full opacity-100' : 'md:w-0 h-0 md:h-full opacity-0'"
-            class="relative w-full bg-[#121212] border-t md:border-t-0 md:border-r border-brand-800/20 flex flex-col z-20 shadow-2xl order-2 md:order-2 transition-all duration-300 overflow-hidden shrink-0 mb-16 md:mb-0"
+            class="relative w-full bg-brand-950/95 backdrop-blur-2xl border-t md:border-t-0 md:border-r border-brand-800/20 flex flex-col z-20 shadow-2xl order-2 md:order-2 transition-all duration-300 overflow-hidden shrink-0 mb-16 md:mb-0"
         >
             <header class="p-4 md:p-6 border-b border-brand-800/20 bg-brand-950/40 flex items-center justify-between">
                 <div>
@@ -156,7 +156,7 @@
                                     x-show="showAllSolidColors || index < 14"
                                     @click="updatePartColor(activePart, color)" 
                                     :style="`background-color: ${color}`" 
-                                    :class="partColors[activePart] === color && partColorMode[activePart] === 'solid' ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-[#121212] scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'" 
+                                    :class="partColors[activePart] === color && partColorMode[activePart] === 'solid' ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-brand-950 scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'" 
                                     class="w-7 h-7 rounded-full border border-white/5 transition-all shadow-lg"
                                 ></button>
                             </template>
@@ -179,7 +179,7 @@
                                 <button 
                                     x-show="showAllGradients || index < 14"
                                     @click="applyGradientPreset(activePart, gp)"
-                                    :class="partActiveGradientPreset[activePart] === gp.id ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-[#121212] scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'"
+                                    :class="partActiveGradientPreset[activePart] === gp.id ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-brand-950 scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'"
                                     class="w-7 h-7 rounded-full border border-white/5 transition-all shadow-lg"
                                     :style="`background: ${gp.type === 'radial' ? 'radial-gradient(circle, ' + gp.color1 + ', ' + gp.color2 + ')' : 'linear-gradient(' + gp.angle + 'deg, ' + gp.color1 + ', ' + gp.color2 + ')'}`"
                                 ></button>
@@ -273,7 +273,7 @@
                             </div>
                             <div class="grid grid-cols-7 gap-1.5">
                                 <template x-for="(color, index) in solidColors" :key="'pat-'+color">
-                                    <button x-show="showAllPatternColors || index < 14" @click="updatePatternColor(color)" :style="`background-color: ${color}`" :class="patternColor === color ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-[#121212] scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'" class="w-7 h-7 rounded-full border border-white/5 shadow-lg transition-all"></button>
+                                    <button x-show="showAllPatternColors || index < 14" @click="updatePatternColor(color)" :style="`background-color: ${color}`" :class="patternColor === color ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-brand-950 scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'" class="w-7 h-7 rounded-full border border-white/5 shadow-lg transition-all"></button>
                                 </template>
                                 <button class="w-7 h-7 rounded-full border-2 border-dashed border-brand-800 hover:border-brand-500 bg-brand-950/40 flex items-center justify-center relative transition-all hover:scale-105">
                                     <span class="text-brand-400 text-sm leading-none">+</span>
@@ -292,7 +292,7 @@
                                     <button 
                                         x-show="showAllPatternGradients || index < 14"
                                         @click="updatePatternGradientFromPreset(gp)"
-                                        :class="patternActiveGradientPreset === gp.id && activeState.partPatternGradientEnabled[activePatternPart] ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-[#121212] scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'"
+                                        :class="patternActiveGradientPreset === gp.id && activeState.partPatternGradientEnabled[activePatternPart] ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-brand-950 scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'"
                                         class="w-7 h-7 rounded-full border border-white/5 transition-all shadow-lg"
                                         :style="`background: ${gp.type === 'radial' ? 'radial-gradient(circle, ' + gp.color1 + ', ' + gp.color2 + ')' : 'linear-gradient(' + gp.angle + 'deg, ' + gp.color1 + ', ' + gp.color2 + ')'}`"
                                     ></button>
@@ -422,7 +422,7 @@
                         </div>
                         <div class="grid grid-cols-7 gap-1.5">
                             <template x-for="(color, index) in solidColors" :key="'txt-'+color">
-                                <button x-show="showAllTextColors || index < 14" @click="updateTextProperty('activeColor', color)" :style="`background-color: ${color}`" :class="activeColor === color && !textGradientEnabled ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-[#121212] scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'" class="w-7 h-7 rounded-full border border-white/5 shadow-lg transition-all"></button>
+                                <button x-show="showAllTextColors || index < 14" @click="updateTextProperty('activeColor', color)" :style="`background-color: ${color}`" :class="activeColor === color && !textGradientEnabled ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-brand-950 scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'" class="w-7 h-7 rounded-full border border-white/5 shadow-lg transition-all"></button>
                             </template>
                             <button class="w-7 h-7 rounded-full border-2 border-dashed border-brand-800 hover:border-brand-500 bg-brand-950/40 flex items-center justify-center relative transition-all hover:scale-105">
                                 <span class="text-brand-400 text-sm leading-none pointer-events-none">+</span>
@@ -441,7 +441,7 @@
                                 <button 
                                     x-show="showAllTextGradients || index < 14"
                                     @click="applyTextGradientPreset(gp)"
-                                    :class="textActiveGradientPreset === gp.id && textGradientEnabled ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-[#121212] scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'"
+                                    :class="textActiveGradientPreset === gp.id && textGradientEnabled ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-brand-950 scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'"
                                     class="w-7 h-7 rounded-full border border-white/5 transition-all shadow-lg"
                                     :style="`background: ${gp.type === 'radial' ? 'radial-gradient(circle, ' + gp.color1 + ', ' + gp.color2 + ')' : 'linear-gradient(' + gp.angle + 'deg, ' + gp.color1 + ', ' + gp.color2 + ')'}`"
                                 ></button>
@@ -545,6 +545,9 @@
             </div>
             
             <div class="absolute bottom-20 md:bottom-8 right-8 z-40 flex flex-col gap-3 items-end">
+                <button @click="openPreview()" class="bg-brand-950 hover:bg-brand-900 text-brand-400 w-14 h-14 rounded-2xl shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-brand-800 group" title="Preview Keseluruhan">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
                 <button @click="triggerSave()" class="bg-brand-900 hover:bg-brand-800 text-white w-14 h-14 rounded-2xl shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-white/10 group" title="Simpan Desain">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-12 transition-transform"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                 </button>
@@ -642,7 +645,7 @@
                 <h3 class="font-bold text-brand-50 uppercase tracking-widest text-sm">Pangkas Gambar</h3>
                 <button @click="cancelCrop()" class="p-2 text-brand-400 hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             </div>
-            <div class="flex-1 bg-[#121212] relative overflow-hidden flex items-center justify-center min-h-[300px]">
+            <div class="flex-1 bg-brand-950/95 backdrop-blur-2xl relative overflow-hidden flex items-center justify-center min-h-[300px]">
                 <img id="cropper-image" class="max-w-full max-h-full block">
             </div>
             <div class="p-6 border-t border-brand-800/30 flex justify-end gap-3 bg-brand-950/40">
@@ -703,6 +706,121 @@
         </div>
     </div>
 
+    <!-- Modal Preview Keseluruhan -->
+    <div x-show="showPreviewModal" x-cloak class="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" x-transition>
+        <div class="bg-brand-950 border border-brand-800/50 rounded-3xl w-full max-w-5xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-brand-800/30 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-900/40 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-brand-400"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-brand-50 uppercase tracking-widest text-sm">Preview Keseluruhan</h3>
+                        <p class="text-[10px] text-brand-400 mt-0.5 font-bold tracking-widest uppercase">Lihat hasil desain akhir</p>
+                    </div>
+                </div>
+                <!-- Tombol Toggle Sisi -->
+                <div class="flex items-center gap-2 ml-auto mr-4">
+                    <button @click="togglePreviewLayer('jersey_front')"
+                        :class="previewVisibility.jersey_front ? 'bg-brand-800 text-white' : 'bg-transparent text-brand-500 border border-brand-700'"
+                        class="px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
+                        Depan
+                    </button>
+                    <button @click="togglePreviewLayer('jersey_back')"
+                        :class="previewVisibility.jersey_back ? 'bg-brand-800 text-white' : 'bg-transparent text-brand-500 border border-brand-700'"
+                        class="px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
+                        Belakang
+                    </button>
+                    <button @click="togglePreviewLayer('pants')"
+                        :class="previewVisibility.pants ? 'bg-brand-800 text-white' : 'bg-transparent text-brand-500 border border-brand-700'"
+                        class="px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
+                        Celana
+                    </button>
+                </div>
+                <button @click="showPreviewModal = false" class="p-2 text-brand-400 hover:text-white transition-colors shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <!-- Layout Preview: Depan (besar, kiri) | Belakang+Celana (kanan, ditumpuk) -->
+            <div class="p-6 flex-1 overflow-hidden">
+                <div class="flex gap-4 h-full min-h-[380px]">
+                    <!-- DEPAN (Kolom Kiri, Besar) -->
+                    <div x-show="previewVisibility.jersey_front"
+                         :class="(previewVisibility.jersey_back || previewVisibility.pants) ? 'flex-[2]' : 'flex-1'"
+                         class="flex flex-col gap-2 transition-all duration-300">
+                        <p class="text-[9px] font-bold text-brand-500 uppercase tracking-widest text-center">Depan</p>
+                        <div class="flex-1 bg-brand-900/20 border border-brand-800/60 rounded-2xl flex items-center justify-center p-3 overflow-hidden">
+                            <template x-if="viewSnapshots.jersey_front">
+                                <img :src="viewSnapshots.jersey_front" alt="Depan" class="max-w-full max-h-full object-contain drop-shadow-2xl">
+                            </template>
+                            <template x-if="!viewSnapshots.jersey_front">
+                                <div class="text-brand-600 text-xs text-center flex flex-col items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                                    <span class="uppercase tracking-widest" style="font-size:9px">Buka tab Depan dulu</span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- BELAKANG + CELANA (Kolom Kanan, Ditumpuk) -->
+                    <div x-show="previewVisibility.jersey_back || previewVisibility.pants"
+                         class="flex-1 flex flex-col gap-3 transition-all duration-300">
+                        <!-- Belakang -->
+                        <div x-show="previewVisibility.jersey_back"
+                             :class="previewVisibility.pants ? 'flex-1' : 'flex-1'"
+                             class="flex flex-col gap-2">
+                            <p class="text-[9px] font-bold text-brand-500 uppercase tracking-widest text-center">Belakang</p>
+                            <div class="flex-1 bg-brand-900/20 border border-brand-800/60 rounded-2xl flex items-center justify-center p-3 overflow-hidden">
+                                <template x-if="viewSnapshots.jersey_back">
+                                    <img :src="viewSnapshots.jersey_back" alt="Belakang" class="max-w-full max-h-full object-contain drop-shadow-2xl">
+                                </template>
+                                <template x-if="!viewSnapshots.jersey_back">
+                                    <div class="text-brand-600 text-xs text-center flex flex-col items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                                        <span class="uppercase tracking-widest" style="font-size:9px">Buka tab Belakang dulu</span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        <!-- Celana -->
+                        <div x-show="previewVisibility.pants"
+                             :class="previewVisibility.jersey_back ? 'flex-1' : 'flex-1'"
+                             class="flex flex-col gap-2">
+                            <p class="text-[9px] font-bold text-brand-500 uppercase tracking-widest text-center">Celana</p>
+                            <div class="flex-1 bg-brand-900/20 border border-brand-800/60 rounded-2xl flex items-center justify-center p-3 overflow-hidden">
+                                <template x-if="viewSnapshots.pants">
+                                    <img :src="viewSnapshots.pants" alt="Celana" class="max-w-full max-h-full object-contain drop-shadow-2xl">
+                                </template>
+                                <template x-if="!viewSnapshots.pants">
+                                    <div class="text-brand-600 text-xs text-center flex flex-col items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                                        <span class="uppercase tracking-widest" style="font-size:9px">Buka tab Celana dulu</span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 pb-6 border-t border-brand-800/30 pt-4 flex flex-col sm:flex-row gap-3">
+                <button @click="showPreviewModal = false" class="py-3 px-6 rounded-2xl border border-brand-800 text-brand-400 hover:bg-brand-900/10 transition-all text-xs font-bold uppercase tracking-widest text-center">Tutup</button>
+                <div class="flex-1 flex gap-3">
+                    <button @click="exportDesignHD('png')" class="flex-1 py-3 px-4 rounded-2xl bg-brand-900 hover:bg-brand-800 text-white shadow-xl transition-all text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Download PNG HD
+                    </button>
+                    <button @click="exportDesignHD('jpeg')" class="flex-1 py-3 px-4 rounded-2xl bg-brand-900 hover:bg-brand-800 text-white shadow-xl transition-all text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Download JPG HD
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Hidden input for CSRF and Routes -->
     <input type="hidden" id="csrf-token" value="{{ csrf_token() }}">
     <input type="hidden" id="save-design-url" value="{{ route('customer.designs.store') }}">
@@ -711,6 +829,9 @@
         <input type="hidden" id="existing-design-data" value="{{ json_encode($design->design_json) }}">
         <input type="hidden" id="existing-design-name" value="{{ $design->name }}">
     @endif
+    <input type="hidden" id="is-authenticated" value="{{ auth()->check() ? '1' : '0' }}">
 
 </div>
+
+@vite('resources/js/customizer.js')
 @endsection

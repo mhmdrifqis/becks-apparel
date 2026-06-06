@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Katalog Paket - Becks Apparel')
+@section('title', 'Katalog Paket')
 
 @section('content')
 <div class="bg-slate-50 min-h-screen">
@@ -32,7 +32,7 @@
     </section>
 
     <!-- Catalog Content -->
-    <div class="max-w-7xl mx-auto px-4 py-12" x-data="{ activeCategory: 'all' }">
+    <div class="max-w-7xl mx-auto px-4 py-12" x-data="{ activeCategory: new URLSearchParams(window.location.search).get('category') || 'all' }">
         <div class="flex flex-col lg:flex-row gap-12">
             
             <!-- Sidebar Filters -->
