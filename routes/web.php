@@ -59,6 +59,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout/process', [App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
 });
 
+// Chatbot Endpoint (Proxy & Live Chat)
+Route::post('/chatbot', [\App\Http\Controllers\ChatbotController::class, 'handleChat'])->name('chatbot.handle');
+Route::get('/chatbot/poll', [\App\Http\Controllers\ChatbotController::class, 'pollMessages'])->name('chatbot.poll');
+
 require __DIR__.'/auth.php';
 
 // Webhook for Midtrans (No Authentication Required)

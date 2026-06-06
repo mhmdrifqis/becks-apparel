@@ -72,6 +72,7 @@ class MasterDataSeeder extends Seeder
                     'category' => $row[1] ?? 'Standard',
                     'status' => ($row[2] ?? 'Ready') === 'Ready' ? 'Ready' : 'Out of Stock',
                     'additional_price' => 0, // Default 0 as per CSV for now
+                    'allowed_categories' => ['jersey'], // Default to jersey for these fabrics
                 ]
             );
         }

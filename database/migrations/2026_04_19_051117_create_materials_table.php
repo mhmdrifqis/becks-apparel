@@ -15,8 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->enum('category', ['Standard', 'Premium'])->default('Standard');
+            $table->json('allowed_categories')->nullable();
+            $table->text('description')->nullable();
+            $table->string('image_path')->nullable();
             $table->enum('status', ['Ready', 'Out of Stock'])->default('Ready');
             $table->decimal('additional_price', 15, 2)->default(0);
+            $table->decimal('stock', 10, 2)->default(0);
+            $table->string('unit')->default('Meter');
             $table->timestamps();
         });
     }
