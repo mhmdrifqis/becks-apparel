@@ -36,7 +36,7 @@ class ChatbotController extends Controller
         }
 
         // 2. Jika tidak ada sesi aktif, proxy ke FastAPI
-        $fastapiUrl = env('FASTAPI_CHATBOT_URL', 'http://127.0.0.1:8000/chatbot');
+        $fastapiUrl = config('services.chatbot.url');
 
         try {
             $response = Http::timeout(10)->post($fastapiUrl, [
@@ -87,12 +87,14 @@ class ChatbotController extends Controller
             return response()->json(['messages' => [], 'status' => 'no_chat']);
         }
 
-        // Ambil pesan dari admin yang lebih baru dari last_id
-        $messages = $chat->messages()
-            ->where('sender', 'admin')
-            ->where('id', '>', $lastId)
-            ->orderBy('id', 'asc')
-            ->get();
+        $query = $chat->messages()->where('id', '>', $lastId);
+        
+        // Hanya ambil pesan admin jika bukan permintaan load riwayat penuh (all=1)
+        if (!$request->query('all')) {
+            $query->where('sender', 'admin');
+        }
+
+        $messages = $query->orderBy('id', 'asc')->get();
 
         return response()->json([
             'messages' => $messages,

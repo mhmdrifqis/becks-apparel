@@ -107,14 +107,13 @@
 
                     <form wire:submit.prevent="sendMessage" class="flex gap-2">
 
-                        <x-filament::input.wrapper class="flex-1">
-                            <x-filament::input
-                                type="text"
-                                wire:model="newMessage"
-                                placeholder="Tulis balasan..."
-                                required
-                            />
-                        </x-filament::input.wrapper>
+                        <input
+                            type="text"
+                            wire:model="newMessage"
+                            placeholder="Tulis balasan..."
+                            class="flex-1 rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            required
+                        >
 
                         <x-filament::button type="submit" color="success">
                             Kirim

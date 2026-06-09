@@ -31,6 +31,8 @@ class MessagesRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('message')
+            ->poll('3s')
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('sender')
                     ->badge()
@@ -55,6 +57,13 @@ class MessagesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
+                Tables\Actions\CreateAction::make()
+                    ->label('Balas Pesan')
+                    ->icon('heroicon-o-chat-bubble-left-ellipsis')
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $data['sender'] = 'admin';
+                        return $data;
+                    }),
                 Tables\Actions\Action::make('clearMessages')
                     ->label('Kosongkan Semua Pesan')
                     ->color('danger')

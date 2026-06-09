@@ -45,16 +45,7 @@ class MaterialResource extends Resource
                             ])
                             ->required(),
 
-                        Forms\Components\Select::make('allowed_categories')
-                            ->label('Tersedia Untuk Produk')
-                            ->multiple()
-                            ->options([
-                                'jersey' => 'Jersey',
-                                'jacket' => 'Jacket',
-                                'tshirt' => 'T-Shirt',
-                                'kemeja' => 'Kemeja',
-                            ])
-                            ->required(),
+
 
                         Forms\Components\TextInput::make('additional_price')
                             ->label('Harga Tambahan')
@@ -127,7 +118,11 @@ class MaterialResource extends Resource
                 Tables\Columns\TextColumn::make('product_types')
                     ->label('Tipe Produk')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', array_map('ucfirst', $state)) : 'Semua'),
+                    ->getStateUsing(function ($record) {
+                        $types = $record->product_types;
+                        return (empty($types) || !is_array($types)) ? ['Semua'] : $types;
+                    })
+                    ->formatStateUsing(fn ($state) => ucfirst($state)),
 
                 Tables\Columns\TextColumn::make('additional_price')
                     ->label('Extra Price')

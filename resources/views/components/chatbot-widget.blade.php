@@ -1,6 +1,33 @@
 <div 
-    x-data="{ isOpen: false }" 
+    x-data="{ 
+        isOpen: false,
+        x: 0, y: 0, dragging: false, hasDragged: false, startX: 0, startY: 0, initialX: 0, initialY: 0,
+        dragStart(e) {
+            this.dragging = true;
+            this.hasDragged = false;
+            this.initialX = e.clientX;
+            this.initialY = e.clientY;
+            this.startX = e.clientX - this.x;
+            this.startY = e.clientY - this.y;
+        },
+        dragMove(e) {
+            if (!this.dragging) return;
+            if (Math.abs(e.clientX - this.initialX) > 5 || Math.abs(e.clientY - this.initialY) > 5) {
+                this.hasDragged = true;
+            }
+            this.x = e.clientX - this.startX;
+            this.y = e.clientY - this.startY;
+        },
+        dragEnd() {
+            this.dragging = false;
+        }
+    }" 
+    @mousemove.window="dragMove"
+    @mouseup.window="dragEnd"
+    @touchmove.window="if(dragging) { dragMove($event.touches[0]); $event.preventDefault(); }"
+    @touchend.window="dragEnd"
     class="fixed bottom-6 right-6 z-50 flex flex-col items-end"
+    :style="`transform: translate(${x}px, ${y}px)`"
 >
     <!-- Chat Window -->
     <div 
@@ -97,13 +124,15 @@
 
     <!-- Toggle Button -->
     <button 
-        @click="isOpen = !isOpen"
-        class="w-14 h-14 rounded-full bg-brand-900 hover:bg-brand-800 text-white shadow-lg shadow-brand-900/30 flex items-center justify-center transition-all duration-300 hover:scale-105 focus:outline-none ring-4 ring-white dark:ring-zinc-950 group"
+        @mousedown="dragStart"
+        @touchstart="dragStart($event.touches[0])"
+        @click.prevent="if(!hasDragged) isOpen = !isOpen"
+        class="w-14 h-14 rounded-full bg-brand-900 hover:bg-brand-800 text-white shadow-lg shadow-brand-900/30 flex items-center justify-center transition-all duration-300 hover:scale-105 focus:outline-none ring-4 ring-white dark:ring-zinc-950 group cursor-grab active:cursor-grabbing"
     >
-        <svg x-show="!isOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg x-show="!isOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:animate-pulse pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
         </svg>
-        <svg x-show="isOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" style="display: none;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg x-show="isOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pointer-events-none" style="display: none;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
     </button>
@@ -173,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     };
 
-    const addMessage = (message, sender = 'user', options = null) => {
+    const addMessageToDOM = (message, sender = 'user', options = null) => {
         const div = document.createElement('div');
         div.className = `flex items-start gap-2 max-w-[85%] ${sender === 'user' ? 'ml-auto flex-row-reverse' : ''} animate-fade-in-up`;
         
@@ -250,6 +279,15 @@ document.addEventListener('DOMContentLoaded', function() {
         scrollToBottom();
     };
 
+    const addMessage = (message, sender = 'user', options = null) => {
+        addMessageToDOM(message, sender, options);
+        if (!isAdminMode) {
+            const localHistory = JSON.parse(sessionStorage.getItem('becks_chat_history') || '[]');
+            localHistory.push({ message, sender, options });
+            sessionStorage.setItem('becks_chat_history', JSON.stringify(localHistory));
+        }
+    };
+
     const sendChatMessage = async (message) => {
         if (!message || message.trim() === '') return;
 
@@ -310,6 +348,36 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         sendChatMessage(chatInput.value);
     });
+
+    const loadChatHistory = async () => {
+        try {
+            const res = await fetch(`{{ route('chatbot.poll') }}?last_id=0&all=1`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+            
+            if (data.status === 'active') {
+                isAdminMode = true;
+                toggleAdminUI(true);
+                if (data.messages && data.messages.length > 0) {
+                    data.messages.forEach(msg => {
+                        addMessageToDOM(msg.message, msg.sender);
+                        lastMessageId = Math.max(lastMessageId, msg.id);
+                    });
+                }
+                startPolling();
+                return;
+            }
+        } catch (e) { console.error('History fetch error:', e); }
+
+        // Jika tidak ada LiveChat aktif, muat dari sessionStorage
+        const localHistory = JSON.parse(sessionStorage.getItem('becks_chat_history') || '[]');
+        localHistory.forEach(msg => {
+            addMessageToDOM(msg.message, msg.sender, msg.options);
+        });
+    };
+
+    loadChatHistory();
 });
 </script>
 

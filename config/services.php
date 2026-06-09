@@ -37,4 +37,8 @@ return [
         'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
     ],
 
+    'chatbot' => [
+        'url' => env('FASTAPI_CHATBOT_URL', 'http://127.0.0.1:8000/chatbot'),
+    ],
+
 ];

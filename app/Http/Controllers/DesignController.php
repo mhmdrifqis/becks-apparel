@@ -27,14 +27,14 @@ class DesignController extends Controller
         $previewPath = null;
         if ($request->preview_image) {
             $imageData = $request->preview_image;
-            $image = str_replace('data:image/png;base64,', '', $imageData);
+            $image = preg_replace('/^data:image\/\w+;base64,/', '', $imageData);
             $image = str_replace(' ', '+', $image);
-            $imageName = 'design_' . time() . '_' . Str::random(10) . '.png';
+            $imageName = 'design_' . time() . '_' . Str::random(10) . '.jpg';
             $previewPath = 'designs/' . $imageName;
             Storage::disk('public')->put($previewPath, base64_decode($image));
         }
 
-        Design::create([
+        $design = Design::create([
             'user_id' => Auth::id(),
             'name' => $request->name,
             'design_json' => json_decode($request->design_json, true),
@@ -44,7 +44,9 @@ class DesignController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Desain berhasil disimpan!',
-            'redirect' => route('customer.designs')
+            'design_id' => $design->id,
+            'redirect' => route('customer.designs.edit', $design->id),
+            'updateUrl' => route('customer.designs.update', $design->id)
         ]);
     }
 
@@ -68,9 +70,9 @@ class DesignController extends Controller
             }
 
             $imageData = $request->preview_image;
-            $image = str_replace('data:image/png;base64,', '', $imageData);
+            $image = preg_replace('/^data:image\/\w+;base64,/', '', $imageData);
             $image = str_replace(' ', '+', $image);
-            $imageName = 'design_' . time() . '_' . Str::random(10) . '.png';
+            $imageName = 'design_' . time() . '_' . Str::random(10) . '.jpg';
             $previewPath = 'designs/' . $imageName;
             Storage::disk('public')->put($previewPath, base64_decode($image));
         }
@@ -84,7 +86,8 @@ class DesignController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Desain berhasil diperbarui!',
-            'redirect' => route('customer.designs')
+            'redirect' => route('customer.designs.edit', $design->id),
+            'updateUrl' => route('customer.designs.update', $design->id)
         ]);
     }
 

@@ -53,7 +53,7 @@
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8 p-6 md:p-12 overflow-hidden relative">
             <div class="overflow-x-auto no-scrollbar -mx-6 px-6">
                 <div class="flex items-start justify-between min-w-[600px] md:min-w-0 relative py-4">
-                    <div class="absolute top-[48px] left-[10%] right-[10%] h-0.5 bg-slate-100 z-0"></div>
+                    <div class="absolute top-[40px] md:top-[48px] left-[10%] right-[10%] h-0.5 bg-slate-100 z-0"></div>
                     
                     @php
                         $isCancelled = $order->status === 'cancelled';
@@ -99,9 +99,9 @@
                             
                             $isStageCancelled = $stage['key'] === 'cancelled';
                         @endphp
-                        <div class="flex flex-col items-center text-center w-32 relative z-10">
+                        <div class="flex flex-col items-center text-center flex-1 relative z-10">
                             @if($idx > 0 && ($isCompleted || $isCurrent))
-                                <div class="absolute top-[32px] -left-1/2 w-full h-0.5 {{ $isStageCancelled ? 'bg-red-500' : 'bg-brand-900' }} -z-10"></div>
+                                <div class="absolute top-[24px] md:top-[32px] -left-1/2 w-full h-0.5 {{ $isStageCancelled ? 'bg-red-500' : 'bg-brand-900' }} -z-10"></div>
                             @endif
 
                             <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-4 flex items-center justify-center transition-all duration-700
@@ -161,7 +161,7 @@
                     <div class="p-6 md:p-8">
                         @if($order->statusLogs->count() > 0)
                             <ol class="relative border-s border-slate-200 ms-3 space-y-8">                  
-                                @foreach($order->statusLogs->sortByDesc('created_at') as $index => $log)
+                                @foreach($order->statusLogs->sortByDesc('created_at')->values() as $index => $log)
                                     <li class="ms-6">            
                                         <span class="absolute flex items-center justify-center w-6 h-6 {{ $index === 0 ? 'bg-brand-900 ring-brand-100' : 'bg-slate-200 ring-white' }} rounded-full -start-3 ring-4">
                                             @if($index === 0)
@@ -358,7 +358,7 @@
 
                         @if($order->payment_status === 'unpaid' && $order->status === 'unpaid')
                             <div class="mt-6 pt-6 border-t border-slate-50">
-                                <form action="{{ route('customer.orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')">
+                                <form action="{{ route('customer.orders.cancel', $order->id) }}" method="POST" onsubmit="confirmAction(event, 'Apakah Anda yakin ingin membatalkan pesanan ini?')">
                                     @csrf
                                     <button type="submit" class="w-full text-center text-[9px] font-black uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors py-2">
                                         Batalkan Pesanan

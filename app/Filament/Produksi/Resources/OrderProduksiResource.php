@@ -97,7 +97,6 @@ class OrderProduksiResource extends Resource
         return $table
             ->query(
                 Order::query()
-                    ->whereIn('status', ['paid', 'printing', 'sewing', 'qc', 'ready'])
                     ->whereIn('payment_status', ['paid', 'partial'])
             )
             ->columns([

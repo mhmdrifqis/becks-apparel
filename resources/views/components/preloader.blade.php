@@ -8,7 +8,7 @@
         
         <!-- Logo container -->
         <div class="relative animate-bounce-slow">
-            <x-application-logo class="h-24 w-auto drop-shadow-[0_0_15px_rgba(6,64,43,0.5)]" />
+            <x-application-logo class="h-24 w-auto text-brand-500 drop-shadow-[0_0_15px_rgba(6,64,43,0.5)]" />
         </div>
         
         <!-- Loading bar -->

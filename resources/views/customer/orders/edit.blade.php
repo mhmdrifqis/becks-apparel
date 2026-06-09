@@ -107,7 +107,7 @@
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                                                     Pilih File
                                                 </button>
-                                                <input type="file" :id="'fileInput'+item.id" @change="handleFileSelect(item, $event)" multiple class="hidden" :name="'designs['+item.id+'][files][]'">
+                                                <input type="file" :id="'fileInput'+item.id" @change="handleFileSelect(item, $event)" multiple accept=".jpg,.jpeg,.png" class="hidden" :name="'designs['+item.id+'][files][]'">
                                                 <template x-if="item.designFiles.length === 0">
                                                     <span class="text-[10px] font-bold text-slate-400">Belum ada file dipilih</span>
                                                 </template>
@@ -123,7 +123,7 @@
                                                     </div>
                                                 </template>
                                             </div>
-                                            <p class="text-[8px] text-slate-400 mt-4 italic">* Anda dapat memilih lebih dari satu file (Gambar, PDF, Zip).</p>
+                                            <p class="text-[8px] text-slate-400 mt-4 italic">* Anda dapat memilih lebih dari satu file (Hanya format gambar JPG atau PNG).</p>
                                         </div>
                                     </div>
 
@@ -386,7 +386,6 @@
                     item.designFiles.push(files[i]);
                 }
                 this.syncFiles(item);
-                event.target.value = '';
             },
 
             removeDesignFile(item, index) {

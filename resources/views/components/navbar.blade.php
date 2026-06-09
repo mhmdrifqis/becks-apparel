@@ -16,7 +16,12 @@
         },
         async fetchCounts() {
             try {
-                const res = await fetch('{{ route('cart.counts') }}');
+                const res = await fetch('{{ route('cart.counts') }}', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
                 const data = await res.json();
                 this.cartCount = data.cart;
                 this.orderCount = data.orders;

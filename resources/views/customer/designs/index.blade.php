@@ -43,7 +43,7 @@
                                          
                                          <div class="flex items-center gap-3">
                                              <a href="{{ route('customer.designs.edit', $design) }}" class="flex-1 bg-white border border-slate-200 text-slate-700 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all text-center">Edit Design</a>
-                                             <form action="{{ route('customer.designs.destroy', $design) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus desain ini?')">
+                                             <form action="{{ route('customer.designs.destroy', $design) }}" method="POST" class="inline" onsubmit="confirmAction(event, 'Apakah Anda yakin ingin menghapus desain ini?')">
                                                  @csrf
                                                  @method('DELETE')
                                                  <button type="submit" class="p-3 bg-rose-50 text-rose-600 rounded-2xl hover:bg-rose-100 transition-all" title="Hapus">

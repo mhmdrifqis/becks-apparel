@@ -340,7 +340,25 @@
             },
 
             async removeItem(id) {
-                if (!confirm('Hapus item dari keranjang?')) return;
+                const result = await Swal.fire({
+                    title: 'Hapus Item',
+                    text: 'Apakah Anda yakin ingin menghapus item ini dari keranjang?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#18181b',
+                    cancelButtonColor: '#ef4444',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal',
+                    background: document.documentElement.classList.contains('dark') ? '#09090b' : '#ffffff',
+                    color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#18181b',
+                    customClass: {
+                        popup: 'rounded-2xl border border-gray-200 dark:border-zinc-800',
+                        confirmButton: 'rounded-full px-6 py-2 text-sm font-bold',
+                        cancelButton: 'rounded-full px-6 py-2 text-sm font-bold'
+                    }
+                });
+
+                if (!result.isConfirmed) return;
                 
                 try {
                     let res = await fetch(`{{ url('/cart') }}/${id}`, {

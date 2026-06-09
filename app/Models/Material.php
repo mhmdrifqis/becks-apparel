@@ -10,7 +10,7 @@ class Material extends Model
     protected $fillable = [
         'name',
         'category',
-        'allowed_categories',
+
         'description',
         'image_path',
         'status',
@@ -21,9 +21,10 @@ class Material extends Model
     ];
 
     protected $casts = [
-        'additional_price' => 'decimal:2',
+        'additional_price' => 'integer',
+        'stock'            => 'float',
         'product_types'    => 'array',
-        'allowed_categories' => 'array',
+
     ];
 
     protected $appends = ['image_url'];

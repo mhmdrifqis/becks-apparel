@@ -33,6 +33,18 @@ class MaterialDescriptionSeeder extends Seeder
             'England' => 'Mirip bahan wafel namun dengan pola yang lebih kecil. Awet dan tahan terhadap gesekan.',
             'Sena' => 'Kain dengan pori-pori bulat yang padat. Menyerap keringat maksimal dan mudah dicuci.',
             'Tepo' => 'Sangat lentur, jatuh, dan memiliki serat yang rapat, memberikan sensasi dingin di kulit.',
+            
+            // JAKET
+            'Lotto' => 'Bahan yang halus, jatuh, dan sedikit tebal namun elastis. Sering dipakai untuk jaket olahraga karena permukaannya yang menyerap keringat dengan baik.',
+            'Diadora' => 'Bahan yang sedikit mengkilap di bagian luar dan memiliki bulu halus di bagian dalam sehingga hangat. Sangat nyaman di cuaca dingin.',
+            
+            // KAOS
+            'Cotton Combed 24s' => 'Kain katun murni dengan tingkat ketebalan sedang (24s). Awet, menyerap keringat maksimal, dan tidak menerawang. Standar premium distro.',
+            'Cotton Combed 30s' => 'Kain katun murni tipis (30s) yang sangat sejuk. Cocok dipakai di iklim tropis karena lebih ringan dan sirkulasi udara lebih lancar.',
+            
+            // KEMEJA
+            'Verlando CP' => 'Bahan drill paduan katun dan polyester. Kuat, tidak mudah kusut, awet, dan warnanya lebih tahan lama.',
+            'Maryland Drill' => 'Kain drill dengan komposisi katun dominan. Lebih lembut, adem, sangat menyerap keringat, dan terlihat rapi serta elegan.'
         ];
 
         foreach ($materialsData as $name => $desc) {

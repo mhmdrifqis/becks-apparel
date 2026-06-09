@@ -577,8 +577,33 @@ export default () => ({
         this.isHistoryAction = wasHistoryAction;
     },
 
-    openPreview() {
-        // Instantly open modal — snapshots are already captured by renderLayers()
+    async ensureAllSnapshots() {
+        const originalView = this.currentView;
+        const mockup = this.availableMockups.find(m => m.id === this.currentModel);
+        if (!mockup) return;
+        
+        const viewsToRender = ['front', 'back', 'pants'].filter(v => mockup.parts[v] && mockup.parts[v].length > 0);
+        const viewMap = { 'front': 'jersey_front', 'back': 'jersey_back', 'pants': 'pants' };
+        
+        this.isLoading = true;
+        for (const view of viewsToRender) {
+            const snapKey = viewMap[view];
+            if (!this.viewSnapshots[snapKey]) {
+                await this.setViewSilently(view);
+                await this._waitForRender();
+                // Wait an extra frame to ensure captureSnapshot finishes
+                await this._waitForRender();
+            }
+        }
+        if (this.currentView !== originalView) {
+            await this.setViewSilently(originalView);
+            await this._waitForRender();
+        }
+        this.isLoading = false;
+    },
+
+    async openPreview() {
+        await this.ensureAllSnapshots();
         this.showPreviewModal = true;
     },
 
@@ -1082,7 +1107,9 @@ export default () => ({
 
     captureSnapshot() {
         // Gunakan requestAnimationFrame agar pixel benar-benar sudah dilukis
-        const viewToCapture = this.currentView;
+        const viewMap = { 'front': 'jersey_front', 'back': 'jersey_back', 'pants': 'pants' };
+        const viewToCapture = viewMap[this.currentView] || this.currentView;
+        
         requestAnimationFrame(() => {
             if (this.canvas && this.viewSnapshots.hasOwnProperty(viewToCapture)) {
                 try {
@@ -1571,6 +1598,9 @@ export default () => ({
         this.isLoading = true;
         this.showSaveModal = false;
 
+        // Ensure all snapshots are captured before saving
+        await this.ensureAllSnapshots();
+
         try {
             // 1. Prepare Export State (JSON)
             const exportState = {
@@ -1588,24 +1618,57 @@ export default () => ({
                 currentView: this.currentView
             };
 
-            // 2. Capture Preview Image
-            // Reset zoom and viewport for clean export
-            const originalZoom = this.canvas.getZoom();
-            const originalVPT = this.canvas.viewportTransform.slice();
-            
-            this.resetZoom();
-            this.canvas.renderAll();
-            
-            const previewImage = this.canvas.toDataURL({
-                format: 'png',
-                quality: 0.8,
-                multiplier: 1 // Keep it 600x600
-            });
-            
-            // Restore zoom
-            this.canvas.setZoom(originalZoom);
-            this.canvas.viewportTransform = originalVPT;
-            this.canvas.renderAll();
+            // 2. Capture Preview Image (Composite of all views)
+            const views = ['jersey_front', 'jersey_back', 'pants'];
+            const visibleViews = views.filter(v => this.viewSnapshots[v]);
+            let finalPreviewDataUrl = '';
+
+            if (visibleViews.length > 0) {
+                const offscreen = document.createElement('canvas');
+                const w = 600;
+                const h = 600;
+                const gap = 20;
+
+                const hasFront = !!this.viewSnapshots.jersey_front;
+                const hasBack  = !!this.viewSnapshots.jersey_back;
+                const hasPants = !!this.viewSnapshots.pants;
+
+                const rightCount = (hasBack ? 1 : 0) + (hasPants ? 1 : 0);
+                const leftWidth  = hasFront ? (rightCount > 0 ? w + gap : w) : 0;
+                const rightWidth = rightCount > 0 ? w : 0;
+                const rightHeight = h / (rightCount > 1 ? 2 : 1) - (rightCount > 1 ? gap/2 : 0);
+
+                offscreen.width  = leftWidth + rightWidth;
+                offscreen.height = h;
+
+                const ctx = offscreen.getContext('2d');
+                ctx.fillStyle = '#ffffff'; 
+                ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+
+                const loadImg = src => new Promise(res => { const i = new window.Image(); i.onload = () => res(i); i.src = src; });
+
+                if (hasFront) {
+                    const img = await loadImg(this.viewSnapshots.jersey_front);
+                    ctx.drawImage(img, 0, 0, w, h);
+                }
+                let rightY = 0;
+                if (hasBack) {
+                    const img = await loadImg(this.viewSnapshots.jersey_back);
+                    ctx.drawImage(img, leftWidth, 0, rightWidth, rightHeight);
+                    rightY = rightHeight + gap;
+                }
+                if (hasPants) {
+                    const img = await loadImg(this.viewSnapshots.pants);
+                    ctx.drawImage(img, leftWidth, rightY, rightWidth, h - rightY);
+                }
+
+                // Create a smaller preview image so we don't blow up the payload size
+                const scaledCanvas = document.createElement('canvas');
+                scaledCanvas.width = offscreen.width / 2;
+                scaledCanvas.height = offscreen.height / 2;
+                scaledCanvas.getContext('2d').drawImage(offscreen, 0, 0, scaledCanvas.width, scaledCanvas.height);
+                finalPreviewDataUrl = scaledCanvas.toDataURL('image/jpeg', 0.7);
+            }
 
             // 3. Send to Server
             const url = this.updateDesignUrl || this.saveDesignUrl;
@@ -1622,7 +1685,7 @@ export default () => ({
                 body: JSON.stringify({
                     name: this.designName,
                     design_json: JSON.stringify(exportState),
-                    preview_image: previewImage
+                    preview_image: finalPreviewDataUrl
                 })
             });
 
@@ -1641,10 +1704,23 @@ export default () => ({
             }
 
             if (result.success) {
-                // Redirect to designs list
-                window.location.href = result.redirect;
+                // Update URL to the new edit route without reloading the page
+                window.history.pushState({}, '', result.redirect);
+                
+                // Update the save URL to the update route for future saves
+                if (result.updateUrl) {
+                    this.updateDesignUrl = result.updateUrl;
+                }
+                
+                // Show success message
+                alert(result.message);
+                
+                // Close modal
+                this.showSaveModal = false;
+                this.isLoading = false;
             } else {
                 alert('Gagal menyimpan desain: ' + result.message);
+                this.isLoading = false;
                 this.isLoading = false;
             }
         } catch (error) {

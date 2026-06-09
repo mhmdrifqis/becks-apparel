@@ -117,6 +117,7 @@
                                                        :id="'fileInput'+item.id"
                                                        @change="handleFileSelect(item, $event)" 
                                                        multiple 
+                                                       accept=".jpg,.jpeg,.png"
                                                        class="hidden" 
                                                        :name="'designs['+item.id+'][files][]'">
                                                 
@@ -137,7 +138,7 @@
                                                 </template>
                                             </div>
 
-                                            <p class="text-[8px] text-slate-400 mt-4 italic">* Anda dapat memilih lebih dari satu file (Gambar, PDF, Zip).</p>
+                                            <p class="text-[8px] text-slate-400 mt-4 italic">* Anda dapat memilih lebih dari satu file (Hanya format gambar JPG atau PNG).</p>
                                         </div>
                                     </div>
                                      <div x-show="item.designMethod === 'customizer'" x-transition class="space-y-4">
@@ -409,8 +410,6 @@
                     item.designFiles.push(files[i]);
                 }
                 this.syncFiles(item);
-                // Clear input so same file can be re-selected if removed
-                event.target.value = '';
             },
 
             removeDesignFile(item, index) {

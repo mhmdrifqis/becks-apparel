@@ -408,7 +408,7 @@
                                     :class="activeFont === f.id ? 'border-brand-500 bg-brand-900/30 ring-1 ring-brand-500' : 'border-brand-800/30 hover:border-brand-700 bg-brand-950/20'"
                                     class="p-3 border rounded-xl transition-all text-center group"
                                 >
-                                    <div class="text-sm text-brand-50 truncate" :style="`font-family: '${f.id}'`" x-text="'Abc 123'"></div>
+                                    <div class="text-sm text-brand-50 truncate" :style="`font-family: ${f.family}`" x-text="'Abc 123'"></div>
                                     <div class="text-[8px] text-brand-400/60 mt-1 uppercase font-bold tracking-widest" x-text="f.name"></div>
                                 </button>
                             </template>

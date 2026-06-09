@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('payment_settings', function (Blueprint $table) {
             $table->id();
-            $table->string('midtrans_server_key')->nullable();
-            $table->string('midtrans_client_key')->nullable();
+            $table->text('midtrans_server_key')->nullable();
+            $table->text('midtrans_client_key')->nullable();
             $table->boolean('is_production')->default(false);
             $table->timestamps();
         });

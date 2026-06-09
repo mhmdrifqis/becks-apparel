@@ -25,7 +25,16 @@ class CatalogController extends Controller
 
         // Filter bahan sesuai kategori produk (jersey, jaket, kaos, kemeja)
         $productType = strtolower($package->category);
-        $materials = \App\Models\Material::forProductType($productType)->get();
+        $materialsQuery = \App\Models\Material::forProductType($productType);
+
+        if ($productType === 'tshirt' || $productType === 'kaos') {
+            if (stripos($package->name, '24s') !== false) {
+                $materialsQuery->where('name', 'like', '%24s%');
+            } elseif (stripos($package->name, '30s') !== false) {
+                $materialsQuery->where('name', 'like', '%30s%');
+            }
+        }
+        $materials = $materialsQuery->get();
 
         return view('catalog.show', compact('package', 'materials'));
     }

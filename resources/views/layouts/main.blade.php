@@ -90,6 +90,34 @@
                 @endif
             };
         </script>
+        <!-- SweetAlert2 -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            function confirmAction(event, message) {
+                event.preventDefault();
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: message,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#18181b', // brand-900
+                    cancelButtonColor: '#ef4444',
+                    confirmButtonText: 'Ya, Lanjutkan!',
+                    cancelButtonText: 'Batal',
+                    background: document.documentElement.classList.contains('dark') ? '#09090b' : '#ffffff',
+                    color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#18181b',
+                    customClass: {
+                        popup: 'rounded-2xl border border-gray-200 dark:border-zinc-800',
+                        confirmButton: 'rounded-full px-6 py-2 text-sm font-bold',
+                        cancelButton: 'rounded-full px-6 py-2 text-sm font-bold'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        event.target.closest('form').submit();
+                    }
+                });
+            }
+        </script>
         <!-- Chatbot Widget -->
         <x-chatbot-widget />
     </body>
