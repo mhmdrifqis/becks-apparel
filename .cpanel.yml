@@ -1,0 +1,15 @@
+---
+deployment:
+  tasks:
+    # 1. Tentukan folder tujuan (Ubah public_html menjadi nama folder domain Anda jika bukan domain utama)
+    - export DEPLOYPATH=$HOME/public_html/
+    
+    # 2. Salin semua file dari repository Git ke folder tujuan
+    - /bin/cp -R * $DEPLOYPATH
+    
+    # 3. Masuk ke folder tujuan
+    - cd $DEPLOYPATH
+    
+    # 4. (Opsional) Jalankan composer install jika Anda ingin cPanel otomatis menginstal/update paket
+    # Hapus tanda pagar (#) di awal baris bawah ini jika ingin diaktifkan:
+    # - /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader
