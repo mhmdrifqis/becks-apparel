@@ -558,20 +558,20 @@
     </div>
 
 @if($order->tracking_number)
-<script type="text/javascript" src="//www.17track.net/externalcall.js"></script>
+<script type="text/javascript" src="https://parcelsapp.com/js/widget.js"></script>
 <script type="text/javascript">
 function doTrack() {
     var container = document.getElementById("YQContainer");
     if(container.classList.contains('hidden')) {
         container.classList.remove('hidden');
         if(container.innerHTML === '') {
-            YQV5.trackSingle({
-                YQ_ContainerId:"YQContainer",
-                YQ_Height: 560,
-                YQ_Fc:"0",
-                YQ_Lang:"id",
-                YQ_Num:"{{ trim($order->tracking_number) }}"
-            });
+            setTimeout(function() {
+                ParcelsAppWidget.init({
+                    container: "YQContainer",
+                    tracking: "{{ trim($order->tracking_number) }}",
+                    language: "id"
+                });
+            }, 50);
         }
     } else {
         container.classList.add('hidden');
