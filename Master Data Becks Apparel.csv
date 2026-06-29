@@ -1,0 +1,56 @@
+MASTER DATA BECKS APPAREL (UPDATE KATALOG & PRICE LIST),,,
+,,,
+1. MASTER_PACKAGES,,,
+Kategori,Nama Paket,Harga Dasar,Spesifikasi
+Jersey,Paket A,90000,"Jersey & Celana Non-printing, Logo/Sponsor DTF, Nameset DTF"
+Jersey,Paket B,110000,"Badan Non-printing, Lengan Printing, DTF"
+Jersey,Paket C,130000,"Jersey Full Printing, Celana Non-printing"
+Jersey,Paket D,160000,Jersey & Celana Full Printing
+Jersey,Paket E,170000,"Full Printing, Logo/Sponsor/Nameset DTF"
+Jacket,Paket A,170000,"Jacket Full Printing, Bahan Lotto/Diadora"
+Jacket,Paket B,155000,"Jacket Kombinasi Printing + Bahan, Lotto/Diadora"
+Jacket,Paket C,250000,Setelan Jacket Full Printing + Celana Training
+Tshirt,Paket A (24s),80000,"Material Cotton Combed 24s, Sablon DTF"
+Tshirt,Paket B (30s),60000,"Material Cotton Combed 30s, Sablon DTF"
+Kemeja,Kemeja Drill,80000,"Material Verlando CP, Maryland Drill, dll"
+,,,
+2. MASTER_UPGRADES,,,
+Nama Opsi,Kategori,Harga Tambahan,Keterangan
+Logo Rubber,Logo,20000,Additional per item
+Logo Semiwoven,Logo,25000,Additional per item
+Logo Bordir,Logo,30000,Additional per item
+Tangan Panjang,Fitur,20000,Berlaku untuk Jersey/Tshirt/Kemeja
+Tangan Raglan,Fitur,15000,Pola Raglan
+Kerah Kemeja & Wangki,Fitur,20000,Upgrade dari kerah standar
+Kaos Kaki Custom,Aksesori,35000,Minimum order berlaku
+Rompi Custom,Aksesori,25000,Material standar
+Flag Custom,Aksesori,20000,Bendera custom
+,,,
+3. LOGIKA_SIZE_SURCHARGE,,,
+Kategori Produk,Ukuran Standar,Surcharge (>XL),Kelipatan
+Jersey,XXS - XL,5000,Per step size di atas XL
+Tshirt,S - XL,10000,Per step size di atas XL
+Kemeja,S - XL,10000,Per step size di atas XL
+,,,
+4. MASTER_MATERIALS (70+ PILIHAN),,,
+Nama Bahan,Kategori,Status,
+Milano,Standard,Ready,
+Benzema,Standard,Ready,
+Smash,Premium,Ready,
+N-Tech,Premium,Ready,
+Wafel,Standard,Ready,
+MU,Standard,Ready,
+Kultus,Standard,Ready,
+Thailand,Standard,Ready,
+Bubin,Standard,Ready,
+Adidas,Standard,Ready,
+Diamond,Standard,Ready,
+Holland,Standard,Ready,
+Koba,Standard,Ready,
+Virtual,Standard,Ready,
+Bambu,Standard,Ready,
+Brazil,Standard,Ready,
+Ferari,Standard,Ready,
+England,Standard,Ready,
+Sena,Standard,Ready,
+Tepo,Standard,Ready,

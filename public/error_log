@@ -1,0 +1,52 @@
+[10-Jun-2026 20:59:01 Asia/Jakarta] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 7.4.33. in /home/epeq3782/public_html/vendor/composer/platform_check.php on line 24
+[10-Jun-2026 21:00:46 Asia/Jakarta] PHP Warning:  require(/home/epeq3782/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: Permission denied in /home/epeq3782/public_html/vendor/composer/autoload_real.php on line 55
+[10-Jun-2026 21:00:46 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/epeq3782/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/epeq3782/public_html/vendor/composer/autoload_real.php:55
+Stack trace:
+#0 /home/epeq3782/public_html/vendor/composer/autoload_real.php(38): composerRequire9218d0f24c558c149d015e4992a4f7da()
+#1 /home/epeq3782/public_html/vendor/autoload.php(12): ComposerAutoloaderInit9218d0f24c558c149d015e4992a4f7da::getLoader()
+#2 /home/epeq3782/public_html/public/index.php(13): require('/home/epeq3782/...')
+#3 {main}
+  thrown in /home/epeq3782/public_html/vendor/composer/autoload_real.php on line 55
+[10-Jun-2026 21:00:50 Asia/Jakarta] PHP Warning:  require(/home/epeq3782/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: Permission denied in /home/epeq3782/public_html/vendor/composer/autoload_real.php on line 55
+[10-Jun-2026 21:00:50 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/epeq3782/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/epeq3782/public_html/vendor/composer/autoload_real.php:55
+Stack trace:
+#0 /home/epeq3782/public_html/vendor/composer/autoload_real.php(38): composerRequire9218d0f24c558c149d015e4992a4f7da()
+#1 /home/epeq3782/public_html/vendor/autoload.php(12): ComposerAutoloaderInit9218d0f24c558c149d015e4992a4f7da::getLoader()
+#2 /home/epeq3782/public_html/public/index.php(13): require('/home/epeq3782/...')
+#3 {main}
+  thrown in /home/epeq3782/public_html/vendor/composer/autoload_real.php on line 55
+[10-Jun-2026 21:01:23 Asia/Jakarta] PHP Warning:  require(/home/epeq3782/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: Permission denied in /home/epeq3782/public_html/vendor/composer/autoload_real.php on line 55
+[10-Jun-2026 21:01:23 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/epeq3782/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/epeq3782/public_html/vendor/composer/autoload_real.php:55
+Stack trace:
+#0 /home/epeq3782/public_html/vendor/composer/autoload_real.php(38): composerRequire9218d0f24c558c149d015e4992a4f7da()
+#1 /home/epeq3782/public_html/vendor/autoload.php(12): ComposerAutoloaderInit9218d0f24c558c149d015e4992a4f7da::getLoader()
+#2 /home/epeq3782/public_html/public/index.php(13): require('/home/epeq3782/...')
+#3 {main}
+  thrown in /home/epeq3782/public_html/vendor/composer/autoload_real.php on line 55
+[10-Jun-2026 21:01:25 Asia/Jakarta] PHP Warning:  require(/home/epeq3782/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: Permission denied in /home/epeq3782/public_html/vendor/composer/autoload_real.php on line 55
+[10-Jun-2026 21:01:25 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/epeq3782/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/epeq3782/public_html/vendor/composer/autoload_real.php:55
+Stack trace:
+#0 /home/epeq3782/public_html/vendor/composer/autoload_real.php(38): composerRequire9218d0f24c558c149d015e4992a4f7da()
+#1 /home/epeq3782/public_html/vendor/autoload.php(12): ComposerAutoloaderInit9218d0f24c558c149d015e4992a4f7da::getLoader()
+#2 /home/epeq3782/public_html/public/index.php(13): require('/home/epeq3782/...')
+#3 {main}
+  thrown in /home/epeq3782/public_html/vendor/composer/autoload_real.php on line 55
+[10-Jun-2026 21:01:26 Asia/Jakarta] PHP Warning:  require(/home/epeq3782/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: Permission denied in /home/epeq3782/public_html/vendor/composer/autoload_real.php on line 55
+[10-Jun-2026 21:01:26 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/epeq3782/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/epeq3782/public_html/vendor/composer/autoload_real.php:55
+Stack trace:
+#0 /home/epeq3782/public_html/vendor/composer/autoload_real.php(38): composerRequire9218d0f24c558c149d015e4992a4f7da()
+#1 /home/epeq3782/public_html/vendor/autoload.php(12): ComposerAutoloaderInit9218d0f24c558c149d015e4992a4f7da::getLoader()
+#2 /home/epeq3782/public_html/public/index.php(13): require('/home/epeq3782/...')
+#3 {main}
+  thrown in /home/epeq3782/public_html/vendor/composer/autoload_real.php on line 55
+[10-Jun-2026 21:01:27 Asia/Jakarta] PHP Warning:  require(/home/epeq3782/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: Permission denied in /home/epeq3782/public_html/vendor/composer/autoload_real.php on line 55
+[10-Jun-2026 21:01:27 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/epeq3782/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/epeq3782/public_html/vendor/composer/autoload_real.php:55
+Stack trace:
+#0 /home/epeq3782/public_html/vendor/composer/autoload_real.php(38): composerRequire9218d0f24c558c149d015e4992a4f7da()
+#1 /home/epeq3782/public_html/vendor/autoload.php(12): ComposerAutoloaderInit9218d0f24c558c149d015e4992a4f7da::getLoader()
+#2 /home/epeq3782/public_html/public/index.php(13): require('/home/epeq3782/...')
+#3 {main}
+  thrown in /home/epeq3782/public_html/vendor/composer/autoload_real.php on line 55
+[11-Jun-2026 20:59:06 Asia/Jakarta] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 7.4.33. in /home/becb7659/public_html/vendor/composer/platform_check.php on line 24
+[16-Jun-2026 00:41:48 Asia/Jakarta] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 7.4.33. in /home/becb7659/public_html/vendor/composer/platform_check.php on line 24
+[16-Jun-2026 00:41:58 Asia/Jakarta] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 7.4.33. in /home/becb7659/public_html/vendor/composer/platform_check.php on line 24

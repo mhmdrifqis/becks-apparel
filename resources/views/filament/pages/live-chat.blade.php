@@ -1,0 +1,137 @@
+<x-filament-panels::page>
+    <div wire:poll.3s="loadActiveChats" class="grid grid-cols-1 md:grid-cols-3 gap-6 h-[70vh]">
+
+        <!-- Sidebar: Active Chats -->
+        <div class="col-span-1 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 flex flex-col overflow-hidden">
+
+            <!-- Header Sidebar -->
+            <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                <h3 class="text-lg font-bold text-black dark:text-white">
+                    Obrolan Aktif ({{ count($activeChats) }})
+                </h3>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-2">
+                @forelse($activeChats as $chat)
+                    <button
+                        wire:click="selectChat({{ $chat->id }})"
+                        class="w-full text-left p-3 mb-2 rounded-lg transition-colors border {{ $selectedChatId == $chat->id ? 'bg-primary-50 border-primary-500 dark:bg-primary-900/20 dark:border-primary-500' : 'bg-transparent border-transparent hover:bg-gray-50 dark:hover:bg-gray-800' }}"
+                    >
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-gray-900 dark:text-white">
+                                {{ $chat->user_name ?? 'Guest User' }}
+                            </span>
+
+                            <span class="text-xs text-gray-500">
+                                {{ $chat->created_at->format('H:i') }}
+                            </span>
+                        </div>
+
+                        <div class="text-xs text-gray-500 mt-1 truncate">
+                            ID: {{ substr($chat->user_id, 0, 15) }}...
+                        </div>
+                    </button>
+                @empty
+                    <div class="text-center p-4 text-sm text-gray-500 mt-10">
+                        Tidak ada pelanggan yang meminta bantuan admin saat ini.
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="col-span-1 md:col-span-2 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 flex flex-col overflow-hidden">
+
+            @if($selectedChatId)
+
+                <!-- Header Chat -->
+                <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 flex justify-between items-center">
+
+                    <h3 class="text-lg font-bold text-black dark:text-white">
+                        Chat dengan Pelanggan
+                    </h3>
+
+                    <x-filament::button
+                        wire:click="endSession"
+                        color="danger"
+                        size="sm"
+                        icon="heroicon-o-x-circle">
+                        Akhiri Sesi
+                    </x-filament::button>
+
+                </div>
+
+                <!-- Messages -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-4" id="chat-box">
+
+                    @forelse($messages as $msg)
+
+                        @if($msg->sender == 'admin')
+
+                            <div class="flex items-start gap-3 flex-row-reverse">
+                                <div class="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center flex-shrink-0 text-white font-bold text-xs">
+                                    CS
+                                </div>
+
+                                <div class="bg-primary-600 text-white px-4 py-2 rounded-2xl rounded-tr-none shadow-sm text-sm max-w-[80%]">
+                                    {{ $msg->message }}
+                                </div>
+                            </div>
+
+                        @else
+
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 text-gray-600 dark:text-gray-300 font-bold text-xs">
+                                    U
+                                </div>
+
+                                <div class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-2xl rounded-tl-none border border-gray-200 dark:border-gray-700 shadow-sm text-sm max-w-[80%]">
+                                    {{ $msg->message }}
+                                </div>
+                            </div>
+
+                        @endif
+
+                    @empty
+
+                        <div class="text-center text-sm text-gray-500">
+                            Belum ada pesan.
+                        </div>
+
+                    @endforelse
+
+                </div>
+
+                <!-- Input -->
+                <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+
+                    <form wire:submit.prevent="sendMessage" class="flex gap-2">
+
+                        <input
+                            type="text"
+                            wire:model="newMessage"
+                            placeholder="Tulis balasan..."
+                            class="flex-1 rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            required
+                        >
+
+                        <x-filament::button type="submit" color="success">
+                            Kirim
+                        </x-filament::button>
+
+                    </form>
+
+                </div>
+
+            @else
+
+                <div class="flex-1 flex flex-col items-center justify-center text-gray-500">
+                    <p>Pilih salah satu obrolan di samping untuk mulai membalas.</p>
+                </div>
+
+            @endif
+
+        </div>
+
+    </div>
+</x-filament-panels::page>
