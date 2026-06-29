@@ -3,7 +3,7 @@ name: Deploy Laravel to cPanel via FTP
 on:
   push:
     branches:
-      - main # Atau 'master', tergantung nama branch utama Anda
+      - deploy # Berubah menjadi branch deploy
 
 jobs:
   web-deploy:
