@@ -428,12 +428,9 @@
                              </div>
                              @if($order->tracking_number)
                              <button onclick="doTrack()" class="w-full py-3 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-lg shadow-brand-900/20 active:scale-95 flex items-center justify-center gap-2">
-                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                 Lacak Pengiriman Secara Live
+                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                 Lacak Pengiriman (Tab Baru)
                              </button>
-                             
-                             <!-- Container for 17Track Widget -->
-                             <div id="YQContainer" class="mt-4 overflow-hidden rounded-xl border border-slate-100 hidden shadow-sm"></div>
                              @endif
                         </div>
                         <div class="mt-8 pt-8 border-t border-slate-50">
@@ -558,26 +555,11 @@
     </div>
 
 @if($order->tracking_number)
-<script type="text/javascript" src="//www.17track.net/externalcall.js"></script>
 <script type="text/javascript">
 function doTrack() {
-    var container = document.getElementById("YQContainer");
-    if(container.classList.contains('hidden')) {
-        container.classList.remove('hidden');
-        if(container.innerHTML === '') {
-            setTimeout(function() {
-                YQV5.trackSingle({
-                    YQ_ContainerId: "YQContainer",
-                    YQ_Height: 560,
-                    YQ_Fc: "0",
-                    YQ_Lang: "id",
-                    YQ_Num: "{{ trim($order->tracking_number) }}"
-                });
-            }, 100);
-        }
-    } else {
-        container.classList.add('hidden');
-    }
+    var resi = "{{ trim($order->tracking_number) }}";
+    // Membuka tab baru ke layanan pelacakan ParcelsApp yang sangat akurat untuk J&T/JNE dsb.
+    window.open("https://parcelsapp.com/id/tracking/" + resi, "_blank");
 }
 </script>
 @endif
