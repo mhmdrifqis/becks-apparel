@@ -416,7 +416,7 @@
                     @if($order->status === 'shipped' || $order->status === 'completed')
                         <div class="mt-8 pt-8 border-t border-slate-50">
                              <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Informasi Pengiriman</h3>
-                             <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                             <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 mb-4">
                                  <div class="flex justify-between items-center mb-2">
                                      <span class="text-[10px] font-bold text-slate-400 uppercase">Kurir</span>
                                      <span class="text-[10px] font-black text-slate-900 uppercase">{{ $order->courier_name ?? 'Reguler' }}</span>
@@ -426,6 +426,15 @@
                                      <span class="text-[11px] font-black text-brand-900 uppercase tracking-wider">{{ $order->tracking_number ?? '-' }}</span>
                                  </div>
                              </div>
+                             @if($order->tracking_number)
+                             <button onclick="doTrack()" class="w-full py-3 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-lg shadow-brand-900/20 active:scale-95 flex items-center justify-center gap-2">
+                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                 Lacak Pengiriman Secara Live
+                             </button>
+                             
+                             <!-- Container for 17Track Widget -->
+                             <div id="YQContainer" class="mt-4 overflow-hidden rounded-xl border border-slate-100 hidden shadow-sm"></div>
+                             @endif
                         </div>
                         <div class="mt-8 pt-8 border-t border-slate-50">
                              <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Pengembalian Barang</h3>
@@ -547,6 +556,29 @@
             </div>
         </div>
     </div>
+
+@if($order->tracking_number)
+<script type="text/javascript" src="//www.17track.net/externalcall.js"></script>
+<script type="text/javascript">
+function doTrack() {
+    var container = document.getElementById("YQContainer");
+    if(container.classList.contains('hidden')) {
+        container.classList.remove('hidden');
+        if(container.innerHTML === '') {
+            YQV5.trackSingle({
+                YQ_ContainerId:"YQContainer",
+                YQ_Height: 560,
+                YQ_Fc:"0",
+                YQ_Lang:"id",
+                YQ_Num:"{{ trim($order->tracking_number) }}"
+            });
+        }
+    } else {
+        container.classList.add('hidden');
+    }
+}
+</script>
+@endif
 
 <script src="{{ config('services.midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
 <script>
