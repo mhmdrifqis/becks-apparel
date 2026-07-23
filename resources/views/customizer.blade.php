@@ -723,25 +723,17 @@
             </div>
             <div class="p-6 space-y-3">
                 <p class="text-xs text-brand-100/90 leading-relaxed font-medium">
-                    Desain <span class="font-bold text-emerald-400" x-text="'&quot;' + designName + '&quot;'"></span> telah berhasil tersimpan.
-                </p>
-                <p class="text-[11px] text-brand-400/80 leading-relaxed">
-                    Silakan kembali ke katalog untuk melanjutkan proses pemesanan dengan desain ini.
+                    Desain <span class="font-bold text-emerald-400" x-text="'&quot;' + designName + '&quot;'"></span> telah berhasil tersimpan. Silakan pilih langkah selanjutnya:
                 </p>
             </div>
-            <div class="px-6 pb-6 flex flex-col gap-2.5">
+            <div class="px-6 pb-6 flex flex-col gap-3">
                 <button @click="redirectToCatalog()" class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-xl transition-all text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                    <span x-text="packageSlug ? 'Lanjutkan Pemesanan (Ke Katalog)' : 'Ke Katalog Produk'"></span>
+                    Teruskan ke Order
                 </button>
-                <div class="flex gap-2">
-                    <a href="{{ route('customer.designs') }}" class="flex-1 py-3 rounded-2xl border border-brand-800 text-brand-300 hover:bg-brand-900/40 transition-all text-[10px] font-bold uppercase tracking-widest text-center flex items-center justify-center text-decoration-none">
-                        Lihat Desain Saya
-                    </a>
-                    <button @click="showSuccessSaveModal = false" class="flex-1 py-3 rounded-2xl border border-brand-800/60 text-brand-400 hover:bg-brand-900/20 transition-all text-[10px] font-bold uppercase tracking-widest">
-                        Tetap di Customizer
-                    </button>
-                </div>
+                <button @click="showSuccessSaveModal = false" class="w-full py-3 rounded-2xl border border-brand-800 text-brand-300 hover:bg-brand-900/40 transition-all text-xs font-bold uppercase tracking-widest">
+                    Tetap Mengedit
+                </button>
             </div>
         </div>
     </div>
