@@ -20,7 +20,7 @@
             
             <div class="space-y-6">
                 <!-- 1. Alamat Pengiriman (Editable Becks Style) -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
                     <!-- Becks Ribbon decoration (Green & Gold) -->
                     <div class="h-1 w-full bg-[repeating-linear-gradient(45deg,#064e3b,#064e3b_10px,#fff_10px,#fff_20px,#ca8a04_20px,#ca8a04_30px,#fff_30px,#fff_40px)]"></div>
                     
@@ -38,21 +38,70 @@
                                 <svg class="w-5 h-5 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <h2 class="text-xs font-black text-brand-900 uppercase tracking-widest">Alamat Pengiriman</h2>
                             </div>
-                            <button type="button" @click="addressEditing = true" x-show="!addressEditing" class="text-[10px] font-black text-brand-900 uppercase tracking-widest hover:underline">Ubah</button>
+                            <div class="flex items-center gap-3">
+                                <button type="button" @click="showAddAddressModal = true" class="text-[10px] font-black text-brand-900 uppercase tracking-widest hover:underline flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                    Tambah Alamat Baru
+                                </button>
+                                <button type="button" @click="addressEditing = !addressEditing" class="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:underline">
+                                    <span x-text="addressEditing ? 'Tutup Input Manual' : 'Input Manual / Edit'"></span>
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- View Mode -->
-                        <div x-show="!addressEditing" class="space-y-1">
+                        <!-- Saved Addresses Cards Selection -->
+                        <div x-show="userAddresses.length > 0" class="mb-6 space-y-3">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Pilih Alamat Tersimpan</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto custom-scrollbar p-1">
+                                <template x-for="addr in userAddresses" :key="addr.id">
+                                    <div @click="selectAddress(addr)" 
+                                         class="p-4 rounded-2xl border-2 transition-all cursor-pointer relative flex flex-col justify-between"
+                                         :class="selectedAddressId === addr.id ? 'border-brand-900 bg-brand-50/40 shadow-md' : 'border-slate-100 bg-slate-50/50 hover:border-slate-200'">
+                                        <div>
+                                            <div class="flex items-center justify-between mb-2">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-brand-900 text-white" x-text="addr.label || 'Alamat'"></span>
+                                                    <template x-if="addr.is_default">
+                                                        <span class="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-amber-500 text-white">Utama</span>
+                                                    </template>
+                                                </div>
+                                                <template x-if="!addr.is_default">
+                                                    <button type="button" @click.stop="setDefaultAddress(addr)" class="text-[8px] font-bold text-slate-400 hover:text-brand-900 uppercase">Set Utama</button>
+                                                </template>
+                                            </div>
+                                            <div class="space-y-0.5">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-xs font-black text-slate-900" x-text="addr.nama_penerima"></span>
+                                                    <span class="text-slate-300">|</span>
+                                                    <span class="text-xs font-bold text-slate-600" x-text="addr.no_telepon"></span>
+                                                </div>
+                                                <p class="text-xs text-slate-600 leading-relaxed font-medium line-clamp-2" x-text="addr.alamat_lengkap"></p>
+                                                <p class="text-[10px] text-slate-400 font-bold uppercase" x-text="addr.kota + ', ' + addr.provinsi + ' (' + addr.kode_pos + ')'"></p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 flex items-center justify-end">
+                                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+                                                 :class="selectedAddressId === addr.id ? 'border-brand-900 bg-brand-900 text-white' : 'border-slate-300'">
+                                                <svg x-show="selectedAddressId === addr.id" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Active Selected Address Display (View Mode) -->
+                        <div x-show="!addressEditing" class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
                             <div class="flex items-center gap-2">
                                 <span class="text-sm font-black text-slate-900 uppercase" x-text="recipient_name || 'Nama Belum Diisi'"></span>
                                 <span class="text-slate-300">|</span>
                                 <span class="text-sm font-bold text-slate-500" x-text="recipient_phone || 'No. Telp Belum Diisi'"></span>
                             </div>
-                            <p class="text-sm text-slate-600 leading-relaxed" x-text="fullAddress || 'Silakan lengkapi alamat pengiriman Anda.'"></p>
+                            <p class="text-sm text-slate-600 leading-relaxed font-medium" x-text="fullAddress || 'Silakan pilih atau buat alamat baru.'"></p>
                         </div>
 
                         <!-- Edit Mode -->
-                        <div x-show="addressEditing" x-transition class="space-y-6">
+                        <div x-show="addressEditing" x-transition class="space-y-6 mt-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Nama Penerima</label>
@@ -111,7 +160,7 @@
                                 </div>
                             </div>
                             <div class="flex justify-end">
-                                <button type="button" @click="addressEditing = false" class="px-6 py-2 bg-brand-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand-900/20">Simpan Alamat</button>
+                                <button type="button" @click="addressEditing = false" class="px-6 py-2 bg-brand-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand-900/20">Selesai Edit</button>
                             </div>
                         </div>
                     </div>
@@ -408,6 +457,78 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Modal Tambah Alamat Baru -->
+            <div x-show="showAddAddressModal" x-cloak class="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" x-transition>
+                <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border border-slate-100 flex flex-col max-h-[90vh]">
+                    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-900 flex items-center justify-center font-bold">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-black text-slate-900 uppercase tracking-widest text-sm">Tambah Alamat Baru</h3>
+                                <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Simpan Alamat ke Akun Saya</p>
+                            </div>
+                        </div>
+                        <button type="button" @click="showAddAddressModal = false" class="p-2 text-slate-400 hover:text-slate-700 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="p-6 space-y-4 overflow-y-auto custom-scrollbar flex-1 text-left">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Label Alamat</label>
+                            <input type="text" x-model="newAddress.label" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Contoh: Rumah, Kantor, Toko">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Nama Penerima *</label>
+                                <input type="text" x-model="newAddress.nama_penerima" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Nama Lengkap">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">No. Telepon / WA *</label>
+                                <input type="text" x-model="newAddress.no_telepon" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="08xxxxxxxxxx">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Alamat Lengkap *</label>
+                            <textarea x-model="newAddress.alamat_lengkap" required rows="2" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Jl. Nama Jalan, No, RT/RW, Patokan"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Provinsi *</label>
+                                <input type="text" x-model="newAddress.provinsi" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Contoh: Jawa Barat">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Kota / Kabupaten *</label>
+                                <input type="text" x-model="newAddress.kota" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Contoh: Kota Bandung">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Kode Pos *</label>
+                            <input type="text" x-model="newAddress.kode_pos" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="40123">
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2">
+                            <input type="checkbox" id="is_default_checkbox" x-model="newAddress.is_default" class="w-4 h-4 rounded text-brand-900 focus:ring-brand-900 border-slate-300">
+                            <label for="is_default_checkbox" class="text-xs font-bold text-slate-700 cursor-pointer">Jadikan Alamat Utama (Default)</label>
+                        </div>
+                    </div>
+
+                    <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50">
+                        <button type="button" @click="showAddAddressModal = false" class="px-6 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition-all text-xs font-bold uppercase tracking-widest">Batal</button>
+                        <button type="button" @click="saveNewAddress()" :disabled="isSavingAddress" class="px-6 py-2.5 rounded-xl bg-brand-900 text-white hover:bg-brand-800 shadow-lg shadow-brand-900/20 transition-all text-xs font-black uppercase tracking-widest disabled:opacity-50 flex items-center gap-2">
+                            <span x-show="!isSavingAddress">Simpan & Gunakan</span>
+                            <span x-show="isSavingAddress" class="animate-pulse">Menyimpan...</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -415,6 +536,20 @@
 <script>
     function checkoutWizard() {
         return {
+            userAddresses: @js($userAddresses),
+            selectedAddressId: null,
+            showAddAddressModal: false,
+            newAddress: {
+                label: 'Rumah',
+                nama_penerima: '{{ Auth::user()->name }}',
+                no_telepon: '{{ Auth::user()->phone ?? "" }}',
+                alamat_lengkap: '',
+                provinsi: '',
+                kota: '',
+                kode_pos: '',
+                is_default: true,
+            },
+            isSavingAddress: false,
             recipient_name: '{{ Auth::user()->name }}',
             recipient_phone: '{{ Auth::user()->phone ?? "" }}',
             shipping_address: '',
@@ -433,9 +568,94 @@
             isLoadingShipping: false,
             totalWeight: 0,
 
-            init() {
+            async init() {
                 this.totalWeight = this.items.reduce((sum, item) => sum + (item.qty * 250), 0);
-                this.fetchProvinces();
+                await this.fetchProvinces();
+
+                if (this.userAddresses && this.userAddresses.length > 0) {
+                    let defaultAddr = this.userAddresses.find(a => a.is_default) || this.userAddresses[0];
+                    await this.selectAddress(defaultAddr);
+                }
+            },
+
+            async selectAddress(addr) {
+                if (!addr) return;
+                this.selectedAddressId = addr.id;
+                this.recipient_name = addr.nama_penerima;
+                this.recipient_phone = addr.no_telepon;
+                this.shipping_address = addr.alamat_lengkap;
+
+                // Match province in RajaOngkir
+                if (this.provinces && this.provinces.length > 0) {
+                    let foundProv = this.provinces.find(p => p.province.toLowerCase().includes(addr.provinsi.toLowerCase()) || addr.provinsi.toLowerCase().includes(p.province.toLowerCase()));
+                    if (foundProv) {
+                        this.selectedProvince = foundProv.province_id;
+                        await this.fetchCities();
+                        let foundCity = this.cities.find(c => (c.type + ' ' + c.city_name).toLowerCase().includes(addr.kota.toLowerCase()) || c.city_name.toLowerCase().includes(addr.kota.toLowerCase()) || addr.kota.toLowerCase().includes(c.city_name.toLowerCase()));
+                        if (foundCity) {
+                            this.selectedCity = foundCity.city_id;
+                            if (this.selectedCourier) {
+                                this.fetchCosts();
+                            }
+                        }
+                    }
+                }
+            },
+
+            async saveNewAddress() {
+                if (!this.newAddress.nama_penerima || !this.newAddress.no_telepon || !this.newAddress.alamat_lengkap || !this.newAddress.provinsi || !this.newAddress.kota || !this.newAddress.kode_pos) {
+                    alert('Mohon isi semua field alamat wajib.');
+                    return;
+                }
+
+                this.isSavingAddress = true;
+                try {
+                    let res = await fetch('{{ route("user.addresses.store") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify(this.newAddress)
+                    });
+
+                    let data = await res.json();
+                    if (data.success) {
+                        this.userAddresses = data.addresses;
+                        this.showAddAddressModal = false;
+                        if (data.address) {
+                            await this.selectAddress(data.address);
+                        }
+                        this.newAddress.alamat_lengkap = '';
+                    } else {
+                        alert(data.message || 'Gagal menyimpan alamat.');
+                    }
+                } catch (e) {
+                    console.error('Error saving address:', e);
+                    alert('Terjadi kesalahan saat menyimpan alamat.');
+                } finally {
+                    this.isSavingAddress = false;
+                }
+            },
+
+            async setDefaultAddress(addr) {
+                try {
+                    let res = await fetch('/user/addresses/' + addr.id + '/set-default', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    });
+                    let data = await res.json();
+                    if (data.success) {
+                        this.userAddresses = data.addresses;
+                    }
+                } catch (e) {
+                    console.error('Failed to set default address', e);
+                }
             },
 
             async fetchProvinces() {

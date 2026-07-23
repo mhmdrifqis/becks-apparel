@@ -24,8 +24,9 @@ class CheckoutController extends Controller
 
         $upgrades = \App\Models\Upgrade::all()->groupBy('category');
         $userDesigns = \App\Models\Design::where('user_id', Auth::id())->whereNotNull('name')->latest()->get();
+        $userAddresses = Auth::user()->addresses()->latest()->get();
 
-        return view('customer.checkout.index', compact('cartItems', 'upgrades', 'userDesigns'));
+        return view('customer.checkout.index', compact('cartItems', 'upgrades', 'userDesigns', 'userAddresses'));
     }
 
     public function process(Request $request)

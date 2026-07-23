@@ -68,6 +68,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/shipping/cities/{province}', [App\Http\Controllers\ShippingController::class, 'getCities'])->name('shipping.cities');
     Route::post('/shipping/cost', [App\Http\Controllers\ShippingController::class, 'calculateCost'])->name('shipping.cost');
 
+    // User Address Routes
+    Route::get('/user/addresses', [App\Http\Controllers\UserAddressController::class, 'index'])->name('user.addresses.index');
+    Route::post('/user/addresses', [App\Http\Controllers\UserAddressController::class, 'store'])->name('user.addresses.store');
+    Route::post('/user/addresses/{address}/set-default', [App\Http\Controllers\UserAddressController::class, 'setDefault'])->name('user.addresses.set-default');
+    Route::delete('/user/addresses/{address}', [App\Http\Controllers\UserAddressController::class, 'destroy'])->name('user.addresses.destroy');
+
     // Checkout Routes
     Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('customer.checkout.index');
     Route::post('/checkout/process', [App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
