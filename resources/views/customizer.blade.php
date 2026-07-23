@@ -217,7 +217,7 @@
                         <div x-show="activeState.partGradientType[activePart] === 'linear'" x-transition>
                             <label class="flex justify-between text-[10px] font-bold text-brand-400/80 mb-2 uppercase tracking-widest">
                                 <span>Sudut Gradasi</span>
-                                <span class="text-brand-400" x-text="activeState.partGradientAngle[activePart] + '°'"></span>
+                                <span class="text-brand-400" x-text="activeState.partGradientAngle[activePart] + 'ï¿½'"></span>
                             </label>
                             <input type="range" min="0" max="360" :value="activeState.partGradientAngle[activePart]" @input="updatePartGradient(activePart, 'partGradientAngle', $event.target.value)" class="w-full h-1 bg-brand-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
                         </div>
@@ -335,7 +335,7 @@
                                 </div>
                                 <div class="space-y-3">
                                     <div class="flex justify-between items-center">
-                                        <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Angle: <span class="text-brand-300" x-text="partPatternAngles[activePatternPart]"></span>°</label>
+                                        <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Angle: <span class="text-brand-300" x-text="partPatternAngles[activePatternPart]"></span>ï¿½</label>
                                         <button @click="resetPatternProperty('angle')" class="p-1 hover:text-brand-300 text-brand-500/70 transition-colors" title="Reset Angle">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                                         </button>
@@ -709,6 +709,43 @@
         </div>
     </div>
 
+    <!-- Modal Sukses Simpan Desain -->
+    <div x-show="showSuccessSaveModal" x-cloak class="fixed inset-0 z-[135] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" x-transition>
+        <div class="bg-brand-950 border border-brand-800/50 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <div class="p-6 border-b border-brand-800/30 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-brand-50 uppercase tracking-widest text-sm">Desain Berhasil Disimpan!</h3>
+                    <p class="text-[10px] text-emerald-400 mt-0.5 font-bold tracking-widest uppercase">Koleksi Desain Saya</p>
+                </div>
+            </div>
+            <div class="p-6 space-y-3">
+                <p class="text-xs text-brand-100/90 leading-relaxed font-medium">
+                    Desain <span class="font-bold text-emerald-400" x-text="'&quot;' + designName + '&quot;'"></span> telah berhasil tersimpan.
+                </p>
+                <p class="text-[11px] text-brand-400/80 leading-relaxed">
+                    Silakan kembali ke katalog untuk melanjutkan proses pemesanan dengan desain ini.
+                </p>
+            </div>
+            <div class="px-6 pb-6 flex flex-col gap-2.5">
+                <button @click="redirectToCatalog()" class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-xl transition-all text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    <span x-text="packageSlug ? 'Lanjutkan Pemesanan (Ke Katalog)' : 'Ke Katalog Produk'"></span>
+                </button>
+                <div class="flex gap-2">
+                    <a href="{{ route('customer.designs') }}" class="flex-1 py-3 rounded-2xl border border-brand-800 text-brand-300 hover:bg-brand-900/40 transition-all text-[10px] font-bold uppercase tracking-widest text-center flex items-center justify-center text-decoration-none">
+                        Lihat Desain Saya
+                    </a>
+                    <button @click="showSuccessSaveModal = false" class="flex-1 py-3 rounded-2xl border border-brand-800/60 text-brand-400 hover:bg-brand-900/20 transition-all text-[10px] font-bold uppercase tracking-widest">
+                        Tetap di Customizer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Konfirmasi Kembali -->
     <div x-show="showBackModal" x-cloak class="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" x-transition>
         <div class="bg-brand-950 border border-brand-800/50 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
@@ -727,7 +764,7 @@
             <div class="px-6 pb-6 flex flex-col gap-2">
                 <button @click="triggerSave()" class="w-full py-3 rounded-2xl bg-brand-900 hover:bg-brand-800 text-white shadow-xl transition-all text-xs font-bold uppercase tracking-widest">Ya, Simpan Desain</button>
                 <div class="flex gap-2">
-                    <button @click="window.history.back()" class="flex-1 py-3 rounded-2xl border border-rose-900/30 text-rose-400 hover:bg-rose-950/30 transition-all text-xs font-bold uppercase tracking-widest">Tidak, Buang Perubahan</button>
+                    <button @click="redirectToCatalog()" class="flex-1 py-3 rounded-2xl border border-rose-900/30 text-rose-400 hover:bg-rose-950/30 transition-all text-xs font-bold uppercase tracking-widest">Tidak, Buang Perubahan</button>
                     <button @click="showBackModal = false" class="flex-1 py-3 rounded-2xl border border-brand-800 text-brand-400 hover:bg-brand-900/10 transition-all text-xs font-bold uppercase tracking-widest">Batal</button>
                 </div>
             </div>

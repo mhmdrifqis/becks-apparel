@@ -250,6 +250,8 @@ export default () => ({
     showSaveModal: false,
     showBackModal: false,
     showPreviewModal: false,
+    showSuccessSaveModal: false,
+    packageSlug: '',
     // Auto-snapshot: setiap view di-capture otomatis saat renderLayers()
     viewSnapshots: { jersey_front: null, jersey_back: null, pants: null },
     // Toggle visibilitas setiap sisi di preview
@@ -336,6 +338,10 @@ export default () => ({
 
     init() {
         this.$nextTick(() => {
+            // Read package query parameter from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            this.packageSlug = urlParams.get('package') || '';
+
             this.initCanvas().then(async () => {
                 // Initialize URLs from DOM
                 this.saveDesignUrl = document.getElementById('save-design-url')?.value || '';
@@ -1571,12 +1577,20 @@ export default () => ({
         this.showSaveModal = true;
     },
 
+    redirectToCatalog() {
+        if (this.packageSlug) {
+            window.location.href = '/catalog/' + this.packageSlug;
+        } else {
+            window.location.href = '/catalog';
+        }
+    },
+
     handleBack() {
         // If there are changes (undoStack > 1), ask to save
         if (this.undoStack.length > 1) {
             this.showBackModal = true;
         } else {
-            window.history.back();
+            this.redirectToCatalog();
         }
     },
 
@@ -1692,18 +1706,17 @@ export default () => ({
 
             if (result.success) {
                 // Update URL to the new edit route without reloading the page
-                window.history.pushState({}, '', result.redirect);
+                const targetUrl = result.redirect + (this.packageSlug ? '?package=' + encodeURIComponent(this.packageSlug) : '');
+                window.history.pushState({}, '', targetUrl);
                 
                 // Update the save URL to the update route for future saves
                 if (result.updateUrl) {
                     this.updateDesignUrl = result.updateUrl;
                 }
                 
-                // Show success message
-                alert(result.message);
-                
-                // Close modal
+                // Close save modal & open success modal
                 this.showSaveModal = false;
+                this.showSuccessSaveModal = true;
                 this.isLoading = false;
             } else {
                 alert('Gagal menyimpan desain: ' + result.message);
