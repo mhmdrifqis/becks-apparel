@@ -11,6 +11,7 @@ class Package extends Model
         'name',
         'slug',
         'base_price',
+        'weight',
         'description',
         'specification',
         'features',

@@ -142,4 +142,91 @@ class ShippingController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function autoCalculate(Request $request)
+    {
+        $request->validate([
+            'destination' => 'required',
+            'weight' => 'required|numeric|min:1',
+            'courier' => 'nullable|string'
+        ]);
+
+        $destination = $request->destination;
+        $weight = max(1, (int) $request->weight);
+        $origin = env('RAJAONGKIR_ORIGIN_CITY_ID', 456);
+        $targetCourier = $request->input('courier');
+
+        $cacheKey = "shipping_auto_{$origin}_{$destination}_{$weight}_" . ($targetCourier ?: 'all');
+
+        try {
+            $result = \Illuminate\Support\Facades\Cache::remember($cacheKey, 600, function () use ($origin, $destination, $weight, $targetCourier) {
+                $couriers = $targetCourier ? [$targetCourier] : ['jne', 'pos', 'tiki'];
+                $allOptions = [];
+
+                foreach ($couriers as $courierCode) {
+                    try {
+                        $response = Http::asForm()->withHeaders([
+                            'key' => $this->apiKey
+                        ])->post("{$this->baseUrl}/calculate/domestic-cost", [
+                            'origin' => $origin,
+                            'destination' => $destination,
+                            'weight' => $weight,
+                            'courier' => $courierCode
+                        ]);
+
+                        $data = $response->json();
+                        if (!isset($data['meta']['code']) || $data['meta']['code'] === 200) {
+                            $rawCosts = $data['data'][0]['costs'] ?? $data['data'] ?? [];
+                            foreach ($rawCosts as $item) {
+                                $val = $item['cost'][0]['value'] ?? $item['cost']['value'] ?? (is_numeric($item['cost']) ? $item['cost'] : 0);
+                                $etd = $item['cost'][0]['etd'] ?? $item['cost']['etd'] ?? $item['etd'] ?? '';
+                                
+                                if ($val > 0) {
+                                    $allOptions[] = [
+                                        'courier' => $courierCode,
+                                        'courier_name' => strtoupper($courierCode),
+                                        'service' => $item['service'] ?? 'REG',
+                                        'description' => $item['description'] ?? '',
+                                        'cost' => (int) $val,
+                                        'etd' => $etd,
+                                    ];
+                                }
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+                }
+
+                if (empty($allOptions)) {
+                    return null;
+                }
+
+                usort($allOptions, fn($a, $b) => $a['cost'] <=> $b['cost']);
+
+                return [
+                    'cheapest' => $allOptions[0],
+                    'all_options' => $allOptions
+                ];
+            });
+
+            if (!$result) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Layanan pengiriman tidak tersedia untuk kota tujuan ini atau API mengalami gangguan.'
+                ], 400);
+            }
+
+            return response()->json([
+                'success' => true,
+                'cheapest' => $result['cheapest'],
+                'all_options' => $result['all_options']
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghitung ongkos kirim: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

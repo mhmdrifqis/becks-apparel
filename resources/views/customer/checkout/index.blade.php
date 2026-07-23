@@ -100,6 +100,34 @@
                             <p class="text-sm text-slate-600 leading-relaxed font-medium" x-text="fullAddress || 'Silakan pilih atau buat alamat baru.'"></p>
                         </div>
 
+                        <!-- Automated Cheapest Courier Display -->
+                        <div class="mt-4 p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/80 shadow-sm relative overflow-hidden" x-show="autoSelectedCourier">
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-2xl bg-emerald-700 text-white flex items-center justify-center font-black text-sm shadow-md shadow-emerald-700/20">
+                                        🚀
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-black text-emerald-950 uppercase tracking-wider" x-text="autoSelectedCourier ? (autoSelectedCourier.courier_name + ' - ' + autoSelectedCourier.service) : ''"></span>
+                                            <span x-show="autoSelectedCourier && autoSelectedCourier.isAuto" class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-emerald-700 text-white shadow-sm">Termurah Otomatis</span>
+                                        </div>
+                                        <p class="text-xs font-bold text-emerald-700 mt-0.5" x-text="'Ongkir: Rp ' + formatRupiah(shippingCost) + (autoSelectedCourier && autoSelectedCourier.etd ? (' (Estimasi ' + autoSelectedCourier.etd + ' hari)') : '')"></p>
+                                    </div>
+                                </div>
+                                <button type="button" @click="showCourierOptionsModal = true" class="px-3.5 py-2 bg-white text-emerald-900 border border-emerald-300 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-100 transition-all shadow-sm flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                                    Ganti Kurir
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Error Alert -->
+                        <div x-show="shippingError" class="mt-4 p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs font-bold text-rose-700 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-rose-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span x-text="shippingError"></span>
+                        </div>
+
                         <!-- Edit Mode -->
                         <div x-show="addressEditing" x-transition class="space-y-6 mt-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -529,6 +557,48 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Modal Ganti Kurir (Manual Override) -->
+            <div x-show="showCourierOptionsModal" x-cloak class="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" x-transition>
+                <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-100 flex flex-col">
+                    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-900 flex items-center justify-center font-bold">
+                                🚚
+                            </div>
+                            <div>
+                                <h3 class="font-black text-slate-900 uppercase tracking-widest text-sm">Pilih Opsi Ekspedisi</h3>
+                                <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Hasil Query RajaOngkir Starter</p>
+                            </div>
+                        </div>
+                        <button type="button" @click="showCourierOptionsModal = false" class="p-2 text-slate-400 hover:text-slate-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="p-6 space-y-3 max-h-[60vh] overflow-y-auto custom-scrollbar text-left">
+                        <template x-for="(opt, idx) in allShippingOptions" :key="idx">
+                            <div @click="applyShippingOption(opt, false); showCourierOptionsModal = false"
+                                 class="p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between"
+                                 :class="(selectedCourier === opt.courier && selectedService && selectedService.service === opt.service) ? 'border-emerald-600 bg-emerald-50/40 shadow-sm' : 'border-slate-100 bg-slate-50/50 hover:border-slate-200'">
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-black text-slate-900 uppercase" x-text="opt.courier_name + ' - ' + opt.service"></span>
+                                        <template x-if="idx === 0">
+                                            <span class="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-emerald-600 text-white">Termurah</span>
+                                        </template>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 font-medium" x-text="opt.description || 'Layanan Reguler'"></p>
+                                    <p class="text-[10px] text-slate-400 font-bold" x-text="'Estimasi: ' + opt.etd + ' hari'"></p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm font-black text-brand-900" x-text="'Rp ' + formatRupiah(opt.cost)"></span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -539,6 +609,7 @@
             userAddresses: @js($userAddresses),
             selectedAddressId: null,
             showAddAddressModal: false,
+            showCourierOptionsModal: false,
             newAddress: {
                 label: 'Rumah',
                 nama_penerima: '{{ Auth::user()->name }}',
@@ -547,6 +618,8 @@
                 provinsi: '',
                 kota: '',
                 kode_pos: '',
+                rajaongkir_city_id: '',
+                rajaongkir_province_id: '',
                 is_default: true,
             },
             isSavingAddress: false,
@@ -567,9 +640,17 @@
             shippingCost: 0,
             isLoadingShipping: false,
             totalWeight: 0,
+            autoSelectedCourier: null,
+            allShippingOptions: [],
+            shippingError: null,
 
             async init() {
-                this.totalWeight = this.items.reduce((sum, item) => sum + (item.qty * 250), 0);
+                this.totalWeight = this.items.reduce((sum, item) => {
+                    let w = (item.package && item.package.weight) ? item.package.weight : 250;
+                    return sum + (item.qty * w);
+                }, 0);
+                if (this.totalWeight <= 0) this.totalWeight = 1000;
+
                 await this.fetchProvinces();
 
                 if (this.userAddresses && this.userAddresses.length > 0) {
@@ -584,22 +665,92 @@
                 this.recipient_name = addr.nama_penerima;
                 this.recipient_phone = addr.no_telepon;
                 this.shipping_address = addr.alamat_lengkap;
+                this.shippingError = null;
 
-                // Match province in RajaOngkir
-                if (this.provinces && this.provinces.length > 0) {
+                let destinationCityId = addr.rajaongkir_city_id;
+
+                // Match province & city in RajaOngkir if city_id is missing
+                if (!destinationCityId && this.provinces && this.provinces.length > 0) {
                     let foundProv = this.provinces.find(p => p.province.toLowerCase().includes(addr.provinsi.toLowerCase()) || addr.provinsi.toLowerCase().includes(p.province.toLowerCase()));
                     if (foundProv) {
                         this.selectedProvince = foundProv.province_id;
                         await this.fetchCities();
                         let foundCity = this.cities.find(c => (c.type + ' ' + c.city_name).toLowerCase().includes(addr.kota.toLowerCase()) || c.city_name.toLowerCase().includes(addr.kota.toLowerCase()) || addr.kota.toLowerCase().includes(c.city_name.toLowerCase()));
                         if (foundCity) {
+                            destinationCityId = foundCity.city_id;
                             this.selectedCity = foundCity.city_id;
-                            if (this.selectedCourier) {
-                                this.fetchCosts();
-                            }
                         }
                     }
                 }
+
+                if (destinationCityId) {
+                    this.selectedCity = destinationCityId;
+                    await this.autoCalculateShipping(destinationCityId);
+                } else {
+                    this.shippingError = 'Tujuan pengiriman belum terhubung dengan city_id RajaOngkir. Silakan buat atau edit alamat.';
+                    this.shippingCost = 0;
+                    this.selectedService = null;
+                    this.autoSelectedCourier = null;
+                }
+            },
+
+            async autoCalculateShipping(cityId, courier = null) {
+                this.isLoadingShipping = true;
+                this.shippingError = null;
+                try {
+                    let res = await fetch('{{ route("shipping.auto-calculate") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            destination: cityId,
+                            weight: this.totalWeight,
+                            courier: courier
+                        })
+                    });
+
+                    let data = await res.json();
+                    if (res.ok && data.success) {
+                        this.allShippingOptions = data.all_options || [];
+                        let cheapest = data.cheapest;
+                        if (cheapest) {
+                            this.applyShippingOption(cheapest, true);
+                        }
+                    } else {
+                        this.shippingError = data.message || 'Gagal menghitung ongkos kirim RajaOngkir.';
+                        this.shippingCost = 0;
+                        this.selectedService = null;
+                        this.autoSelectedCourier = null;
+                    }
+                } catch (e) {
+                    console.error('Auto shipping calculation error:', e);
+                    this.shippingError = 'Terjadi kesalahan jaringan saat menghitung ongkos kirim.';
+                    this.shippingCost = 0;
+                    this.selectedService = null;
+                    this.autoSelectedCourier = null;
+                } finally {
+                    this.isLoadingShipping = false;
+                }
+            },
+
+            applyShippingOption(opt, isAuto = false) {
+                this.selectedCourier = opt.courier;
+                this.selectedService = {
+                    service: opt.service,
+                    description: opt.description,
+                    cost: [{ value: opt.cost, etd: opt.etd }]
+                };
+                this.shippingCost = opt.cost;
+                this.autoSelectedCourier = {
+                    courier_name: opt.courier_name,
+                    service: opt.service,
+                    cost: opt.cost,
+                    etd: opt.etd,
+                    isAuto: isAuto
+                };
             },
 
             async saveNewAddress() {

@@ -61,6 +61,13 @@ class PackageResource extends Resource
                             ->prefix('Rp')
                             ->required(),
 
+                        Forms\Components\TextInput::make('weight')
+                            ->label('Berat Produk')
+                            ->numeric()
+                            ->suffix('gram')
+                            ->default(250)
+                            ->required(),
+
                         Forms\Components\FileUpload::make('images')
                             ->label('Gambar Produk')
                             ->image()

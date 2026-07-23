@@ -67,6 +67,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/shipping/provinces', [App\Http\Controllers\ShippingController::class, 'getProvinces'])->name('shipping.provinces');
     Route::get('/shipping/cities/{province}', [App\Http\Controllers\ShippingController::class, 'getCities'])->name('shipping.cities');
     Route::post('/shipping/cost', [App\Http\Controllers\ShippingController::class, 'calculateCost'])->name('shipping.cost');
+    Route::post('/shipping/auto-calculate', [App\Http\Controllers\ShippingController::class, 'autoCalculate'])->name('shipping.auto-calculate');
 
     // User Address Routes
     Route::get('/user/addresses', [App\Http\Controllers\UserAddressController::class, 'index'])->name('user.addresses.index');

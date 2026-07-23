@@ -18,6 +18,8 @@ class UserAddress extends Model
         'kota',
         'provinsi',
         'kode_pos',
+        'rajaongkir_city_id',
+        'rajaongkir_province_id',
         'is_default',
     ];
 

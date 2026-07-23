@@ -24,6 +24,8 @@ class UserAddressController extends Controller
             'kota' => 'required|string|max:255',
             'provinsi' => 'required|string|max:255',
             'kode_pos' => 'required|string|max:20',
+            'rajaongkir_city_id' => 'nullable|string',
+            'rajaongkir_province_id' => 'nullable|string',
             'is_default' => 'nullable|boolean',
         ]);
 
@@ -49,6 +51,8 @@ class UserAddressController extends Controller
             'kota' => $request->kota,
             'provinsi' => $request->provinsi,
             'kode_pos' => $request->kode_pos,
+            'rajaongkir_city_id' => $request->rajaongkir_city_id,
+            'rajaongkir_province_id' => $request->rajaongkir_province_id,
             'is_default' => $isDefault,
         ]);
 
