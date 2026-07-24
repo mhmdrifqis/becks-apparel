@@ -39,7 +39,7 @@
                     <div class="flex justify-center mb-4">
                         <x-application-logo class="h-12 w-auto fill-current text-brand-900 dark:text-brand-400" />
                     </div>
-                    <h2 class="text-3xl font-black tracking-tighter" x-text="authMode === 'login' ? 'Selamat Datang Kembali' : 'Bergabung Sekarng'"></h2>
+                    <h2 class="text-3xl font-black tracking-tighter" x-text="authMode === 'login' ? 'Selamat Datang Kembali' : 'Bergabung Sekarang'"></h2>
                     <p class="text-gray-500 dark:text-zinc-400 text-sm mt-2" x-text="authMode === 'login' ? 'Masuk ke akun Becks Apparel Anda' : 'Buat akun untuk mulai kustomisasi jersey'"></p>
                 </div>
 
@@ -48,9 +48,9 @@
                     <form method="POST" action="{{ route('login') }}" class="space-y-5">
                         @csrf
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Email Address</label>
-                            <input type="email" name="email" value="{{ old('email') }}" required autofocus class="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-zinc-950 focus:ring-0 transition-all dark:text-white" placeholder="nama@email.com">
-                            @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Nomor WhatsApp / Email</label>
+                            <input type="text" name="login" value="{{ old('login') }}" required autofocus class="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-zinc-950 focus:ring-0 transition-all dark:text-white" placeholder="08xxxxxxxxxx atau email">
+                            @error('login') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
@@ -63,7 +63,7 @@
                             <input type="password" name="password" required class="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-zinc-950 focus:ring-0 transition-all dark:text-white" placeholder="••••••••">
                         </div>
 
-                        <div className="flex items-center">
+                        <div class="flex items-center">
                             <label class="inline-flex items-center cursor-pointer group">
                                 <input type="checkbox" name="remember" class="rounded-md bg-gray-100 dark:bg-zinc-800 border-transparent text-brand-900 focus:ring-brand-500 transition-all">
                                 <span class="ml-2 text-sm text-gray-600 dark:text-zinc-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">Ingat saya</span>
@@ -114,13 +114,19 @@
                         @csrf
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Nama Lengkap</label>
-                            <input type="text" name="name" value="{{ old('name') }}" required class="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-zinc-950 focus:ring-0 transition-all dark:text-white" placeholder="John Doe">
+                            <input type="text" name="name" value="{{ old('name') }}" required class="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-zinc-950 focus:ring-0 transition-all dark:text-white" placeholder="Nama Lengkap Anda">
                             @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Email Address</label>
-                            <input type="email" name="email" value="{{ old('email') }}" required class="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-zinc-950 focus:ring-0 transition-all dark:text-white" placeholder="nama@email.com">
+                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Nomor WhatsApp / Telepon</label>
+                            <input type="text" name="phone" value="{{ old('phone') }}" required class="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-zinc-950 focus:ring-0 transition-all dark:text-white" placeholder="Contoh: 08123456789">
+                            @error('phone') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Email Address (Opsional)</label>
+                            <input type="email" name="email" value="{{ old('email') }}" class="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-zinc-950 focus:ring-0 transition-all dark:text-white" placeholder="nama@email.com (opsional)">
                             @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
