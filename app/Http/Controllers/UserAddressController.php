@@ -6,6 +6,8 @@ use App\Models\UserAddress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use App\Helpers\PhoneHelper;
+
 class UserAddressController extends Controller
 {
     public function index()
@@ -46,7 +48,7 @@ class UserAddressController extends Controller
             'user_id' => $userId,
             'label' => $request->filled('label') ? $request->label : 'Alamat',
             'nama_penerima' => $request->nama_penerima,
-            'no_telepon' => $request->no_telepon,
+            'no_telepon' => PhoneHelper::normalize($request->no_telepon),
             'alamat_lengkap' => $request->alamat_lengkap,
             'kota' => $request->kota,
             'provinsi' => $request->provinsi,

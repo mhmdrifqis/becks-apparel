@@ -44,6 +44,8 @@ class SocialiteController extends Controller
                     'password' => null, // Password is null for social logins
                 ]);
 
+                $user->assignRole('Pelanggan');
+
                 Auth::login($user);
             }
 
