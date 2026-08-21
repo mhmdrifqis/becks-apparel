@@ -47,8 +47,15 @@ class RegisteredUserController extends Controller
             'email' => ['nullable', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ], [
+            'name.required' => 'Nama Lengkap wajib diisi.',
+            'phone.required' => 'Nomor WhatsApp/Telepon wajib diisi.',
             'phone.regex' => 'Nomor WhatsApp/Telepon harus nomor Indonesia yang valid (contoh: 081234567890).',
-            'phone.unique' => 'Nomor WhatsApp/Telepon sudah terdaftar.',
+            'phone.unique' => 'Nomor WhatsApp/Telepon ini sudah terdaftar. Silakan login atau gunakan nomor lain.',
+            'email.email' => 'Format email yang Anda masukkan tidak valid.',
+            'email.unique' => 'Email ini sudah terdaftar. Silakan gunakan email lain.',
+            'password.required' => 'Password wajib diisi.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok dengan password yang Anda ketik.',
+            'password.min' => 'Password minimal harus 8 karakter.',
         ]);
 
         $phone = PhoneHelper::normalize($request->phone);

@@ -28,8 +28,8 @@
     </head>
     <body 
         x-data="{ 
-            showAuthModal: @if(session('show_auth_modal') || $errors->has('login_error')) true @else false @endif, 
-            authMode: 'login' 
+            showAuthModal: @if(session('show_auth_modal') || $errors->any()) true @else false @endif, 
+            authMode: @if($errors->has('name') || $errors->has('phone') || $errors->has('password_confirmation')) 'register' @else 'login' @endif 
         }" 
         @open-auth-modal.window="showAuthModal = true; authMode = $event.detail?.mode || 'login'"
         class="font-sans antialiased bg-gray-50 text-gray-900 dark:bg-zinc-950 dark:text-zinc-100 transition-colors duration-500 overflow-x-hidden"

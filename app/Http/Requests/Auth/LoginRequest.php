@@ -53,11 +53,23 @@ class LoginRequest extends FormRequest
             $login = PhoneHelper::normalize($login);
         }
 
+        // Cek ketersediaan akun terlebih dahulu
+        $user = \App\Models\User::where($loginType, $login)->first();
+        if (!$user) {
+            $msg = ($loginType === 'email') 
+                ? 'Email yang Anda masukkan belum terdaftar. Silakan mendaftar dahulu.' 
+                : 'Nomor WhatsApp/Telepon (' . $login . ') belum terdaftar. Silakan mendaftar dahulu.';
+            
+            throw ValidationException::withMessages([
+                'login' => $msg,
+            ]);
+        }
+
         if (! Auth::attempt([$loginType => $login, 'password' => $password], $remember)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'login' => trans('auth.failed'),
+                'password' => 'Password yang Anda masukkan salah. Silakan coba lagi atau gunakan Lupa Password via WhatsApp.',
             ]);
         }
 
