@@ -1,74 +1,69 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
+    <div class="mb-6 text-center">
+        <h2 class="font-display text-2xl font-black tracking-tight text-white">Bergabung Sekarang</h2>
+        <p class="mt-1 text-xs text-zinc-400">Buat akun untuk mulai kustomisasi jersey</p>
+    </div>
+
+    <form method="POST" action="{{ route('register') }}" class="space-y-4">
         @csrf
 
         <!-- Name -->
         <div>
-            <x-input-label for="name" :value="__('Nama Lengkap')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" placeholder="Nama Lengkap Anda" />
+            <x-input-label for="name" :value="__('Nama Lengkap')" class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1" />
+            <x-text-input id="name" class="block w-full px-4 py-3 rounded-2xl bg-zinc-800/80 border-white/10 text-white placeholder-zinc-500 focus:border-brand-500 focus:ring-brand-500/20 transition-all text-sm" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" placeholder="Nama Lengkap Anda" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
         <!-- Phone / WhatsApp Number -->
-        <div class="mt-4">
-            <x-input-label for="phone" :value="__('Nomor WhatsApp / Telepon')" />
-            <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone')" required placeholder="Contoh: 08123456789" />
+        <div>
+            <x-input-label for="phone" :value="__('Nomor WhatsApp / Telepon')" class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1" />
+            <x-text-input id="phone" class="block w-full px-4 py-3 rounded-2xl bg-zinc-800/80 border-white/10 text-white placeholder-zinc-500 focus:border-brand-500 focus:ring-brand-500/20 transition-all text-sm" type="text" name="phone" :value="old('phone')" required placeholder="Contoh: 081234567890" />
             <x-input-error :messages="$errors->get('phone')" class="mt-2" />
         </div>
 
         <!-- Email Address (Optional) -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email (Opsional)')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" autocomplete="username" placeholder="alamat@email.com (opsional)" />
+        <div>
+            <x-input-label for="email" :value="__('Email (Opsional)')" class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1" />
+            <x-text-input id="email" class="block w-full px-4 py-3 rounded-2xl bg-zinc-800/80 border-white/10 text-white placeholder-zinc-500 focus:border-brand-500 focus:ring-brand-500/20 transition-all text-sm" type="email" name="email" :value="old('email')" autocomplete="username" placeholder="alamat@email.com (opsional)" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
+        <div>
+            <x-input-label for="password" :value="__('Password')" class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1" />
+            <x-text-input id="password" class="block w-full px-4 py-3 rounded-2xl bg-zinc-800/80 border-white/10 text-white placeholder-zinc-500 focus:border-brand-500 focus:ring-brand-500/20 transition-all text-sm"
                             type="password"
                             name="password"
-                            required autocomplete="new-password" />
-
+                            required autocomplete="new-password" placeholder="Minimal 8 karakter" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
         <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
+        <div>
+            <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1" />
+            <x-text-input id="password_confirmation" class="block w-full px-4 py-3 rounded-2xl bg-zinc-800/80 border-white/10 text-white placeholder-zinc-500 focus:border-brand-500 focus:ring-brand-500/20 transition-all text-sm"
                             type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
+                            name="password_confirmation" required autocomplete="new-password" placeholder="Ulangi password" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-between mt-6">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
-                {{ __('Sudah punya akun? Masuk') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Daftar Akun') }}
-            </x-primary-button>
-        </div>
+        <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-brand-900 to-brand-800 hover:from-brand-800 hover:to-brand-700 text-white font-bold text-sm rounded-2xl shadow-xl shadow-brand-950/40 border border-brand-700/50 transition-all transform active:scale-[0.98] uppercase tracking-wider mt-2">
+            {{ __('Daftar Akun (OTP WA)') }}
+        </button>
 
         <div class="mt-6">
             <div class="relative">
                 <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-gray-300 dark:border-gray-700"></div>
+                    <div class="w-full border-t border-white/10"></div>
                 </div>
-                <div class="relative flex justify-center text-sm">
-                    <span class="px-2 bg-white dark:bg-gray-800 text-gray-500">Atau daftar dengan</span>
+                <div class="relative flex justify-center text-xs">
+                    <span class="px-3 bg-zinc-900 text-zinc-500">Atau daftar dengan</span>
                 </div>
             </div>
 
-            <div class="mt-6">
-                <a href="{{ route('auth.google') }}" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                    <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+            <div class="mt-4">
+                <a href="{{ route('auth.google') }}" class="w-full flex items-center justify-center px-4 py-3 border border-white/10 rounded-2xl shadow-sm text-xs font-bold text-zinc-200 bg-zinc-800/60 hover:bg-zinc-800 hover:border-white/20 transition-all active:scale-[0.98]">
+                    <svg class="h-4 w-4 mr-2.5" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
                         <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                             <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"/>
                             <path fill="#34A853" d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -19.444 63.239 -14.754 63.239 Z"/>
@@ -79,6 +74,13 @@
                     Lanjutkan dengan Google
                 </a>
             </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-white/10 text-center">
+            <p class="text-xs text-zinc-400">
+                Sudah punya akun? 
+                <a href="{{ route('login') }}" class="font-bold text-brand-400 hover:text-brand-300 transition-colors">Masuk Di Sini</a>
+            </p>
         </div>
     </form>
 </x-guest-layout>
