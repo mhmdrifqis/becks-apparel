@@ -19,6 +19,14 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
+    // WhatsApp OTP Registration Routes
+    Route::get('register-verify-otp', [RegisteredUserController::class, 'showVerifyOtpForm'])
+        ->name('register.otp.show');
+    Route::post('register-verify-otp', [RegisteredUserController::class, 'verifyRegistrationOtp'])
+        ->name('register.otp.verify');
+    Route::post('register-resend-otp', [RegisteredUserController::class, 'resendRegistrationOtp'])
+        ->name('register.otp.resend');
+
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 

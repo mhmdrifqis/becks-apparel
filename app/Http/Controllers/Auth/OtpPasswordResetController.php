@@ -83,8 +83,13 @@ class OtpPasswordResetController extends Controller
         $res = $this->whatsapp->sendMessage($user->phone, $message);
         Log::info("Sent OTP to {$user->phone}: {$otp}. Result: " . json_encode($res));
 
+        $statusMsg = 'Kode OTP 6-digit telah dikirimkan ke WhatsApp Anda (' . substr($user->phone, 0, 4) . '****' . substr($user->phone, -3) . ').';
+        if (isset($res['status']) && $res['status'] === false) {
+            $statusMsg .= ' (Catatan: Gateway Fonnte WA terputus: "' . ($res['reason'] ?? 'Device Disconnected') . '". Kode OTP Anda: ' . $otp . ')';
+        }
+
         return redirect()->route('password.otp.verify-form')
-            ->with('status', 'Kode OTP 6-digit telah dikirimkan ke WhatsApp Anda (' . substr($user->phone, 0, 4) . '****' . substr($user->phone, -3) . ').');
+            ->with('status', $statusMsg);
     }
 
     /**

@@ -30,21 +30,24 @@ class WhatsAppService
         }
 
         try {
-            $response = Http::withHeaders([
-                'Authorization' => $this->token,
-            ])->post($this->baseUrl, [
-                'target' => $recipient,
-                'message' => $message,
-                'countryCode' => '62', // Default Indonesia
-            ]);
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Authorization' => $this->token,
+                ])->post($this->baseUrl, [
+                    'target' => $recipient,
+                    'message' => $message,
+                    'countryCode' => '62', // Default Indonesia
+                ]);
 
             $result = $response->json();
             
-            if (!$response->successful()) {
-                Log::error('Fonnte API Error: ' . json_encode($result));
+            if (!$response->successful() || (isset($result['status']) && $result['status'] === false)) {
+                Log::error('Fonnte API Warning/Error: ' . json_encode($result));
+            } else {
+                Log::info('Fonnte API Success: ' . json_encode($result));
             }
 
-            return $result;
+            return is_array($result) ? $result : ['status' => false, 'reason' => 'Invalid Response'];
 
         } catch (\Exception $e) {
             Log::error('WhatsApp Service Exception: ' . $e->getMessage());
