@@ -14,7 +14,12 @@
 
         <!-- Password -->
         <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+            <div class="flex justify-between items-center">
+                <x-input-label for="password" :value="__('Password')" />
+                <a class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline" href="{{ route('password.otp.request') }}">
+                    {{ __('Lupa Password via WhatsApp?') }}
+                </a>
+            </div>
 
             <x-text-input id="password" class="block mt-1 w-full"
                             type="password"

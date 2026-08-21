@@ -11,6 +11,8 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Auth\OtpPasswordResetController;
+
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
@@ -27,6 +29,20 @@ Route::middleware('guest')->group(function () {
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
         ->name('password.email');
+
+    // WhatsApp OTP Password Reset Routes
+    Route::get('forgot-password-otp', [OtpPasswordResetController::class, 'showRequestForm'])
+        ->name('password.otp.request');
+    Route::post('forgot-password-otp', [OtpPasswordResetController::class, 'sendOtp'])
+        ->name('password.otp.send');
+    Route::get('verify-otp', [OtpPasswordResetController::class, 'showVerifyForm'])
+        ->name('password.otp.verify-form');
+    Route::post('verify-otp', [OtpPasswordResetController::class, 'verifyOtp'])
+        ->name('password.otp.verify');
+    Route::get('reset-password-otp', [OtpPasswordResetController::class, 'showResetForm'])
+        ->name('password.otp.reset-form');
+    Route::post('reset-password-otp', [OtpPasswordResetController::class, 'resetPassword'])
+        ->name('password.otp.reset');
 
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
         ->name('password.reset');

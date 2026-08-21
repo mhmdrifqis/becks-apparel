@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
+use App\Helpers\PhoneHelper;
+
 class LoginRequest extends FormRequest
 {
     /**
@@ -48,7 +50,7 @@ class LoginRequest extends FormRequest
 
         $loginType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
         if ($loginType === 'phone') {
-            $login = preg_replace('/[^0-9]/', '', $login);
+            $login = PhoneHelper::normalize($login);
         }
 
         if (! Auth::attempt([$loginType => $login, 'password' => $password], $remember)) {
@@ -90,6 +92,11 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('login')).'|'.$this->ip());
+        $login = $this->string('login');
+        if (! filter_var($login, FILTER_VALIDATE_EMAIL)) {
+            $login = PhoneHelper::normalize($login);
+        }
+
+        return Str::transliterate(Str::lower($login).'|'.$this->ip());
     }
 }

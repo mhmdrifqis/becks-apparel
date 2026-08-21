@@ -13,6 +13,8 @@ use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+use App\Helpers\PhoneHelper;
+
 class RegisteredUserController extends Controller
 {
     /**
@@ -32,12 +34,15 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:30', 'unique:'.User::class],
+            'phone' => ['required', 'string', 'regex:/^(\+?62|0)8[1-9][0-9]{7,11}$/', 'unique:'.User::class],
             'email' => ['nullable', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'phone.regex' => 'Nomor WhatsApp/Telepon harus nomor Indonesia yang valid (contoh: 081234567890).',
+            'phone.unique' => 'Nomor WhatsApp/Telepon sudah terdaftar.',
         ]);
 
-        $phone = preg_replace('/[^0-9]/', '', $request->phone);
+        $phone = PhoneHelper::normalize($request->phone);
         $email = $request->filled('email') ? $request->email : $phone . '@becksapparel.com';
 
         $user = User::create([

@@ -56,9 +56,7 @@
                         <div>
                             <div class="flex justify-between mb-2">
                                 <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">Password</label>
-                                @if (Route::has('password.request'))
-                                    <a href="{{ route('password.request') }}" class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline">Lupa Password?</a>
-                                @endif
+                                <a href="{{ route('password.otp.request') }}" class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline">Lupa Password via WhatsApp?</a>
                             </div>
                             <input type="password" name="password" required class="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-zinc-950 focus:ring-0 transition-all dark:text-white" placeholder="••••••••">
                         </div>
