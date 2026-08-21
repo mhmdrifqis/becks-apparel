@@ -47,10 +47,10 @@ class OtpPasswordResetController extends Controller
         $isEmail = filter_var($login, FILTER_VALIDATE_EMAIL);
 
         if ($isEmail) {
-            $user = User::where('email', $login)->first();
+            $user = User::where('email', $login)->latest()->first();
         } else {
             $phone = PhoneHelper::normalize($login);
-            $user = User::where('phone', $phone)->first();
+            $user = User::where('phone', $phone)->latest()->first();
         }
 
         if (!$user) {

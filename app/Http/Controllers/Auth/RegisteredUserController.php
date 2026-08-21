@@ -128,6 +128,19 @@ class RegisteredUserController extends Controller
             ]);
         }
 
+        // Double-check jika nomor HP/Email sudah terdaftar saat menunggu OTP
+        if (User::where('phone', $regData['phone'])->exists()) {
+            Cache::forget("reg_otp_{$phone}");
+            session()->forget('pending_reg_phone');
+            return redirect()->route('register')->withErrors(['phone' => 'Nomor WhatsApp/Telepon ini sudah terdaftar. Silakan masuk.']);
+        }
+
+        if (User::where('email', $regData['email'])->exists()) {
+            Cache::forget("reg_otp_{$phone}");
+            session()->forget('pending_reg_phone');
+            return redirect()->route('register')->withErrors(['email' => 'Email ini sudah terdaftar. Silakan gunakan email lain.']);
+        }
+
         // Buat User Baru di Database
         $user = User::create([
             'name' => $regData['name'],
