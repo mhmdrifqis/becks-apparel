@@ -142,7 +142,7 @@
                                                     <div class="bg-white border-2 border-slate-100 rounded-2xl p-2 group-hover:border-brand-900 peer-checked:border-brand-900 peer-checked:bg-brand-50/50 transition-all duration-300 h-full flex flex-col">
                                                         <div class="aspect-square bg-slate-50 rounded-xl overflow-hidden mb-2 relative shrink-0">
                                                             @if($design->preview_path)
-                                                                <img src="{{ Storage::url($design->preview_path) }}" class="w-full h-full object-contain">
+                                                                <img src="{{ Storage::disk('public')->url($design->preview_path) }}" class="w-full h-full object-contain">
                                                             @else
                                                                 <div class="w-full h-full flex items-center justify-center text-slate-300">
                                                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -357,7 +357,7 @@
             items: [
                 @foreach($order->orderItems as $item)
                 @php 
-                    $src = count($item->package->images ?? []) > 0 ? (str_starts_with($item->package->images[0], 'assets/') ? asset($item->package->images[0]) : Storage::url($item->package->images[0])) : ''; 
+                    $src = count($item->package->images ?? []) > 0 ? (str_starts_with($item->package->images[0], 'assets/') ? asset($item->package->images[0]) : Storage::disk('public')->url($item->package->images[0])) : ''; 
                     $existingMethod = $item->design ? (isset($item->design->design_json['files']) ? "upload" : "customizer") : "upload";
                 @endphp
                 {

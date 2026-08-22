@@ -41,4 +41,23 @@ return [
         'url' => env('FASTAPI_CHATBOT_URL', 'http://127.0.0.1:8000/chatbot'),
     ],
 
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
+    'fonnte' => [
+        'token' => env('FONNTE_TOKEN'),
+    ],
+
+    'rajaongkir' => [
+        'api_key' => env('RAJAONGKIR_API_KEY'),
+        'origin_city_id' => env('RAJAONGKIR_ORIGIN_CITY_ID', '456'),
+    ],
+
 ];

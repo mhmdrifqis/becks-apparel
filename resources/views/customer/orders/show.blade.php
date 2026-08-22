@@ -3,7 +3,7 @@
 @section('title', 'Detail Pesanan ' . $order->order_number . ' - Becks Apparel')
 
 @section('content')
-<div class="min-h-screen bg-slate-50 pb-40">
+<div x-data="{ showReturnModal: false }" class="min-h-screen bg-slate-50 pb-40">
     <div class="bg-white border-b border-slate-100 pt-28 pb-6 md:pt-36 md:pb-10">
         <div class="max-w-7xl mx-auto px-4">
             <a href="{{ route('customer.orders') }}" class="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-brand-900 transition-colors mb-6">
@@ -203,7 +203,7 @@
                                 <div class="flex gap-4 md:gap-6">
                                     <div class="w-20 h-20 md:w-24 md:h-24 bg-slate-50 rounded-2xl border border-slate-100 shrink-0 overflow-hidden group relative">
                                         @if(count($item->package->images ?? []) > 0)
-                                            @php $src = str_starts_with($item->package->images[0], 'assets/') ? asset($item->package->images[0]) : Storage::url($item->package->images[0]); @endphp
+                                            @php $src = str_starts_with($item->package->images[0], 'assets/') ? asset($item->package->images[0]) : Storage::disk('public')->url($item->package->images[0]); @endphp
                                             <img src="{{ $src }}" class="w-full h-full object-cover">
                                         @endif
                                     </div>
@@ -237,8 +237,8 @@
                                              @endphp
 
                                              @if($design->preview_path)
-                                                 <a href="{{ asset('storage/' . $design->preview_path) }}" target="_blank" class="w-24 h-24 bg-slate-50 rounded-xl border-2 border-brand-100 overflow-hidden hover:border-brand-900 transition-all group relative">
-                                                     <img src="{{ asset('storage/' . $design->preview_path) }}" class="w-full h-full object-contain">
+                                                 <a href="{{ Storage::disk('public')->url($design->preview_path) }}" target="_blank" class="w-24 h-24 bg-slate-50 rounded-xl border-2 border-brand-100 overflow-hidden hover:border-brand-900 transition-all group relative">
+                                                     <img src="{{ Storage::disk('public')->url($design->preview_path) }}" class="w-full h-full object-contain">
                                                      <div class="absolute inset-0 bg-brand-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
                                                          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                                      </div>
@@ -246,8 +246,8 @@
                                              @endif
 
                                              @foreach($files as $file)
-                                                 <a href="{{ Storage::url($file) }}" target="_blank" class="w-24 h-24 bg-slate-50 rounded-xl border-2 border-brand-100 overflow-hidden hover:border-brand-900 transition-all group relative">
-                                                     <img src="{{ Storage::url($file) }}" class="w-full h-full object-cover">
+                                                 <a href="{{ Storage::disk('public')->url($file) }}" target="_blank" class="w-24 h-24 bg-slate-50 rounded-xl border-2 border-brand-100 overflow-hidden hover:border-brand-900 transition-all group relative">
+                                                     <img src="{{ Storage::disk('public')->url($file) }}" class="w-full h-full object-cover">
                                                      <div class="absolute inset-0 bg-brand-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
                                                          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                                      </div>
@@ -416,7 +416,7 @@
                     @if($order->status === 'shipped' || $order->status === 'completed')
                         <div class="mt-8 pt-8 border-t border-slate-50">
                              <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Informasi Pengiriman</h3>
-                             <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                             <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 mb-4">
                                  <div class="flex justify-between items-center mb-2">
                                      <span class="text-[10px] font-bold text-slate-400 uppercase">Kurir</span>
                                      <span class="text-[10px] font-black text-slate-900 uppercase">{{ $order->courier_name ?? 'Reguler' }}</span>
@@ -426,6 +426,34 @@
                                      <span class="text-[11px] font-black text-brand-900 uppercase tracking-wider">{{ $order->tracking_number ?? '-' }}</span>
                                  </div>
                              </div>
+                             @if($order->tracking_number)
+                             <button onclick="doTrack()" class="w-full py-3 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-lg shadow-brand-900/20 active:scale-95 flex items-center justify-center gap-2">
+                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                 Lacak Pengiriman (Tab Baru)
+                             </button>
+                             @endif
+                        </div>
+                        <div class="mt-8 pt-8 border-t border-slate-50">
+                             <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Pengembalian Barang</h3>
+                             
+                             @if($order->returnRequest)
+                                 <div class="p-4 rounded-xl border {{ $order->returnRequest->status === 'approved' ? 'bg-green-50 border-green-100' : ($order->returnRequest->status === 'rejected' ? 'bg-red-50 border-red-100' : 'bg-amber-50 border-amber-100') }}">
+                                     <div class="flex items-center gap-2 mb-2">
+                                         <span class="text-[10px] font-black uppercase tracking-widest {{ $order->returnRequest->status === 'approved' ? 'text-green-700' : ($order->returnRequest->status === 'rejected' ? 'text-red-700' : 'text-amber-700') }}">
+                                             Status: {{ strtoupper($order->returnRequest->status) }}
+                                         </span>
+                                     </div>
+                                     <p class="text-[10px] text-slate-600 font-bold mb-1 line-clamp-2">Alasan: {{ $order->returnRequest->reason }}</p>
+                                     @if($order->returnRequest->admin_note)
+                                         <p class="text-[9px] text-slate-500 italic mt-2 line-clamp-2">Admin: {{ $order->returnRequest->admin_note }}</p>
+                                     @endif
+                                 </div>
+                             @else
+                                 <button @click="showReturnModal = true" class="w-full py-3 bg-white border-2 border-red-100 text-red-500 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-red-50 hover:border-red-200 transition-all active:scale-95 flex items-center justify-center gap-2">
+                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                                     Ajukan Pengembalian
+                                 </button>
+                             @endif
                         </div>
                     @endif
                 </div>
@@ -490,6 +518,51 @@
         </div>
     </div>
 </div>
+
+    <!-- Return Request Modal -->
+    <div x-show="showReturnModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        <div class="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-hidden shadow-2xl flex flex-col" @click.away="showReturnModal = false">
+            <div class="p-6 md:p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div>
+                    <h2 class="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-tight">Ajukan Pengembalian</h2>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase mt-1">Sertakan bukti foto/video (Maks. 3 File)</p>
+                </div>
+                <button @click="showReturnModal = false" class="p-2 md:p-3 bg-white rounded-xl border border-slate-200 text-slate-400 hover:text-red-500 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 md:p-8">
+                <form action="{{ route('customer.orders.return', $order->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Alasan Pengembalian</label>
+                            <textarea name="reason" rows="4" required class="w-full bg-slate-50 border border-slate-200 text-sm font-bold text-slate-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-brand-900 focus:border-brand-900 outline-none transition-all placeholder:text-slate-400 placeholder:font-medium" placeholder="Jelaskan secara detail bagian mana yang rusak atau tidak sesuai..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Unggah Bukti (Max 10MB/file)</label>
+                            <input type="file" name="proof_files[]" multiple accept="image/*,video/mp4,video/quicktime" required class="w-full text-xs font-bold text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:bg-brand-50 file:text-brand-900 hover:file:bg-brand-100 transition-colors">
+                        </div>
+                        <div class="pt-4 border-t border-slate-50">
+                            <button type="submit" class="w-full py-4 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-lg shadow-brand-900/20 active:scale-95">
+                                Kirim Pengajuan
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+@if($order->tracking_number)
+<script type="text/javascript">
+function doTrack() {
+    var resi = "{{ trim($order->tracking_number) }}";
+    // Membuka tab baru ke layanan pelacakan ParcelsApp yang sangat akurat untuk J&T/JNE dsb.
+    window.open("https://parcelsapp.com/id/tracking/" + resi, "_blank");
+}
+</script>
+@endif
 
 <script src="{{ config('services.midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
 <script>

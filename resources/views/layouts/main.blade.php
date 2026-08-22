@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth overflow-x-hidden">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Becks Apparel') }} - @yield('title', 'Premium Sports Apparel')</title>
+        
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="{{ asset('assets/images/logo-becks.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Inter:wght@400;500;600;700;800;900&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
         <script>
@@ -25,12 +28,13 @@
     </head>
     <body 
         x-data="{ 
-            showAuthModal: @if(session('show_auth_modal') || $errors->has('login_error')) true @else false @endif, 
-            authMode: 'login' 
+            showAuthModal: @if(session('show_auth_modal') || $errors->any()) true @else false @endif, 
+            authMode: @if($errors->has('name') || $errors->has('phone') || $errors->has('password_confirmation')) 'register' @else 'login' @endif 
         }" 
-        class="font-sans antialiased bg-gray-50 text-gray-900 dark:bg-zinc-950 dark:text-zinc-100 transition-colors duration-500"
+        @open-auth-modal.window="showAuthModal = true; authMode = $event.detail?.mode || 'login'"
+        class="font-sans antialiased bg-gray-50 text-gray-900 dark:bg-zinc-950 dark:text-zinc-100 transition-colors duration-500 overflow-x-hidden"
     >
-        <div class="min-h-screen">
+        <div class="min-h-screen overflow-x-hidden w-full max-w-[100vw]">
             <!-- Preloader -->
             <x-preloader />
 
@@ -69,13 +73,16 @@
             }
 
             // Preloader Logic
-            window.onload = function() {
+            document.addEventListener('DOMContentLoaded', function() {
                 const preloader = document.getElementById('preloader');
                 if (preloader) {
-                    preloader.classList.add('opacity-0');
+                    // Beri jeda sangat sebentar agar UI kerender, lalu hilangkan
                     setTimeout(() => {
-                        preloader.style.display = 'none';
-                    }, 700);
+                        preloader.classList.add('opacity-0');
+                        setTimeout(() => {
+                            preloader.style.display = 'none';
+                        }, 500);
+                    }, 150);
                 }
 
                 // Flash Messages to Toast
@@ -88,7 +95,16 @@
                 @if(session('info'))
                     window.dispatchEvent(new CustomEvent('notify', { detail: { message: "{{ session('info') }}", type: 'warning' } }));
                 @endif
-            };
+            });
+
+            // Fallback: Pastikan loading screen hilang paksa setelah 3 detik apapun yang terjadi
+            setTimeout(() => {
+                const p = document.getElementById('preloader');
+                if (p && p.style.display !== 'none') {
+                    p.classList.add('opacity-0');
+                    setTimeout(() => p.style.display = 'none', 500);
+                }
+            }, 3000);
         </script>
         <!-- SweetAlert2 -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -120,5 +136,7 @@
         </script>
         <!-- Chatbot Widget -->
         <x-chatbot-widget />
+
+        @stack('scripts')
     </body>
 </html>

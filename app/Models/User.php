@@ -20,6 +20,7 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'password',
         'phone',
+        'google_id',
     ];
 
     /**
@@ -75,6 +76,11 @@ class User extends Authenticatable implements FilamentUser
     public function designs()
     {
         return $this->hasMany(Design::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class);
     }
 
     public function activeOrdersCount()

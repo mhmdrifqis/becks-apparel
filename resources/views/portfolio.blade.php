@@ -24,8 +24,8 @@
                     Our Work
                 </span>
                 <h1 class="text-5xl md:text-8xl font-black text-white tracking-tighter leading-none mb-8">
-                    MASTER<br/>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-green-300">PIECE PIECES.</span>
+                    PORTOFOLIO<br/>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-green-300">KAMI</span>
                 </h1>
                 <p class="text-brand-100/60 text-lg md:text-xl mb-12 max-w-xl leading-relaxed">
                     Koleksi karya terbaik yang telah kami wujudkan untuk para juara di lapangan.

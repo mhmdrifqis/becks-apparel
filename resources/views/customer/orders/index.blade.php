@@ -106,7 +106,7 @@
                                     <div class="flex gap-4 md:gap-6 border-b border-slate-50 last:border-0 pb-6 last:pb-0">
                                         <div class="w-20 h-20 md:w-24 md:h-24 bg-slate-50 rounded-xl border border-slate-100 shrink-0 overflow-hidden">
                                             @if(count($item->package->images ?? []) > 0)
-                                                @php $src = str_starts_with($item->package->images[0], 'assets/') ? asset($item->package->images[0]) : Storage::url($item->package->images[0]); @endphp
+                                                @php $src = str_starts_with($item->package->images[0], 'assets/') ? asset($item->package->images[0]) : Storage::disk('public')->url($item->package->images[0]); @endphp
                                                 <img src="{{ $src }}" class="w-full h-full object-cover">
                                             @endif
                                         </div>

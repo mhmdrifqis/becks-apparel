@@ -18,13 +18,14 @@ class Material extends Model
         'stock',
         'unit',
         'product_types',
+        'allowed_categories',
     ];
 
     protected $casts = [
-        'additional_price' => 'integer',
-        'stock'            => 'float',
-        'product_types'    => 'array',
-
+        'additional_price'   => 'integer',
+        'stock'              => 'float',
+        'product_types'      => 'array',
+        'allowed_categories' => 'array',
     ];
 
     protected $appends = ['image_url'];

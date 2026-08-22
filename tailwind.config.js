@@ -13,8 +13,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"DM Sans"', ...defaultTheme.fontFamily.sans],
-                display: ['Syne', ...defaultTheme.fontFamily.sans],
+                sans: ['"Plus Jakarta Sans"', 'Inter', ...defaultTheme.fontFamily.sans],
+                display: ['"Plus Jakarta Sans"', 'Inter', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 brand: {

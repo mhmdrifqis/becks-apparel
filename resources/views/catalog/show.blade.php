@@ -35,7 +35,8 @@
     },
     async addToCart(redirect = false) {
         if (!@js(auth()->check())) {
-            $dispatch('open-auth-modal');
+            window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Silakan Daftar/Login untuk melanjutkan pemesanan.', type: 'warning' } }));
+            $dispatch('open-auth-modal', { mode: 'register' });
             return;
         }
 
@@ -92,7 +93,7 @@
                 <div class="aspect-square bg-slate-50 mb-6 overflow-hidden rounded-2xl">
                     @php $imgList = $package->images ?: ['assets/images/placeholder.png']; @endphp
                     @foreach($imgList as $i => $imgPath)
-                    @php $src = str_starts_with($imgPath, 'assets/') ? asset($imgPath) : Storage::url($imgPath); @endphp
+                    @php $src = str_starts_with($imgPath, 'assets/') ? asset($imgPath) : Storage::disk('public')->url($imgPath); @endphp
                     <img x-show="activeSlide === {{ $i }}" 
                          x-transition:enter="transition ease-in-out duration-300"
                          src="{{ $src }}" 
@@ -104,7 +105,7 @@
                 <!-- Thumbnails Horizontal -->
                 <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                     @foreach($imgList as $i => $imgPath)
-                    @php $src = str_starts_with($imgPath, 'assets/') ? asset($imgPath) : Storage::url($imgPath); @endphp
+                    @php $src = str_starts_with($imgPath, 'assets/') ? asset($imgPath) : Storage::disk('public')->url($imgPath); @endphp
                     <button @click="activeSlide = {{ $i }}" 
                             class="w-20 h-20 flex-shrink-0 border-2 transition-all p-1 rounded-xl"
                             :class="activeSlide === {{ $i }} ? 'border-brand-900 bg-brand-50' : 'border-slate-100 hover:border-slate-200'">

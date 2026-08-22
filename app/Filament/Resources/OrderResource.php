@@ -269,6 +269,58 @@ class OrderResource extends Resource
                     ]),
             ])
             ->actions([
+                Tables\Actions\Action::make('ship')
+                    ->label('Kirim')
+                    ->icon('heroicon-o-truck')
+                    ->color('primary')
+                    ->visible(fn ($record) => $record->status === 'ready')
+                    ->form([
+                        Forms\Components\Select::make('courier_name')
+                            ->label('Ekspedisi')
+                            ->options([
+                                'JNE' => 'JNE',
+                                'J&T' => 'J&T',
+                                'Sicepat' => 'Sicepat',
+                                'POS' => 'POS Indonesia',
+                                'Wahana' => 'Wahana',
+                                'Ninja' => 'Ninja Xpress',
+                                'Lalamove' => 'Lalamove',
+                                'Grab' => 'Grab Express',
+                                'Gojek' => 'GoSend',
+                                'Self Pickup' => 'Ambil Sendiri',
+                            ])
+                            ->default(fn ($record) => $record->courier_name)
+                            ->required(),
+                        Forms\Components\TextInput::make('tracking_number')
+                            ->label('Nomor Resi')
+                            ->placeholder('Contoh: JP1234567890')
+                            ->required(),
+                    ])
+                    ->action(function (Order $record, array $data): void {
+                        $record->update([
+                            'status' => 'shipped',
+                            'courier_name' => $data['courier_name'],
+                            'tracking_number' => $data['tracking_number'],
+                        ]);
+                        
+                        \Filament\Notifications\Notification::make()
+                            ->title('Pesanan berhasil dikirim')
+                            ->success()
+                            ->send();
+                    }),
+                Tables\Actions\Action::make('complete')
+                    ->label('Selesai')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->status === 'shipped')
+                    ->requiresConfirmation()
+                    ->action(function (Order $record): void {
+                        $record->update(['status' => 'completed']);
+                        \Filament\Notifications\Notification::make()
+                            ->title('Pesanan telah diselesaikan')
+                            ->success()
+                            ->send();
+                    }),
                 Tables\Actions\ViewAction::make()
                     ->label('Detail')
                     ->slideOver()

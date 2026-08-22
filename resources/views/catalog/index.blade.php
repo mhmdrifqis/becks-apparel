@@ -38,11 +38,11 @@
             <!-- Sidebar Filters -->
             <aside class="w-full lg:w-64 space-y-8 flex-shrink-0">
                 <div>
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Kategori Produk</h3>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Kategori Produk</h3>
                     <div class="space-y-2">
                         <button @click="activeCategory = 'all'" 
                                 :class="activeCategory === 'all' ? 'bg-brand-900 text-white shadow-lg shadow-brand-900/20' : 'text-slate-600 hover:bg-slate-100'" 
-                                class="w-full text-left px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-between group">
+                                class="w-full text-left px-5 py-3.5 rounded-2xl text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-between group">
                             Semua Produk
                             <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                         </button>
@@ -50,7 +50,7 @@
                         @foreach($categories as $key => $label)
                         <button @click="activeCategory = '{{ $key }}'" 
                                 :class="activeCategory === '{{ $key }}' ? 'bg-brand-900 text-white shadow-lg shadow-brand-900/20' : 'text-slate-600 hover:bg-slate-100'" 
-                                class="w-full text-left px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-between group">
+                                class="w-full text-left px-5 py-3.5 rounded-2xl text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-between group">
                             {{ $label }}
                             <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                         </button>
@@ -59,9 +59,9 @@
                 </div>
 
                 <div class="p-6 bg-brand-50 rounded-[2rem] border border-brand-100">
-                    <p class="text-[10px] font-black text-brand-900 uppercase tracking-widest mb-2">Butuh Bantuan?</p>
+                    <p class="text-xs font-bold text-brand-900 uppercase tracking-widest mb-2">Butuh Bantuan?</p>
                     <p class="text-xs text-brand-800/60 leading-relaxed mb-4">Konsultasikan kebutuhan tim Anda dengan tim ahli kami secara gratis.</p>
-                    <a href="#" class="inline-block text-[10px] font-black text-brand-900 uppercase tracking-widest border-b-2 border-brand-900 pb-1">Hubungi WhatsApp</a>
+                    <a href="https://wa.me/6285183327132" target="_blank" class="inline-block text-xs font-bold text-brand-900 uppercase tracking-widest border-b-2 border-brand-900 pb-1">Hubungi WhatsApp</a>
                 </div>
             </aside>
 
@@ -75,27 +75,27 @@
                      class="mb-16">
                     
                     <div class="flex items-center gap-4 mb-8">
-                        <h2 class="text-xs font-black text-slate-900 uppercase tracking-[0.3em]">{{ $categories[$category] ?? ucfirst($category) }}</h2>
-                        <div class="h-px bg-slate-100 flex-1"></div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ count($items) }} Models</span>
+                        <h2 class="text-xl md:text-2xl font-extrabold text-slate-900 uppercase tracking-wider">{{ $categories[$category] ?? ucfirst($category) }}</h2>
+                        <div class="h-px bg-slate-200 flex-1"></div>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">{{ count($items) }} Models</span>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8">
                         @foreach($items as $package)
-                        <a href="{{ route('catalog.show', $package->slug) }}" class="group block bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-slate-200 transition-all duration-500 text-decoration-none">
+                        <a href="{{ route('catalog.show', $package->slug) }}" class="group block bg-white rounded-2xl md:rounded-[2.5rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-slate-200 transition-all duration-500 text-decoration-none">
                             <!-- Image Container -->
                             <div class="aspect-[4/5] bg-slate-50 relative overflow-hidden">
                                 @if($package->images && count($package->images) > 0)
-                                    @php $imgPath = $package->images[0]; $src = str_starts_with($imgPath, 'assets/') ? asset($imgPath) : Storage::url($imgPath); @endphp
+                                    @php $imgPath = $package->images[0]; $src = str_starts_with($imgPath, 'assets/') ? asset($imgPath) : Storage::disk('public')->url($imgPath); @endphp
                                     <img src="{{ $src }}" alt="{{ $package->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-300">
-                                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        <svg class="w-8 h-8 md:w-12 md:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     </div>
                                 @endif
                                 
                                 <!-- Hover Overlay -->
-                                <div class="absolute inset-x-4 bottom-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                                <div class="hidden md:block absolute inset-x-4 bottom-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                                     <div class="bg-white/90 backdrop-blur-md p-4 rounded-2xl text-center shadow-xl">
                                         <p class="text-[10px] font-black text-brand-900 uppercase tracking-widest">Detail Produk & Kustomisasi</p>
                                     </div>
@@ -103,18 +103,18 @@
                             </div>
 
                             <!-- Content -->
-                            <div class="p-6">
-                                <h3 class="text-lg font-black text-slate-900 uppercase tracking-tight group-hover:text-brand-900 transition-colors line-clamp-1 mb-1">{{ $package->name }}</h3>
-                                <p class="text-[11px] text-slate-500 line-clamp-2 mb-4 leading-relaxed">
+                            <div class="p-3 md:p-6">
+                                <h3 class="text-xs md:text-lg font-black text-slate-900 uppercase tracking-tight group-hover:text-brand-900 transition-colors line-clamp-1 mb-1">{{ $package->name }}</h3>
+                                <p class="hidden md:block text-[11px] text-slate-500 line-clamp-2 mb-4 leading-relaxed">
                                     {{ $package->description ?? 'Deskripsi belum tersedia.' }}
                                 </p>
-                                <div class="flex items-center justify-between items-end">
+                                <div class="flex items-center justify-between md:items-end mt-2 md:mt-0">
                                     <div>
-                                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Mulai Dari</p>
-                                        <p class="text-lg font-black text-brand-900 tracking-tight">Rp {{ number_format($package->base_price, 0, ',', '.') }}</p>
+                                        <p class="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 md:mb-1">Mulai Dari</p>
+                                        <p class="text-sm md:text-lg font-black text-brand-900 tracking-tight">Rp {{ number_format($package->base_price, 0, ',', '.') }}</p>
                                     </div>
-                                    <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-brand-900 group-hover:text-white transition-all">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                    <div class="w-8 h-8 md:w-10 md:h-10 bg-slate-50 rounded-lg md:rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-brand-900 group-hover:text-white transition-all">
+                                        <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                                     </div>
                                 </div>
                             </div>

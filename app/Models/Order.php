@@ -14,6 +14,8 @@ class Order extends Model
         'shipping_address',
         'notes',
         'status',
+        'shipping_cost',
+        'shipping_service',
         'courier_name',
         'tracking_number',
         'total_amount',
@@ -37,6 +39,11 @@ class Order extends Model
     public function orderItems(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function returnRequest(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ReturnRequest::class);
     }
 
     public function statusLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -65,6 +72,11 @@ class Order extends Model
                     'status' => $order->status,
                     'description' => $label
                 ]);
+
+                // Send notification
+                if ($order->user && $order->status !== 'paid' && $order->status !== 'pending' && $order->status !== 'unpaid') {
+                    $order->user->notify(new \App\Notifications\OrderStatusUpdatedNotification($order, $label));
+                }
             }
         });
     }

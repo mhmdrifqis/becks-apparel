@@ -20,14 +20,17 @@
             
             <div class="space-y-6">
                 <!-- 1. Alamat Pengiriman (Editable Becks Style) -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
                     <!-- Becks Ribbon decoration (Green & Gold) -->
                     <div class="h-1 w-full bg-[repeating-linear-gradient(45deg,#064e3b,#064e3b_10px,#fff_10px,#fff_20px,#ca8a04_20px,#ca8a04_30px,#fff_30px,#fff_40px)]"></div>
                     
                     <!-- Persistent Address Inputs (Hidden when not editing, but always submitted) -->
                     <input type="hidden" name="recipient_name" :value="recipient_name" required>
                     <input type="hidden" name="recipient_phone" :value="recipient_phone" required>
-                    <input type="hidden" name="shipping_address" :value="shipping_address" required>
+                    <input type="hidden" name="shipping_address" :value="fullAddress" required>
+                    <input type="hidden" name="shipping_cost" :value="shippingCost">
+                    <input type="hidden" name="shipping_service" :value="selectedService ? selectedService.service : ''">
+                    <input type="hidden" name="courier_name" :value="selectedCourier.toUpperCase()">
 
                     <div class="p-6 md:p-8">
                         <div class="flex items-center justify-between mb-6">
@@ -35,21 +38,98 @@
                                 <svg class="w-5 h-5 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <h2 class="text-xs font-black text-brand-900 uppercase tracking-widest">Alamat Pengiriman</h2>
                             </div>
-                            <button type="button" @click="addressEditing = true" x-show="!addressEditing" class="text-[10px] font-black text-brand-900 uppercase tracking-widest hover:underline">Ubah</button>
+                            <div class="flex items-center gap-3">
+                                <button type="button" @click="showAddAddressModal = true" class="text-[10px] font-black text-brand-900 uppercase tracking-widest hover:underline flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                    Tambah Alamat Baru
+                                </button>
+                                <button type="button" @click="addressEditing = !addressEditing" class="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:underline">
+                                    <span x-text="addressEditing ? 'Tutup Input Manual' : 'Input Manual / Edit'"></span>
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- View Mode -->
-                        <div x-show="!addressEditing" class="space-y-1">
+                        <!-- Saved Addresses Cards Selection -->
+                        <div x-show="userAddresses.length > 0" class="mb-6 space-y-3">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Pilih Alamat Tersimpan</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto custom-scrollbar p-1">
+                                <template x-for="addr in userAddresses" :key="addr.id">
+                                    <div @click="selectAddress(addr)" 
+                                         class="p-4 rounded-2xl border-2 transition-all cursor-pointer relative flex flex-col justify-between"
+                                         :class="selectedAddressId === addr.id ? 'border-brand-900 bg-brand-50/40 shadow-md' : 'border-slate-100 bg-slate-50/50 hover:border-slate-200'">
+                                        <div>
+                                            <div class="flex items-center justify-between mb-2">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-brand-900 text-white" x-text="addr.label || 'Alamat'"></span>
+                                                    <template x-if="addr.is_default">
+                                                        <span class="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-amber-500 text-white">Utama</span>
+                                                    </template>
+                                                </div>
+                                                <template x-if="!addr.is_default">
+                                                    <button type="button" @click.stop="setDefaultAddress(addr)" class="text-[8px] font-bold text-slate-400 hover:text-brand-900 uppercase">Set Utama</button>
+                                                </template>
+                                            </div>
+                                            <div class="space-y-0.5">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-xs font-black text-slate-900" x-text="addr.nama_penerima"></span>
+                                                    <span class="text-slate-300">|</span>
+                                                    <span class="text-xs font-bold text-slate-600" x-text="addr.no_telepon"></span>
+                                                </div>
+                                                <p class="text-xs text-slate-600 leading-relaxed font-medium line-clamp-2" x-text="addr.alamat_lengkap"></p>
+                                                <p class="text-[10px] text-slate-400 font-bold uppercase" x-text="addr.kota + ', ' + addr.provinsi + ' (' + addr.kode_pos + ')'"></p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 flex items-center justify-end">
+                                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+                                                 :class="selectedAddressId === addr.id ? 'border-brand-900 bg-brand-900 text-white' : 'border-slate-300'">
+                                                <svg x-show="selectedAddressId === addr.id" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Active Selected Address Display (View Mode) -->
+                        <div x-show="!addressEditing" class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
                             <div class="flex items-center gap-2">
                                 <span class="text-sm font-black text-slate-900 uppercase" x-text="recipient_name || 'Nama Belum Diisi'"></span>
                                 <span class="text-slate-300">|</span>
                                 <span class="text-sm font-bold text-slate-500" x-text="recipient_phone || 'No. Telp Belum Diisi'"></span>
                             </div>
-                            <p class="text-sm text-slate-600 leading-relaxed" x-text="shipping_address || 'Silakan lengkapi alamat pengiriman Anda.'"></p>
+                            <p class="text-sm text-slate-600 leading-relaxed font-medium" x-text="fullAddress || 'Silakan pilih atau buat alamat baru.'"></p>
+                        </div>
+
+                        <!-- Automated Cheapest Courier Display -->
+                        <div class="mt-4 p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/80 shadow-sm relative overflow-hidden" x-show="autoSelectedCourier">
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-2xl bg-emerald-700 text-white flex items-center justify-center font-black text-sm shadow-md shadow-emerald-700/20">
+                                        🚀
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-black text-emerald-950 uppercase tracking-wider" x-text="autoSelectedCourier ? (autoSelectedCourier.courier_name + ' - ' + autoSelectedCourier.service) : ''"></span>
+                                            <span x-show="autoSelectedCourier && autoSelectedCourier.isAuto" class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-emerald-700 text-white shadow-sm">Termurah Otomatis</span>
+                                        </div>
+                                        <p class="text-xs font-bold text-emerald-700 mt-0.5" x-text="'Ongkir: Rp ' + formatRupiah(shippingCost) + (autoSelectedCourier && autoSelectedCourier.etd ? (' (Estimasi ' + autoSelectedCourier.etd + ' hari)') : '')"></p>
+                                    </div>
+                                </div>
+                                <button type="button" @click="showCourierOptionsModal = true" class="px-3.5 py-2 bg-white text-emerald-900 border border-emerald-300 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-100 transition-all shadow-sm flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                                    Ganti Kurir
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Error Alert -->
+                        <div x-show="shippingError" class="mt-4 p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs font-bold text-rose-700 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-rose-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span x-text="shippingError"></span>
                         </div>
 
                         <!-- Edit Mode -->
-                        <div x-show="addressEditing" x-transition class="space-y-6">
+                        <div x-show="addressEditing" x-transition class="space-y-6 mt-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Nama Penerima</label>
@@ -61,11 +141,54 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Alamat Lengkap (Jl, No Rumah, Kec, Kota)</label>
-                                <textarea x-model="shipping_address" rows="3" class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900"></textarea>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Alamat Lengkap (Jl, RT/RW, Patokan)</label>
+                                <textarea x-model="shipping_address" rows="2" class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Contoh: Jl. Sudirman No 12, Patokan samping Indomaret"></textarea>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Provinsi</label>
+                                    <select x-model="selectedProvince" @change="fetchCities" class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900">
+                                        <option value="">Pilih Provinsi</option>
+                                        <template x-for="prov in provinces" :key="prov.province_id">
+                                            <option :value="prov.province_id" x-text="prov.province"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Kota / Kabupaten</label>
+                                    <select x-model="selectedCity" @change="fetchCosts" :disabled="!selectedProvince || isLoadingShipping" class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <option value="">Pilih Kota/Kabupaten</option>
+                                        <template x-for="city in cities" :key="city.city_id">
+                                            <option :value="city.city_id" x-text="(city.type == 'Kota' ? 'Kota ' : 'Kab. ') + city.city_name"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Kurir Pengiriman</label>
+                                    <select x-model="selectedCourier" @change="fetchCosts" class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900">
+                                        <option value="">Pilih Kurir</option>
+                                        <template x-for="c in couriers" :key="c.id">
+                                            <option :value="c.id" x-text="c.text"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Layanan & Ongkos Kirim</label>
+                                    <select x-model="selectedServiceRaw" @change="selectService" :disabled="!selectedCourier || services.length === 0 || isLoadingShipping" class="w-full bg-slate-50 border border-slate-100 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <option value="">Pilih Layanan</option>
+                                        <template x-for="(srv, idx) in services" :key="idx">
+                                            <option :value="idx" x-text="srv.service + ' - Rp ' + formatRupiah(srv.cost[0].value) + ' (' + srv.cost[0].etd + ' hari)'"></option>
+                                        </template>
+                                    </select>
+                                    <p x-show="isLoadingShipping" class="text-xs text-brand-600 mt-2 font-bold animate-pulse">Menghitung ongkir...</p>
+                                </div>
                             </div>
                             <div class="flex justify-end">
-                                <button type="button" @click="addressEditing = false" class="px-6 py-2 bg-brand-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand-900/20">Simpan Alamat</button>
+                                <button type="button" @click="addressEditing = false" class="px-6 py-2 bg-brand-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand-900/20">Selesai Edit</button>
                             </div>
                         </div>
                     </div>
@@ -163,7 +286,7 @@
                                                      <div class="bg-white border-2 border-slate-100 rounded-2xl p-2 group-hover:border-brand-900 peer-checked:border-brand-900 peer-checked:bg-brand-50/50 transition-all duration-300 h-full flex flex-col">
                                                          <div class="aspect-square bg-slate-50 rounded-xl overflow-hidden mb-2 relative shrink-0">
                                                              @if($design->preview_path)
-                                                                 <img src="{{ asset('storage/' . $design->preview_path) }}" class="w-full h-full object-contain">
+                                                                 <img src="{{ Storage::disk('public')->url($design->preview_path) }}" class="w-full h-full object-contain">
                                                              @else
                                                                  <div class="w-full h-full flex items-center justify-center text-slate-300">
                                                                      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -328,6 +451,10 @@
                             <span class="text-slate-500 font-medium">Total Tambahan (Roster & Upgrade)</span>
                             <span class="text-brand-900 font-black" x-text="'+ Rp ' + formatRupiah(totalRosterSurcharge)"></span>
                         </div>
+                        <div class="flex justify-between items-center text-sm" x-show="shippingCost > 0">
+                            <span class="text-slate-500 font-medium">Ongkos Kirim (<span x-text="selectedCourier.toUpperCase() + ' ' + (selectedService ? selectedService.service : '')"></span>)</span>
+                            <span class="text-brand-900 font-black" x-text="'+ Rp ' + formatRupiah(shippingCost)"></span>
+                        </div>
                         <div class="pt-4 border-t border-slate-100 flex justify-between items-center">
                             <span class="text-sm md:text-lg font-black text-slate-900 uppercase tracking-tight">Total Pembayaran</span>
                             <span class="text-xl md:text-3xl font-black text-brand-900 tracking-tighter" x-text="formatRupiah(grandTotal)"></span>
@@ -358,6 +485,120 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Modal Tambah Alamat Baru -->
+            <div x-show="showAddAddressModal" x-cloak class="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" x-transition>
+                <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border border-slate-100 flex flex-col max-h-[90vh]">
+                    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-900 flex items-center justify-center font-bold">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-black text-slate-900 uppercase tracking-widest text-sm">Tambah Alamat Baru</h3>
+                                <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Simpan Alamat ke Akun Saya</p>
+                            </div>
+                        </div>
+                        <button type="button" @click="showAddAddressModal = false" class="p-2 text-slate-400 hover:text-slate-700 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="p-6 space-y-4 overflow-y-auto custom-scrollbar flex-1 text-left">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Label Alamat</label>
+                            <input type="text" x-model="newAddress.label" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Contoh: Rumah, Kantor, Toko">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Nama Penerima *</label>
+                                <input type="text" x-model="newAddress.nama_penerima" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Nama Lengkap">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">No. Telepon / WA *</label>
+                                <input type="text" x-model="newAddress.no_telepon" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="08xxxxxxxxxx">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Alamat Lengkap *</label>
+                            <textarea x-model="newAddress.alamat_lengkap" required rows="2" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Jl. Nama Jalan, No, RT/RW, Patokan"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Provinsi *</label>
+                                <input type="text" x-model="newAddress.provinsi" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Contoh: Jawa Barat">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Kota / Kabupaten *</label>
+                                <input type="text" x-model="newAddress.kota" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Contoh: Kota Bandung">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Kode Pos *</label>
+                            <input type="text" x-model="newAddress.kode_pos" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="40123">
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2">
+                            <input type="checkbox" id="is_default_checkbox" x-model="newAddress.is_default" class="w-4 h-4 rounded text-brand-900 focus:ring-brand-900 border-slate-300">
+                            <label for="is_default_checkbox" class="text-xs font-bold text-slate-700 cursor-pointer">Jadikan Alamat Utama (Default)</label>
+                        </div>
+                    </div>
+
+                    <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50">
+                        <button type="button" @click="showAddAddressModal = false" class="px-6 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition-all text-xs font-bold uppercase tracking-widest">Batal</button>
+                        <button type="button" @click="saveNewAddress()" :disabled="isSavingAddress" class="px-6 py-2.5 rounded-xl bg-brand-900 text-white hover:bg-brand-800 shadow-lg shadow-brand-900/20 transition-all text-xs font-black uppercase tracking-widest disabled:opacity-50 flex items-center gap-2">
+                            <span x-show="!isSavingAddress">Simpan & Gunakan</span>
+                            <span x-show="isSavingAddress" class="animate-pulse">Menyimpan...</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Ganti Kurir (Manual Override) -->
+            <div x-show="showCourierOptionsModal" x-cloak class="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" x-transition>
+                <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-100 flex flex-col">
+                    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-900 flex items-center justify-center font-bold">
+                                🚚
+                            </div>
+                            <div>
+                                <h3 class="font-black text-slate-900 uppercase tracking-widest text-sm">Pilih Opsi Ekspedisi</h3>
+                                <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Hasil Query RajaOngkir Starter</p>
+                            </div>
+                        </div>
+                        <button type="button" @click="showCourierOptionsModal = false" class="p-2 text-slate-400 hover:text-slate-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="p-6 space-y-3 max-h-[60vh] overflow-y-auto custom-scrollbar text-left">
+                        <template x-for="(opt, idx) in allShippingOptions" :key="idx">
+                            <div @click="applyShippingOption(opt, false); showCourierOptionsModal = false"
+                                 class="p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between"
+                                 :class="(selectedCourier === opt.courier && selectedService && selectedService.service === opt.service) ? 'border-emerald-600 bg-emerald-50/40 shadow-sm' : 'border-slate-100 bg-slate-50/50 hover:border-slate-200'">
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-black text-slate-900 uppercase" x-text="opt.courier_name + ' - ' + opt.service"></span>
+                                        <template x-if="idx === 0">
+                                            <span class="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-emerald-600 text-white">Termurah</span>
+                                        </template>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 font-medium" x-text="opt.description || 'Layanan Reguler'"></p>
+                                    <p class="text-[10px] text-slate-400 font-bold" x-text="'Estimasi: ' + opt.etd + ' hari'"></p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm font-black text-brand-900" x-text="'Rp ' + formatRupiah(opt.cost)"></span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -365,11 +606,291 @@
 <script>
     function checkoutWizard() {
         return {
+            userAddresses: @js($userAddresses),
+            selectedAddressId: null,
+            showAddAddressModal: false,
+            showCourierOptionsModal: false,
+            newAddress: {
+                label: 'Rumah',
+                nama_penerima: '{{ Auth::user()->name }}',
+                no_telepon: '{{ Auth::user()->phone ?? "" }}',
+                alamat_lengkap: '',
+                provinsi: '',
+                kota: '',
+                kode_pos: '',
+                rajaongkir_city_id: '',
+                rajaongkir_province_id: '',
+                is_default: true,
+            },
+            isSavingAddress: false,
             recipient_name: '{{ Auth::user()->name }}',
             recipient_phone: '{{ Auth::user()->phone ?? "" }}',
             shipping_address: '',
             addressEditing: false,
             isSubmitting: false,
+            provinces: [],
+            cities: [],
+            couriers: [{id: 'jne', text: 'JNE'}, {id: 'pos', text: 'POS Indonesia'}, {id: 'tiki', text: 'TIKI'}],
+            services: [],
+            selectedProvince: '',
+            selectedCity: '',
+            selectedCourier: '',
+            selectedServiceRaw: '',
+            selectedService: null,
+            shippingCost: 0,
+            isLoadingShipping: false,
+            totalWeight: 0,
+            autoSelectedCourier: null,
+            allShippingOptions: [],
+            shippingError: null,
+
+            async init() {
+                this.totalWeight = this.items.reduce((sum, item) => {
+                    let w = (item.package && item.package.weight) ? item.package.weight : 250;
+                    return sum + (item.qty * w);
+                }, 0);
+                if (this.totalWeight <= 0) this.totalWeight = 1000;
+
+                await this.fetchProvinces();
+
+                if (this.userAddresses && this.userAddresses.length > 0) {
+                    let defaultAddr = this.userAddresses.find(a => a.is_default) || this.userAddresses[0];
+                    await this.selectAddress(defaultAddr);
+                }
+            },
+
+            async selectAddress(addr) {
+                if (!addr) return;
+                this.selectedAddressId = addr.id;
+                this.recipient_name = addr.nama_penerima;
+                this.recipient_phone = addr.no_telepon;
+                this.shipping_address = addr.alamat_lengkap;
+                this.shippingError = null;
+
+                let destinationCityId = addr.rajaongkir_city_id;
+
+                // Match province & city in RajaOngkir if city_id is missing
+                if (!destinationCityId && this.provinces && this.provinces.length > 0) {
+                    let foundProv = this.provinces.find(p => p.province.toLowerCase().includes(addr.provinsi.toLowerCase()) || addr.provinsi.toLowerCase().includes(p.province.toLowerCase()));
+                    if (foundProv) {
+                        this.selectedProvince = foundProv.province_id;
+                        await this.fetchCities();
+                        let foundCity = this.cities.find(c => (c.type + ' ' + c.city_name).toLowerCase().includes(addr.kota.toLowerCase()) || c.city_name.toLowerCase().includes(addr.kota.toLowerCase()) || addr.kota.toLowerCase().includes(c.city_name.toLowerCase()));
+                        if (foundCity) {
+                            destinationCityId = foundCity.city_id;
+                            this.selectedCity = foundCity.city_id;
+                        }
+                    }
+                }
+
+                if (destinationCityId) {
+                    this.selectedCity = destinationCityId;
+                    await this.autoCalculateShipping(destinationCityId);
+                } else {
+                    this.shippingError = 'Tujuan pengiriman belum terhubung dengan city_id RajaOngkir. Silakan buat atau edit alamat.';
+                    this.shippingCost = 0;
+                    this.selectedService = null;
+                    this.autoSelectedCourier = null;
+                }
+            },
+
+            async autoCalculateShipping(cityId, courier = null) {
+                this.isLoadingShipping = true;
+                this.shippingError = null;
+                try {
+                    let res = await fetch('{{ route("shipping.auto-calculate") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            destination: cityId,
+                            weight: this.totalWeight,
+                            courier: courier
+                        })
+                    });
+
+                    let data = await res.json();
+                    if (res.ok && data.success) {
+                        this.allShippingOptions = data.all_options || [];
+                        let cheapest = data.cheapest;
+                        if (cheapest) {
+                            this.applyShippingOption(cheapest, true);
+                        }
+                    } else {
+                        this.shippingError = data.message || 'Gagal menghitung ongkos kirim RajaOngkir.';
+                        this.shippingCost = 0;
+                        this.selectedService = null;
+                        this.autoSelectedCourier = null;
+                    }
+                } catch (e) {
+                    console.error('Auto shipping calculation error:', e);
+                    this.shippingError = 'Terjadi kesalahan jaringan saat menghitung ongkos kirim.';
+                    this.shippingCost = 0;
+                    this.selectedService = null;
+                    this.autoSelectedCourier = null;
+                } finally {
+                    this.isLoadingShipping = false;
+                }
+            },
+
+            applyShippingOption(opt, isAuto = false) {
+                this.selectedCourier = opt.courier;
+                this.selectedService = {
+                    service: opt.service,
+                    description: opt.description,
+                    cost: [{ value: opt.cost, etd: opt.etd }]
+                };
+                this.shippingCost = opt.cost;
+                this.autoSelectedCourier = {
+                    courier_name: opt.courier_name,
+                    service: opt.service,
+                    cost: opt.cost,
+                    etd: opt.etd,
+                    isAuto: isAuto
+                };
+            },
+
+            async saveNewAddress() {
+                if (!this.newAddress.nama_penerima || !this.newAddress.no_telepon || !this.newAddress.alamat_lengkap || !this.newAddress.provinsi || !this.newAddress.kota || !this.newAddress.kode_pos) {
+                    alert('Mohon isi semua field alamat wajib.');
+                    return;
+                }
+
+                this.isSavingAddress = true;
+                try {
+                    let res = await fetch('{{ route("user.addresses.store") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify(this.newAddress)
+                    });
+
+                    let data = await res.json();
+                    if (data.success) {
+                        this.userAddresses = data.addresses;
+                        this.showAddAddressModal = false;
+                        if (data.address) {
+                            await this.selectAddress(data.address);
+                        }
+                        this.newAddress.alamat_lengkap = '';
+                    } else {
+                        alert(data.message || 'Gagal menyimpan alamat.');
+                    }
+                } catch (e) {
+                    console.error('Error saving address:', e);
+                    alert('Terjadi kesalahan saat menyimpan alamat.');
+                } finally {
+                    this.isSavingAddress = false;
+                }
+            },
+
+            async setDefaultAddress(addr) {
+                try {
+                    let res = await fetch('/user/addresses/' + addr.id + '/set-default', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    });
+                    let data = await res.json();
+                    if (data.success) {
+                        this.userAddresses = data.addresses;
+                    }
+                } catch (e) {
+                    console.error('Failed to set default address', e);
+                }
+            },
+
+            async fetchProvinces() {
+                try {
+                    let res = await fetch('/shipping/provinces');
+                    let data = await res.json();
+                    if (res.ok) {
+                        this.provinces = data;
+                    } else {
+                        console.error('API Error:', data.error);
+                        alert('Gagal memuat provinsi: ' + (data.error || 'Terjadi kesalahan sistem'));
+                    }
+                } catch (e) {
+                    console.error('Failed to load provinces', e);
+                }
+            },
+
+            async fetchCities() {
+                this.selectedCity = '';
+                this.services = [];
+                this.shippingCost = 0;
+                this.selectedService = null;
+                this.selectedServiceRaw = '';
+                if (!this.selectedProvince) return;
+                
+                try {
+                    let res = await fetch('/shipping/cities/' + this.selectedProvince);
+                    let data = await res.json();
+                    this.cities = data;
+                } catch (e) {
+                    console.error('Failed to load cities');
+                }
+            },
+
+            async fetchCosts() {
+                this.services = [];
+                this.shippingCost = 0;
+                this.selectedService = null;
+                this.selectedServiceRaw = '';
+                
+                if (!this.selectedCity || !this.selectedCourier) return;
+
+                this.isLoadingShipping = true;
+                try {
+                    let res = await fetch('/shipping/cost', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            destination: this.selectedCity,
+                            weight: this.totalWeight,
+                            courier: this.selectedCourier
+                        })
+                    });
+                    let data = await res.json();
+                    this.services = data;
+                } catch (e) {
+                    console.error('Failed to calculate cost');
+                } finally {
+                    this.isLoadingShipping = false;
+                }
+            },
+
+            selectService() {
+                if (this.selectedServiceRaw !== '') {
+                    this.selectedService = this.services[this.selectedServiceRaw];
+                    this.shippingCost = this.selectedService.cost[0].value;
+                } else {
+                    this.selectedService = null;
+                    this.shippingCost = 0;
+                }
+            },
+
+            get fullAddress() {
+                if (!this.shipping_address) return '';
+                let provName = this.provinces.find(p => p.province_id == this.selectedProvince)?.province || '';
+                let cityName = this.cities.find(c => c.city_id == this.selectedCity);
+                cityName = cityName ? ((cityName.type == 'Kota' ? 'Kota ' : 'Kab. ') + cityName.city_name) : '';
+                
+                let location = [cityName, provName].filter(Boolean).join(', ');
+                return this.shipping_address + (location ? '\\n' + location : '');
+            },
 
             availableUpgrades: {
                 @foreach(\App\Models\Upgrade::all() as $u)
@@ -379,7 +900,7 @@
             items: [
                 @foreach($cartItems as $item)
                 @php 
-                    $src = count($item->package->images ?? []) > 0 ? (str_starts_with($item->package->images[0], 'assets/') ? asset($item->package->images[0]) : Storage::url($item->package->images[0])) : ''; 
+                    $src = count($item->package->images ?? []) > 0 ? (str_starts_with($item->package->images[0], 'assets/') ? asset($item->package->images[0]) : Storage::disk('public')->url($item->package->images[0])) : ''; 
                 @endphp
                 {
                     id: {{ $item->id }},
@@ -463,27 +984,27 @@
             },
             
             get grandTotal() {
-                return this.subtotal + this.totalRosterSurcharge;
+                return this.subtotal + this.totalRosterSurcharge + this.shippingCost;
             },
 
             async submitForm() {
                 if (this.isSubmitting) return;
 
                 // Validation
-                if (!this.recipient_name || !this.recipient_phone || !this.shipping_address) {
+                if (!this.recipient_name || !this.recipient_phone || !this.shipping_address || !this.selectedCity || !this.selectedServiceRaw) {
                     this.addressEditing = true;
                     
                     // Use SweetAlert if available, otherwise fallback to alert
                     if (window.Swal) {
                         Swal.fire({
                             title: 'Data Belum Lengkap',
-                            text: 'Silakan isi Nama, Nomor HP, dan Alamat Pengiriman Anda.',
+                            text: 'Silakan isi Nama, Nomor HP, Alamat Pengiriman, serta pilih Kurir dan Layanannya.',
                             icon: 'warning',
                             confirmButtonColor: '#064e3b',
                             confirmButtonText: 'OKE'
                         });
                     } else {
-                        alert('Silakan lengkapi Nama, Nomor HP, dan Alamat Pengiriman Anda sebelum membuat pesanan.');
+                        alert('Silakan lengkapi data alamat dan pengiriman Anda sebelum membuat pesanan.');
                     }
                     return;
                 }

@@ -57,7 +57,7 @@
                         <!-- Product Info -->
                         <div class="flex gap-4 md:gap-6 w-full pl-8 lg:pl-4">
                             <div class="w-24 h-24 md:w-32 md:h-32 bg-slate-50 rounded-2xl md:rounded-3xl border border-slate-100 overflow-hidden shrink-0 group-hover:shadow-lg transition-all duration-500">
-                                @php $imgPath = $item->package->images[0] ?? 'assets/images/placeholder.png'; $src = str_starts_with($imgPath, 'assets/') ? asset($imgPath) : Storage::url($imgPath); @endphp
+                                @php $imgPath = $item->package->images[0] ?? 'assets/images/placeholder.png'; $src = str_starts_with($imgPath, 'assets/') ? asset($imgPath) : Storage::disk('public')->url($imgPath); @endphp
                                 <img src="{{ $src }}" class="w-full h-full object-cover">
                             </div>
                             <div class="flex-1 flex flex-col py-1">
@@ -108,7 +108,7 @@
                                     <span class="text-sm font-black text-brand-900" x-text="formatPrice(getItemPrice({{ $item->id }}))"></span>
                                     <div class="flex items-center gap-1 p-1 bg-slate-50 rounded-xl border border-slate-100">
                                         <button @click="changeQty({{ $item->id }}, -1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg text-slate-400 hover:text-brand-900 border border-slate-100">-</button>
-                                        <input type="number" class="w-10 text-center bg-transparent border-none text-[11px] font-black p-0 focus:ring-0" x-model="items.find(i => i.id === {{ $item->id }}).qty" readonly>
+                                        <input type="number" class="w-10 text-center bg-transparent border-none text-[11px] font-black text-slate-900 p-0 focus:ring-0" x-model="items.find(i => i.id === {{ $item->id }}).qty" readonly>
                                         <button @click="changeQty({{ $item->id }}, 1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg text-slate-400 hover:text-brand-900 border border-slate-100">+</button>
                                     </div>
                                 </div>
@@ -122,7 +122,7 @@
                         <div class="hidden lg:flex justify-center items-center">
                             <div class="flex items-center gap-1 p-1 bg-slate-50 rounded-xl border border-slate-100">
                                 <button @click="changeQty({{ $item->id }}, -1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg text-slate-400 hover:text-brand-900 border border-slate-100 transition-colors">-</button>
-                                <input type="number" class="w-10 text-center bg-transparent border-none text-xs font-black p-0 focus:ring-0" x-model="items.find(i => i.id === {{ $item->id }}).qty" readonly>
+                                <input type="number" class="w-10 text-center bg-transparent border-none text-xs font-black text-slate-900 p-0 focus:ring-0" x-model="items.find(i => i.id === {{ $item->id }}).qty" readonly>
                                 <button @click="changeQty({{ $item->id }}, 1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg text-slate-400 hover:text-brand-900 border border-slate-100 transition-colors">+</button>
                             </div>
                         </div>
@@ -173,7 +173,7 @@
                 'id' => $i->id,
                 'package_id' => $i->package_id,
                 'name' => $i->package->name,
-                'qty' => $i->quantity,
+                'qty' => (int) $i->quantity,
                 'price' => (float)$i->package->base_price, // Ensure number
                 'mat_id' => $i->material_id,
                 'mat_name' => $i->material->name ?? '-',
@@ -243,7 +243,7 @@
                 let it = this.items.find(i => i.id === id);
                 if (!it) return;
                 
-                let newQty = it.qty + delta;
+                let newQty = parseInt(it.qty) + parseInt(delta);
                 if (newQty < 12) return;
 
                 // Optimistic UI

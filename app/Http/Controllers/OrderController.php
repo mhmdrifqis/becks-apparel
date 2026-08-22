@@ -14,7 +14,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         // 1. Validasi Akses: Hanya pemilik pesanan yang boleh melihat halamannya
-        if ($order->user_id !== Auth::id()) {
+        if ($order->user_id != Auth::id()) {
             abort(403, 'Akses tidak sah.');
         }
 
@@ -29,7 +29,7 @@ class OrderController extends Controller
      */
     public function cancel(Order $order)
     {
-        if ($order->user_id !== Auth::id()) {
+        if ($order->user_id != Auth::id()) {
             abort(403);
         }
 
@@ -49,7 +49,7 @@ class OrderController extends Controller
     {
         $order = $item->order;
 
-        if ($order->user_id !== Auth::id()) {
+        if ($order->user_id != Auth::id()) {
             abort(403);
         }
 
@@ -113,7 +113,7 @@ class OrderController extends Controller
      */
     public function updateAddress(Request $request, Order $order)
     {
-        if ($order->user_id !== Auth::id()) {
+        if ($order->user_id != Auth::id()) {
             abort(403);
         }
 
@@ -137,7 +137,7 @@ class OrderController extends Controller
      */
     public function edit(Order $order)
     {
-        if ($order->user_id !== Auth::id()) {
+        if ($order->user_id != Auth::id()) {
             abort(403);
         }
 
@@ -162,7 +162,7 @@ class OrderController extends Controller
      */
     public function updateDetailed(Request $request, Order $order)
     {
-        if ($order->user_id !== Auth::id()) {
+        if ($order->user_id != Auth::id()) {
             abort(403);
         }
 

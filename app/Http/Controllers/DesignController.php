@@ -52,7 +52,7 @@ class DesignController extends Controller
 
     public function update(Request $request, Design $design)
     {
-        if ($design->user_id !== Auth::id()) {
+        if ($design->user_id != Auth::id()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
@@ -93,7 +93,7 @@ class DesignController extends Controller
 
     public function destroy(Design $design)
     {
-        if ($design->user_id !== Auth::id()) {
+        if ($design->user_id != Auth::id()) {
             return back()->with('error', 'Unauthorized');
         }
 
@@ -108,12 +108,11 @@ class DesignController extends Controller
 
     public function edit(Design $design)
     {
-        if ($design->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $isOwner = $design->user_id === Auth::id();
 
         return view('customizer', [
-            'design' => $design
+            'design' => $design,
+            'isOwner' => $isOwner
         ]);
     }
 }

@@ -24,8 +24,9 @@ class CheckoutController extends Controller
 
         $upgrades = \App\Models\Upgrade::all()->groupBy('category');
         $userDesigns = \App\Models\Design::where('user_id', Auth::id())->whereNotNull('name')->latest()->get();
+        $userAddresses = Auth::user()->addresses()->latest()->get();
 
-        return view('customer.checkout.index', compact('cartItems', 'upgrades', 'userDesigns'));
+        return view('customer.checkout.index', compact('cartItems', 'upgrades', 'userDesigns', 'userAddresses'));
     }
 
     public function process(Request $request)
@@ -37,6 +38,9 @@ class CheckoutController extends Controller
             'recipient_name' => 'required|string|max:255',
             'recipient_phone' => 'required|string|max:20',
             'shipping_address' => 'required|string',
+            'shipping_cost' => 'required|numeric|min:0',
+            'shipping_service' => 'required|string',
+            'courier_name' => 'required|string',
             'notes' => 'nullable|string',
             'roster' => 'required|array',
             'designs' => 'nullable|array'
@@ -58,13 +62,16 @@ class CheckoutController extends Controller
             'recipient_name' => $request->recipient_name,
             'recipient_phone' => $request->recipient_phone,
             'shipping_address' => $request->shipping_address,
+            'shipping_cost' => $request->shipping_cost,
+            'shipping_service' => $request->shipping_service,
+            'courier_name' => $request->courier_name,
             'notes' => $request->notes,
             'order_number' => 'ORD-' . date('Ymd') . '-' . strtoupper(uniqid()),
             'status' => 'pending',
             'total_amount' => 0, 
         ]);
 
-        $grandTotal = 0;
+        $grandTotal = $request->shipping_cost;
 
         // 4. Create Order Items
         foreach ($cartItems as $item) {
@@ -172,6 +179,9 @@ class CheckoutController extends Controller
         // 7. Cleanup Cart
         // (Do not delete if you want user to be able to go back, but usually we delete)
         $user->cartItems()->whereIn('id', $cartItemIds)->delete();
+
+        // Send Notification
+        $user->notify(new \App\Notifications\OrderCreatedNotification($order));
 
         return redirect()->route('customer.orders.show', $order->order_number)->with('success', 'Pesanan berhasil dikonfirmasi! Silakan tinjau dan lakukan pembayaran.');
     }

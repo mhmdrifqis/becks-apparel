@@ -303,6 +303,9 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             
+            // Grab history from sessionStorage
+            const localHistory = JSON.parse(sessionStorage.getItem('becks_chat_history') || '[]');
+            
             const response = await fetch('{{ route("chatbot.handle") }}', {
                 method: 'POST',
                 headers: {
@@ -310,7 +313,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     'X-CSRF-TOKEN': token,
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({ 
+                    message: message,
+                    history: localHistory
+                })
             });
 
             const data = await response.json();

@@ -15,10 +15,11 @@
             <div>
                 <h4 class="font-black text-xs uppercase tracking-[0.2em] text-brand-900 dark:text-brand-400 mb-8">Navigasi</h4>
                 <ul class="space-y-4 text-sm font-bold text-gray-600 dark:text-gray-400">
-                    <li><a href="#" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Tentang Kami</a></li>
-                    <li><a href="{{ route('visi-misi') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Visi & Misi</a></li>
-                    <li><a href="{{ route('portfolio') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Portfolio</a></li>
+                    <li><a href="{{ route('home') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Beranda</a></li>
                     <li><a href="{{ route('catalog.index') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Katalog</a></li>
+                    <li><a href="{{ route('customizer') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Customizer</a></li>
+                    <li><a href="{{ route('visi-misi') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Visi & Misi</a></li>
+                    <li><a href="{{ route('portfolio') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Portofolio</a></li>
                 </ul>
             </div>
 
@@ -70,8 +71,8 @@
         <div class="pt-8 border-t dark:border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
             <p>© {{ date('Y') }} Becks Apparel. All rights reserved.</p>
             <div class="flex gap-6">
-                <a href="#" class="hover:text-brand-600 transition-colors">Privacy Policy</a>
-                <a href="#" class="hover:text-brand-600 transition-colors">Terms of Service</a>
+                <a href="{{ route('privacy') }}" class="hover:text-brand-600 transition-colors">Privacy Policy</a>
+                <a href="{{ route('terms') }}" class="hover:text-brand-600 transition-colors">Terms of Service</a>
             </div>
         </div>
     </div>

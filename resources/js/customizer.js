@@ -197,34 +197,17 @@ export default () => ({
 
     availableFonts: [
         { id: 'sans-serif', name: 'Standard', family: 'sans-serif' },
-        { id: 'all-star', name: 'All Star', family: "'All Star', sans-serif" },
-        { id: 'barcelona-24-25', name: 'Barcelona 24-25', family: "'Barcelona 24-25', sans-serif" },
-        { id: 'bayern-munich-24-25', name: 'Bayern Munich 24-25', family: "'Bayern Munich 24-25', sans-serif" },
-        { id: 'boca-juniors-24', name: 'Boca Juniors 24', family: "'Boca Juniors 24', sans-serif" },
-        { id: 'brasil-24', name: 'Brasil 24', family: "'Brasil 24', sans-serif" },
-        { id: 'dortmund-cup-24-25', name: 'Dortmund Cup 24-25', family: "'Dortmund Cup 24-25', sans-serif" },
-        { id: 'england-24', name: 'England 24', family: "'England 24', sans-serif" },
-        { id: 'fiorentina-24-25', name: 'Fiorentina 24-25', family: "'Fiorentina 24-25', sans-serif" },
-        { id: 'france-24', name: 'France 24', family: "'France 24', sans-serif" },
-        { id: 'inter-milan-24-25', name: 'Inter Milan 24-25', family: "'Inter Milan 24-25', sans-serif" },
-        { id: 'juventus-24-25', name: 'Juventus 24-25', family: "'Juventus 24-25', sans-serif" },
-        { id: 'liga-portugal-24-25', name: 'Liga Portugal 24-25', family: "'Liga Portugal 24-25', sans-serif" },
-        { id: 'lyon-24-25', name: 'Lyon 24-25', family: "'Lyon 24-25', sans-serif" },
-        { id: 'man-utd-cup-24-25', name: 'Man Utd Cup 24-25', family: "'Man Utd Cup 24-25', sans-serif" },
-        { id: 'monaco-24-25', name: 'Monaco 24-25', family: "'Monaco 24-25', sans-serif" },
-        { id: 'napoli-24-25', name: 'Napoli 24-25', family: "'Napoli 24-25', sans-serif" },
-        { id: 'netherlands-24', name: 'Netherlands 24', family: "'Netherlands 24', sans-serif" },
-        { id: 'newcastle-cup-24-25', name: 'Newcastle Cup 24-25', family: "'Newcastle Cup 24-25', sans-serif" },
-        { id: 'portugal-24', name: 'Portugal 24', family: "'Portugal 24', sans-serif" },
-        { id: 'premier-league-23-24', name: 'Premier League 23-24', family: "'Premier League 23-24', sans-serif" },
-        { id: 'psg-24-25', name: 'PSG 24-25', family: "'PSG 24-25', sans-serif" },
-        { id: 'puma-24', name: 'Puma 24', family: "'Puma 24', sans-serif" },
-        { id: 'real-madrid-24-25', name: 'Real Madrid 24-25', family: "'Real Madrid 24-25', sans-serif" },
-        { id: 'river-plate-24-25', name: 'River Plate 24-25', family: "'River Plate 24-25', sans-serif" },
-        { id: 'roma-24-25', name: 'Roma 24-25', family: "'Roma 24-25', sans-serif" },
-        { id: 'sc-freiburg', name: 'SC Freiburg', family: "'SC Freiburg', sans-serif" },
-        { id: 'south-africa', name: 'South Africa', family: "'South Africa', sans-serif" },
-        { id: 'spain-wc-2026', name: 'Spain WC 2026', family: "'Spain WC 2026', sans-serif" },
+        { id: 'AC Milan 4th', name: 'AC Milan 4th', family: "'AC Milan 4th', sans-serif" },
+        { id: 'Brondby IF', name: 'Brondby IF', family: "'Brondby IF', sans-serif" },
+        { id: 'Girondins Bordeaux', name: 'Girondins Bordeaux', family: "'Girondins Bordeaux', sans-serif" },
+        { id: 'Iraq 2025', name: 'Iraq 2025', family: "'Iraq 2025', sans-serif" },
+        { id: 'Osasuna 25-26', name: 'Osasuna 25-26', family: "'Osasuna 25-26', sans-serif" },
+        { id: 'Palermo FC', name: 'Palermo FC', family: "'Palermo FC', sans-serif" },
+        { id: 'Portugal WC 2026', name: 'Portugal WC 2026', family: "'Portugal WC 2026', sans-serif" },
+        { id: 'PSG Fourth', name: 'PSG Fourth', family: "'PSG Fourth', sans-serif" },
+        { id: 'SC Freiburg', name: 'SC Freiburg', family: "'SC Freiburg', sans-serif" },
+        { id: 'South Africa', name: 'South Africa', family: "'South Africa', sans-serif" },
+        { id: 'Spain WC 2026', name: 'Spain WC 2026', family: "'Spain WC 2026', sans-serif" },
     ],
 
     // UNIVERSAL TEXT STATE
@@ -267,6 +250,8 @@ export default () => ({
     showSaveModal: false,
     showBackModal: false,
     showPreviewModal: false,
+    showSuccessSaveModal: false,
+    packageSlug: '',
     // Auto-snapshot: setiap view di-capture otomatis saat renderLayers()
     viewSnapshots: { jersey_front: null, jersey_back: null, pants: null },
     // Toggle visibilitas setiap sisi di preview
@@ -353,6 +338,10 @@ export default () => ({
 
     init() {
         this.$nextTick(() => {
+            // Read package query parameter from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            this.packageSlug = urlParams.get('package') || '';
+
             this.initCanvas().then(async () => {
                 // Initialize URLs from DOM
                 this.saveDesignUrl = document.getElementById('save-design-url')?.value || '';
@@ -522,6 +511,10 @@ export default () => ({
             this.textFontSize = obj.fontSize;
             this.textCharSpacing = obj.charSpacing;
             this.textArc = obj.arc || 0;
+            this.resizeCanvas();
+        } else if (obj && obj.type === 'image' && !obj.isSystemLayer) {
+            this.activeMenu = 'logo';
+            this.isPanelOpen = true;
             this.resizeCanvas();
         }
     },
@@ -1146,7 +1139,7 @@ export default () => ({
         if (obj.isSolidColor) {
             filters.push(new window.fabric.filters.BlendColor({
                 color: obj.solidColor || '#000000',
-                mode: 'add', // Turns non-transparent pixels to this color
+                mode: 'tint', // Overwrites non-transparent pixels with this color
                 alpha: 1
             }));
         }
@@ -1584,12 +1577,20 @@ export default () => ({
         this.showSaveModal = true;
     },
 
+    redirectToCatalog() {
+        if (this.packageSlug) {
+            window.location.href = '/catalog/' + this.packageSlug;
+        } else {
+            window.location.href = '/catalog';
+        }
+    },
+
     handleBack() {
         // If there are changes (undoStack > 1), ask to save
         if (this.undoStack.length > 1) {
             this.showBackModal = true;
         } else {
-            window.history.back();
+            this.redirectToCatalog();
         }
     },
 
@@ -1705,18 +1706,17 @@ export default () => ({
 
             if (result.success) {
                 // Update URL to the new edit route without reloading the page
-                window.history.pushState({}, '', result.redirect);
+                const targetUrl = result.redirect + (this.packageSlug ? '?package=' + encodeURIComponent(this.packageSlug) : '');
+                window.history.pushState({}, '', targetUrl);
                 
                 // Update the save URL to the update route for future saves
                 if (result.updateUrl) {
                     this.updateDesignUrl = result.updateUrl;
                 }
                 
-                // Show success message
-                alert(result.message);
-                
-                // Close modal
+                // Close save modal & open success modal
                 this.showSaveModal = false;
+                this.showSuccessSaveModal = true;
                 this.isLoading = false;
             } else {
                 alert('Gagal menyimpan desain: ' + result.message);
