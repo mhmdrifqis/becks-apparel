@@ -71,7 +71,7 @@ class LiveChat extends Page
             $chat->update(['status' => 'closed']);
 
             // Beri tahu FastAPI bahwa admin sudah selesai (ini penting untuk reset state FastAPI)
-            $fastapiUrl = env('FASTAPI_CHATBOT_URL', 'http://127.0.0.1:8000/chatbot');
+            $fastapiUrl = config('services.chatbot.url', env('FASTAPI_CHATBOT_URL', 'http://127.0.0.1:8000/chatbot'));
             try {
                 Http::timeout(5)->post($fastapiUrl, [
                     'message' => 'selesai', // "selesai" atau "_end_admin_" trigger kembali ke bot (lihat api.py bagian exit_keywords atau post_admin_offer)

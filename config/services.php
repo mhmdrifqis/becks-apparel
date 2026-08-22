@@ -55,4 +55,9 @@ return [
         'token' => env('FONNTE_TOKEN'),
     ],
 
+    'rajaongkir' => [
+        'api_key' => env('RAJAONGKIR_API_KEY'),
+        'origin_city_id' => env('RAJAONGKIR_ORIGIN_CITY_ID', '456'),
+    ],
+
 ];

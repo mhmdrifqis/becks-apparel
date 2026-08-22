@@ -12,7 +12,7 @@ class ShippingController extends Controller
 
     public function __construct()
     {
-        $this->apiKey = env('RAJAONGKIR_API_KEY');
+        $this->apiKey = config('services.rajaongkir.api_key', env('RAJAONGKIR_API_KEY'));
     }
 
     public function getProvinces()
