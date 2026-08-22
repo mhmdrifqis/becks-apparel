@@ -91,6 +91,20 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Error processing notification'], 500);
         }
 
+        // Verifikasi Signature Key Midtrans untuk mencegah Spoofing Callback
+        $serverKey = config('services.midtrans.server_key');
+        if (!empty($serverKey) && $request->has('signature_key')) {
+            $expectedSignature = hash('sha512', $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
+            if ($request->signature_key !== $expectedSignature) {
+                Log::warning('Midtrans Callback Signature Mismatch', [
+                    'order_id' => $request->order_id,
+                    'received' => $request->signature_key,
+                    'expected' => $expectedSignature,
+                ]);
+                return response()->json(['message' => 'Invalid signature key'], 403);
+            }
+        }
+
         $transactionStatus = $notification->transaction_status;
         $orderId = $notification->custom_field2; // We mapped Original Order ID here
         $paymentType = $notification->custom_field1;
