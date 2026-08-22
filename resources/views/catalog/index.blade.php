@@ -38,11 +38,11 @@
             <!-- Sidebar Filters -->
             <aside class="w-full lg:w-64 space-y-8 flex-shrink-0">
                 <div>
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Kategori Produk</h3>
+                    <h3 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Kategori Produk</h3>
                     <div class="space-y-2">
                         <button @click="activeCategory = 'all'" 
                                 :class="activeCategory === 'all' ? 'bg-brand-900 text-white shadow-lg shadow-brand-900/20' : 'text-slate-600 hover:bg-slate-100'" 
-                                class="w-full text-left px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-between group">
+                                class="w-full text-left px-5 py-3.5 rounded-2xl text-sm font-black uppercase tracking-wider transition-all flex items-center justify-between group">
                             Semua Produk
                             <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                         </button>
@@ -50,7 +50,7 @@
                         @foreach($categories as $key => $label)
                         <button @click="activeCategory = '{{ $key }}'" 
                                 :class="activeCategory === '{{ $key }}' ? 'bg-brand-900 text-white shadow-lg shadow-brand-900/20' : 'text-slate-600 hover:bg-slate-100'" 
-                                class="w-full text-left px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-between group">
+                                class="w-full text-left px-5 py-3.5 rounded-2xl text-sm font-black uppercase tracking-wider transition-all flex items-center justify-between group">
                             {{ $label }}
                             <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                         </button>
@@ -59,9 +59,9 @@
                 </div>
 
                 <div class="p-6 bg-brand-50 rounded-[2rem] border border-brand-100">
-                    <p class="text-[10px] font-black text-brand-900 uppercase tracking-widest mb-2">Butuh Bantuan?</p>
+                    <p class="text-xs font-black text-brand-900 uppercase tracking-widest mb-2">Butuh Bantuan?</p>
                     <p class="text-xs text-brand-800/60 leading-relaxed mb-4">Konsultasikan kebutuhan tim Anda dengan tim ahli kami secara gratis.</p>
-                    <a href="https://wa.me/6285183327132" target="_blank" class="inline-block text-[10px] font-black text-brand-900 uppercase tracking-widest border-b-2 border-brand-900 pb-1">Hubungi WhatsApp</a>
+                    <a href="https://wa.me/6285183327132" target="_blank" class="inline-block text-xs font-black text-brand-900 uppercase tracking-widest border-b-2 border-brand-900 pb-1">Hubungi WhatsApp</a>
                 </div>
             </aside>
 
@@ -75,9 +75,9 @@
                      class="mb-16">
                     
                     <div class="flex items-center gap-4 mb-8">
-                        <h2 class="text-xs font-black text-slate-900 uppercase tracking-[0.3em]">{{ $categories[$category] ?? ucfirst($category) }}</h2>
-                        <div class="h-px bg-slate-100 flex-1"></div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ count($items) }} Models</span>
+                        <h2 class="text-xl md:text-3xl font-black text-slate-900 uppercase tracking-wider">{{ $categories[$category] ?? ucfirst($category) }}</h2>
+                        <div class="h-px bg-slate-200 flex-1"></div>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">{{ count($items) }} Models</span>
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8">
