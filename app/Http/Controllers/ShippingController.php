@@ -81,7 +81,7 @@ class ShippingController extends Controller
         ]);
 
         try {
-            $origin = env('RAJAONGKIR_ORIGIN_CITY_ID', 456); // Default 456 (Tangerang) jika tidak diset
+            $origin = config('services.rajaongkir.origin_city_id', env('RAJAONGKIR_ORIGIN_CITY_ID', 456)); // Default 456 (Tangerang) jika tidak diset
 
             $response = Http::asForm()->withHeaders([
                 'key' => $this->apiKey
@@ -153,7 +153,7 @@ class ShippingController extends Controller
 
         $destination = $request->destination;
         $weight = max(1, (int) $request->weight);
-        $origin = env('RAJAONGKIR_ORIGIN_CITY_ID', 456);
+        $origin = config('services.rajaongkir.origin_city_id', env('RAJAONGKIR_ORIGIN_CITY_ID', 456));
         $targetCourier = $request->input('courier');
 
         $cacheKey = "shipping_auto_{$origin}_{$destination}_{$weight}_" . ($targetCourier ?: 'all');
