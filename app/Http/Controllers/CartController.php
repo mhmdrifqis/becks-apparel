@@ -27,7 +27,7 @@ class CartController extends Controller
 
         $user = Auth::user();
         $materialId = $request->input('material_id');
-        $quantity = max(12, (int) $request->input('quantity', 12));
+        $quantity = max(1, (int) $request->input('quantity', 1));
         
         $cartItem = $user->cartItems()
             ->where('package_id', $package->id)
@@ -101,8 +101,8 @@ class CartController extends Controller
             }
         }
 
-        if ($quantity < 12) {
-            $quantity = 12;
+        if ($quantity < 1) {
+            $quantity = 1;
         }
 
         $data = ['quantity' => $quantity];
@@ -139,6 +139,10 @@ class CartController extends Controller
         }
 
         $cartItem->delete();
+
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json(['success' => true]);
+        }
 
         return redirect()->back()->with('success', 'Item berhasil dihapus dari keranjang.');
     }

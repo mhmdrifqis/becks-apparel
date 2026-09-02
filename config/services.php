@@ -31,10 +31,9 @@ return [
         ],
     ],
 
-    'midtrans' => [
-        'server_key' => env('MIDTRANS_SERVER_KEY'),
-        'client_key' => env('MIDTRANS_CLIENT_KEY'),
-        'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
+    'paywuz' => [
+        'api_key' => env('PAYWUZ_API_KEY'),
+        'is_production' => env('PAYWUZ_IS_PRODUCTION', false),
     ],
 
     'chatbot' => [

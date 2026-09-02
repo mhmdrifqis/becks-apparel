@@ -39,7 +39,7 @@ class OrderStatusUpdatedNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $url = url('/customer/orders/' . $this->order->id);
+        $url = url('/pesanan/' . $this->order->order_number);
         
         $message = (new MailMessage)
                     ->subject('Update Status Pesanan #' . $this->order->order_number)
@@ -69,7 +69,7 @@ class OrderStatusUpdatedNotification extends Notification implements ShouldQueue
             'order_number' => $this->order->order_number,
             'title' => 'Status Pesanan Update',
             'message' => 'Pesanan #' . $this->order->order_number . ' kini berstatus: ' . $this->newStatusLabel,
-            'url' => '/customer/orders/' . $this->order->id,
+            'url' => '/pesanan/' . $this->order->order_number,
         ];
     }
 }

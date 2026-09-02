@@ -22,8 +22,8 @@ class Order extends Model
         'deposit_amount',
         'payment_status',
         'payment_token',
+        'payment_gateway_id',
         'snap_url',
-        'midtrans_order_id',
     ];
 
     protected $casts = [

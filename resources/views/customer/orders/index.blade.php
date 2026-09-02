@@ -29,7 +29,7 @@
                 <a href="{{ route('catalog.index') }}" class="inline-flex px-8 py-4 bg-brand-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-brand-900/20 active:scale-95 transition-all">Lihat Katalog</a>
             </div>
         @else
-            <div x-data="{ currentTab: 'semua' }">
+            <div x-data="{ currentTab: 'semua', searchQuery: '' }">
                 <!-- Shopee Style Status Tabs -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8 overflow-hidden">
                     <div class="flex overflow-x-auto no-scrollbar">
@@ -52,8 +52,8 @@
                                     $count = 0;
                                     if ($key === 'semua') $count = $orders->count();
                                     elseif ($key === 'unpaid') $count = $orders->where('payment_status', 'unpaid')->where('status', '!=', 'cancelled')->count();
-                                    elseif ($key === 'dikemas') $count = $orders->where('payment_status', '!=', 'unpaid')->whereIn('status', ['pending', 'printing', 'sewing', 'qc'])->count();
-                                    elseif ($key === 'dikirim') $count = $orders->whereIn('status', ['ready', 'shipped'])->count();
+                                    elseif ($key === 'dikemas') $count = $orders->whereIn('status', ['production', 'ready'])->count();
+                                    elseif ($key === 'dikirim') $count = $orders->where('status', 'shipped')->count();
                                     elseif ($key === 'selesai') $count = $orders->where('status', 'completed')->count();
                                     elseif ($key === 'dibatalkan') $count = $orders->where('status', 'cancelled')->count();
                                 @endphp
@@ -68,7 +68,7 @@
                 <!-- Search Placeholder (Shopee Style) -->
                 <div class="bg-slate-200/50 rounded-xl px-4 py-3 mb-8 flex items-center gap-3">
                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" placeholder="Cari berdasarkan No. Pesanan atau Nama Produk..." class="bg-transparent border-none focus:ring-0 text-[11px] font-bold text-slate-600 w-full placeholder:text-slate-400">
+                    <input type="text" x-model="searchQuery" placeholder="Cari berdasarkan No. Pesanan atau Nama Produk..." class="bg-transparent border-none focus:ring-0 text-[11px] font-bold text-slate-600 w-full placeholder:text-slate-400">
                 </div>
 
                 <!-- Order List -->
@@ -77,27 +77,34 @@
                         @php
                             $category = 'semua';
                             if ($order->status === 'cancelled') $category = 'dibatalkan';
-                            elseif ($order->payment_status === 'unpaid') $category = 'unpaid';
-                            elseif (in_array($order->status, ['pending', 'printing', 'sewing', 'qc'])) $category = 'dikemas';
-                            elseif (in_array($order->status, ['ready', 'shipped'])) $category = 'dikirim';
                             elseif ($order->status === 'completed') $category = 'selesai';
+                            elseif ($order->payment_status === 'unpaid') $category = 'unpaid';
+                            elseif (in_array($order->status, ['production', 'ready'])) $category = 'dikemas';
+                            elseif ($order->status === 'shipped') $category = 'dikirim';
 
                             $statusText = strtoupper($order->status);
                             if ($order->payment_status === 'unpaid' && $order->status !== 'cancelled') $statusText = 'BELUM BAYAR';
+                            
+                            $productNames = addslashes(collect($order->orderItems)->map(function($i) { return $i->package->name; })->implode(' '));
                         @endphp
 
-                        <div x-show="currentTab === 'semua' || currentTab === '{{ $category }}'" x-transition 
-                             class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden relative group">
+                        <div x-show="(currentTab === 'semua' || currentTab === '{{ $category }}') && ('{{ strtolower($order->order_number) }}'.includes(searchQuery.toLowerCase()) || '{{ strtolower($productNames) }}'.includes(searchQuery.toLowerCase()))" x-transition class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative group">
                             
                             <!-- Card Header -->
-                            <div class="px-6 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">No. Pesanan:</span>
-                                    <span class="text-[10px] font-black text-slate-900 uppercase tracking-widest">{{ $order->order_number }}</span>
+                            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">No. Pesanan: <span class="text-slate-900">{{ $order->order_number }}</span></span>
+                                    </div>
+                                    <div class="hidden md:flex items-center gap-2 border-l border-slate-200 pl-4">
+                                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        <span class="text-[10px] font-bold text-slate-500">{{ $order->created_at->format('d M Y, H:i') }}</span>
+                                    </div>
                                 </div>
-                                <div class="text-[10px] font-black tracking-widest uppercase {{ $category === 'unpaid' ? 'text-red-500' : ($category === 'dibatalkan' ? 'text-slate-400' : 'text-brand-600') }}">
+                                <span class="text-[10px] font-black uppercase tracking-widest {{ $order->status === 'cancelled' ? 'text-red-500' : ($order->payment_status === 'unpaid' ? 'text-red-500' : 'text-brand-900') }}">
                                     {{ $statusText }}
-                                </div>
+                                </span>
                             </div>
 
                             <!-- Card Body (Items) -->
@@ -137,12 +144,8 @@
                                     </div>
                                 </div>
                                 <div class="mt-6 flex flex-wrap justify-end gap-3">
-                                    @if($category === 'unpaid' && $order->status !== 'cancelled')
-                                        <form action="{{ route('payment.create', $order->id) }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="type" value="dp">
-                                            <button type="submit" class="px-8 py-3 bg-brand-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-800 transition-all shadow-xl shadow-brand-900/20 active:scale-95">Bayar Sekarang</button>
-                                        </form>
+                                    @if($order->payment_status === 'unpaid' && $order->status !== 'cancelled')
+                                        <a href="{{ route('customer.orders.show', $order->order_number) }}" class="px-8 py-3 bg-brand-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-800 transition-all shadow-xl shadow-brand-900/20 active:scale-95 text-center">Bayar Sekarang</a>
                                     @endif
                                     <a href="{{ route('customer.orders.show', $order->order_number) }}" class="px-8 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Detail Pesanan</a>
                                     @if($order->status === 'completed')

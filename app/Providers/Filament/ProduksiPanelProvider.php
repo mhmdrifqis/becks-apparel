@@ -44,6 +44,7 @@ class ProduksiPanelProvider extends PanelProvider
             ->pages([
                 Pages\Dashboard::class,
             ])
+            ->sidebarCollapsibleOnDesktop()
             ->discoverWidgets(in: app_path('Filament/Produksi/Widgets'), for: 'App\\Filament\\Produksi\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,

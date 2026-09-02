@@ -183,6 +183,16 @@ class CheckoutController extends Controller
         // Send Notification
         $user->notify(new \App\Notifications\OrderCreatedNotification($order));
 
+        // Send Notification to Admins & Produksi via Filament
+        $staffUsers = \App\Models\User::role(['Admin', 'Tim Produksi'])->get();
+        if ($staffUsers->isNotEmpty()) {
+            \Filament\Notifications\Notification::make()
+                ->title('Pesanan Baru!')
+                ->body('Terdapat pesanan baru dari ' . $order->recipient_name . ' (' . $order->order_number . ') senilai Rp ' . number_format($order->total_amount, 0, ',', '.'))
+                ->success()
+                ->sendToDatabase($staffUsers);
+        }
+
         return redirect()->route('customer.orders.show', $order->order_number)->with('success', 'Pesanan berhasil dikonfirmasi! Silakan tinjau dan lakukan pembayaran.');
     }
 }

@@ -4,7 +4,7 @@
 
 @section('content')
 <div x-data="{ 
-    qty: 12, 
+    qty: 1, 
     selectedMaterialId: '{{ $materials->first()?->id ?? 0 }}',
     materials: @js($materials),
     openDetail: false,
@@ -14,10 +14,12 @@
     {{-- Carousel State --}}
     activeSlide: 0,
     slidesCount: {{ count($package->images ?: []) > 0 ? count($package->images) : 1 }},
-    autoplay() {
-        setInterval(() => {
-            this.activeSlide = (this.activeSlide + 1) % this.slidesCount;
-        }, 5000);
+    showLightbox: false,
+    nextSlide() {
+        this.activeSlide = (this.activeSlide + 1) % this.slidesCount;
+    },
+    prevSlide() {
+        this.activeSlide = (this.activeSlide - 1 + this.slidesCount) % this.slidesCount;
     },
     get unitPrice() {
         let base = {{ $package->base_price }};
@@ -65,7 +67,7 @@
                 if (redirect && data.cart_item_id) {
                     window.location.href = '{{ route('customer.cart.index') }}?select=' + data.cart_item_id;
                 } else {
-                    window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Pesanan ditambahkan ke keranjang ✨', type: 'success' } }));
+                    window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Pesanan ditambahkan ke keranjang', type: 'success' } }));
                 }
             } else {
                 window.dispatchEvent(new CustomEvent('notify', { detail: { message: data.message, type: 'error' } }));
@@ -74,7 +76,7 @@
             window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Gagal menghubungi server', type: 'error' } }));
         }
     }
-}" x-init="autoplay()" class="bg-white dark:bg-zinc-950 min-h-screen pt-20 pb-32 md:pb-12">
+}" class="bg-white dark:bg-zinc-950 min-h-screen pt-20 pb-32 md:pb-12">
     <div class="max-w-7xl mx-auto px-4 py-8 md:py-16">
         
         <!-- Breadcrumbs: Minimalist -->
@@ -89,17 +91,27 @@
         <div class="bg-white rounded-[2rem] shadow-sm flex flex-col md:flex-row gap-0 overflow-hidden border border-slate-100">
             
             <!-- 1. LEFT: Gallery (Shopee Layout Style) -->
-            <div class="w-full md:w-[450px] lg:w-[480px] p-6 bg-white border-r border-slate-50 flex-shrink-0">
-                <div class="aspect-square bg-slate-50 mb-6 overflow-hidden rounded-2xl">
+            <div class="w-full md:w-[450px] lg:w-[480px] p-6 bg-white border-r border-slate-50 flex-shrink-0 group">
+                <div class="aspect-square bg-slate-50 mb-6 overflow-hidden rounded-2xl relative cursor-zoom-in" @click="showLightbox = true">
                     @php $imgList = $package->images ?: ['assets/images/placeholder.png']; @endphp
                     @foreach($imgList as $i => $imgPath)
                     @php $src = str_starts_with($imgPath, 'assets/') ? asset($imgPath) : Storage::disk('public')->url($imgPath); @endphp
-                    <img x-show="activeSlide === {{ $i }}" 
-                         x-transition:enter="transition ease-in-out duration-300"
+                    <img x-show="activeSlide == {{ $i }}" 
+                         x-transition.opacity.duration.300ms
                          src="{{ $src }}" 
-                         class="w-full h-full object-contain p-4" 
+                         class="absolute inset-0 w-full h-full object-contain p-4" 
                          alt="Main Image">
                     @endforeach
+
+                    <!-- Manual Navigation Buttons -->
+                    @if(count($imgList) > 1)
+                    <button @click.stop="prevSlide()" class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white hover:bg-slate-50 text-slate-800 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button @click.stop="nextSlide()" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white hover:bg-slate-50 text-slate-800 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                    @endif
                 </div>
                 
                 <!-- Thumbnails Horizontal -->
@@ -108,7 +120,7 @@
                     @php $src = str_starts_with($imgPath, 'assets/') ? asset($imgPath) : Storage::disk('public')->url($imgPath); @endphp
                     <button @click="activeSlide = {{ $i }}" 
                             class="w-20 h-20 flex-shrink-0 border-2 transition-all p-1 rounded-xl"
-                            :class="activeSlide === {{ $i }} ? 'border-brand-900 bg-brand-50' : 'border-slate-100 hover:border-slate-200'">
+                            :class="activeSlide == {{ $i }} ? 'border-brand-900 bg-brand-50' : 'border-slate-100 hover:border-slate-200'">
                         <img src="{{ $src }}" class="w-full h-full object-cover rounded-lg" alt="Thumb">
                     </button>
                     @endforeach
@@ -218,7 +230,7 @@
                         <span class="w-32 text-xs font-black text-slate-400 uppercase tracking-widest">Jumlah</span>
                         <div class="flex items-center gap-4">
                             <div class="flex items-center gap-1 p-1 bg-slate-50 rounded-2xl border border-slate-100">
-                                <button @click="if(qty > 12) qty--" class="w-10 h-10 flex items-center justify-center bg-white text-slate-400 rounded-xl hover:text-brand-900 transition-colors border border-slate-100">
+                                <button @click="if(qty > 1) qty--" class="w-10 h-10 flex items-center justify-center bg-white text-slate-400 rounded-xl hover:text-brand-900 transition-colors border border-slate-100">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/></svg>
                                 </button>
                                 <input type="number" x-model="qty" class="w-12 text-center bg-transparent border-none text-lg font-black p-0 focus:ring-0 text-slate-800" readonly>
@@ -226,9 +238,6 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
                                 </button>
                             </div>
-                            <span class="text-[10px] font-black text-amber-500 uppercase tracking-widest leading-relaxed">
-                                * Minimal Pesanan<br/>12 Pcs
-                            </span>
                         </div>
                     </div>
                 </div>
@@ -306,6 +315,39 @@
                 <span class="text-[10px] font-black uppercase tracking-widest leading-none text-center">Beli Sekarang</span>
             </button>
         </div>
+    </div>
+
+    <!-- Lightbox Modal for Images -->
+    <div x-show="showLightbox" class="fixed inset-0 z-[100] bg-black flex items-center justify-center p-0 md:p-10" x-cloak>
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" @click="showLightbox = false"></div>
+        
+        <!-- Lightbox Images -->
+        <div class="relative w-full h-full max-w-7xl mx-auto flex items-center justify-center pointer-events-none">
+            @php $imgList = $package->images ?: ['assets/images/placeholder.png']; @endphp
+            @foreach($imgList as $i => $imgPath)
+            @php $src = str_starts_with($imgPath, 'assets/') ? asset($imgPath) : Storage::disk('public')->url($imgPath); @endphp
+            <img x-show="activeSlide == {{ $i }}" 
+                 x-transition.opacity.duration.200ms
+                 src="{{ $src }}" 
+                 class="absolute inset-0 w-full h-full object-contain pointer-events-auto cursor-zoom-out" 
+                 @click="showLightbox = false"
+                 alt="Enlarged Image">
+            @endforeach
+        </div>
+
+        <!-- Lightbox Controls -->
+        <button @click="showLightbox = false" class="absolute top-4 md:top-8 right-4 md:right-8 z-[110] w-12 h-12 flex items-center justify-center text-white/50 hover:text-white bg-black/20 hover:bg-black/60 rounded-full transition-all">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+
+        @if(count($imgList) > 1)
+        <button @click.stop="prevSlide()" class="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-[110] w-12 h-12 flex items-center justify-center text-white/50 hover:text-white bg-black/20 hover:bg-black/60 rounded-full transition-all">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button @click.stop="nextSlide()" class="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-[110] w-12 h-12 flex items-center justify-center text-white/50 hover:text-white bg-black/20 hover:bg-black/60 rounded-full transition-all">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+        </button>
+        @endif
     </div>
 </div>
 </div>

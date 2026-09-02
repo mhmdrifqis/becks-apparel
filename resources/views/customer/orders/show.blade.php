@@ -3,7 +3,7 @@
 @section('title', 'Detail Pesanan ' . $order->order_number . ' - Becks Apparel')
 
 @section('content')
-<div x-data="{ showReturnModal: false }" class="min-h-screen bg-slate-50 pb-40">
+<div x-data="orderDetail()" class="min-h-screen bg-slate-50 pb-40 relative">
     <div class="bg-white border-b border-slate-100 pt-28 pb-6 md:pt-36 md:pb-10">
         <div class="max-w-7xl mx-auto px-4">
             <a href="{{ route('customer.orders') }}" class="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-brand-900 transition-colors mb-6">
@@ -26,7 +26,7 @@
                 
                 <div class="flex flex-col items-end gap-3">
                     <div class="flex items-center gap-2">
-                        @if($order->payment_status !== 'paid' && $order->midtrans_order_id)
+                        @if($order->payment_status !== 'paid' && $order->payment_gateway_id)
                             <form action="{{ route('payment.sync', $order->id) }}" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="px-4 py-2 rounded-xl border-2 border-brand-900 bg-white text-brand-900 text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-brand-50 transition-all flex items-center gap-2">
@@ -375,20 +375,9 @@
                                 Edit Detail Pesanan
                             </a>
                             <div class="h-px bg-slate-50 w-full my-4"></div>
-                            <form action="{{ route('payment.create', $order->id) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="type" value="dp">
-                                <button type="submit" class="w-full py-4 border-2 border-brand-900 text-brand-900 bg-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-50 transition-all active:scale-95 mb-2">
-                                    Bayar DP 50% (Rp {{ number_format($order->total_amount / 2, 0, ',', '.') }})
-                                </button>
-                            </form>
-                            <form action="{{ route('payment.create', $order->id) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="type" value="full">
-                                <button type="submit" class="w-full py-4 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-lg shadow-brand-900/20 active:scale-95">
-                                    Bayar Lunas Sekarang
-                                </button>
-                            </form>
+                            <button @click="pay('full')" class="w-full py-4 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-lg shadow-brand-900/20 active:scale-95">
+                                Bayar Sekarang
+                            </button>
                         </div>
                     @elseif($order->payment_status === 'partial')
                         @if(in_array($order->status, ['ready', 'shipped']))
@@ -397,13 +386,9 @@
                                     <p class="text-[10px] font-black text-amber-900 uppercase tracking-widest leading-relaxed text-center">Pesanan Siap Dikirim / Sudah Dikirim!</p>
                                     <p class="text-[9px] font-bold text-amber-700 mt-1 text-center">Silakan lakukan pelunasan untuk menyelesaikan transaksi Anda.</p>
                                 </div>
-                                <form action="{{ route('payment.create', $order->id) }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="type" value="rest">
-                                    <button type="submit" class="w-full py-4 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-lg shadow-brand-900/20 active:scale-95">
-                                        Bayar Pelunasan Sekarang
-                                    </button>
-                                </form>
+                                <button @click="pay('rest')" class="w-full py-4 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-lg shadow-brand-900/20 active:scale-95">
+                                    Bayar Pelunasan Sekarang
+                                </button>
                             </div>
                         @else
                             <div class="p-6 bg-brand-50 border border-brand-100 rounded-2xl text-center hidden md:block">
@@ -461,7 +446,7 @@
         </div>
     </div>
 
-    <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] pb-safe" x-data="{ showPayOptions: false }">
+    <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] pb-safe">
         <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
             <div class="flex flex-col">
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tagihan</span>
@@ -470,35 +455,6 @@
             
             <div class="flex items-center gap-2">
                 @if(($order->payment_status === 'unpaid' || ($order->payment_status === 'partial' && in_array($order->status, ['ready', 'shipped']))) && $order->status !== 'cancelled')
-                    <div x-show="showPayOptions" x-transition class="absolute bottom-24 left-4 right-4 bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 space-y-3">
-                        @if($order->payment_status === 'unpaid')
-                            <form action="{{ route('payment.create', $order->id) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="type" value="dp">
-                                <button type="submit" class="w-full py-4 bg-white border-2 border-brand-900 text-brand-900 rounded-xl font-black uppercase tracking-widest text-[10px]">
-                                    Bayar DP 50%
-                                </button>
-                            </form>
-                            <form action="{{ route('payment.create', $order->id) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="type" value="full">
-                                <button type="submit" class="w-full py-4 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px]">
-                                    Bayar Lunas
-                                </button>
-                            </form>
-                        @elseif($order->payment_status === 'partial')
-                            <form action="{{ route('payment.create', $order->id) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="type" value="rest">
-                                <button type="submit" class="w-full py-4 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px]">
-                                    Bayar Pelunasan
-                                </button>
-                            </form>
-                        @endif
-                        
-                        <button @click="showPayOptions = false" class="w-full text-center text-[9px] font-black text-slate-400 uppercase tracking-widest py-2">Batal</button>
-                    </div>
-
                     @if($order->payment_status === 'unpaid')
                         <a href="{{ route('customer.orders.edit', $order->order_number) }}" class="flex items-center gap-2 px-3 py-3 bg-slate-50 text-slate-500 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -506,8 +462,8 @@
                         </a>
                     @endif
                     
-                    <button @click="showPayOptions = !showPayOptions" class="h-12 px-6 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-brand-900/20 active:scale-95 transition-all">
-                        {{ $order->payment_status === 'partial' ? 'Pelunasan' : 'Bayar' }}
+                    <button @click="pay('{{ $order->payment_status === 'partial' ? 'rest' : 'full' }}')" class="h-12 px-6 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-brand-900/20 active:scale-95 transition-all">
+                        {{ $order->payment_status === 'partial' ? 'Bayar Pelunasan' : 'Bayar Lunas' }}
                     </button>
                 @elseif($order->status !== 'cancelled')
                     <a href="https://wa.me/628123456789" target="_blank" class="h-12 px-8 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2">
@@ -564,17 +520,92 @@ function doTrack() {
 </script>
 @endif
 
-<script src="{{ config('services.midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+    <!-- Payment Modal (Mengambang) -->
+    <div x-show="showPaymentModal" 
+         class="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6"
+         style="display: none;">
+        <!-- Backdrop -->
+        <div x-show="showPaymentModal" 
+             x-transition.opacity
+             class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+
+        <!-- Modal Content -->
+        <div x-show="showPaymentModal"
+             x-transition.scale.origin.bottom
+             class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md flex flex-col overflow-hidden text-center p-8">
+            
+            <div class="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-10 h-10 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            
+            <h3 class="text-xl font-black text-slate-900 uppercase tracking-widest mb-2">Menunggu Pembayaran</h3>
+            <p class="text-xs font-bold text-slate-500 mb-8">
+                Halaman pembayaran telah dibuka di tab baru. Silakan selesaikan pembayaran Anda di sana.
+            </p>
+
+            <div class="flex flex-col gap-3 w-full">
+                <a :href="paymentUrl" target="_blank" class="w-full py-4 bg-slate-100 text-slate-600 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-200 transition-colors">
+                    Buka Ulang Halaman Pembayaran
+                </a>
+                <button @click="window.location.reload()" class="w-full py-4 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-lg shadow-brand-900/20 active:scale-95">
+                    SAYA SUDAH BAYAR
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        @if(session('snapToken'))
-            snap.pay('{{ session('snapToken') }}', {
-                onSuccess: function(result){ window.location.href = "{{ route('customer.orders.show', $order->order_number) }}"; },
-                onPending: function(result){ window.location.href = "{{ route('customer.orders.show', $order->order_number) }}"; },
-                onError: function(result){ alert("Pembayaran Gagal!"); },
-                onClose: function(){ }
-            });
-        @endif
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('orderDetail', () => ({
+            showReturnModal: false,
+            showPaymentModal: false,
+            paymentUrl: '',
+            
+            async pay(type) {
+                // Show loading state
+                Swal.fire({
+                    title: 'Memproses...',
+                    text: 'Menghubungkan ke gateway pembayaran',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                try {
+                    let formData = new FormData();
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('type', type);
+
+                    let res = await fetch('{{ route("payment.create", $order->id) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+
+                    let data = await res.json();
+                    Swal.close();
+
+                    if (data.success && data.checkout_url) {
+                        this.paymentUrl = data.checkout_url;
+                        this.showPaymentModal = true;
+                        
+                        // Buka tab baru otomatis
+                        window.open(data.checkout_url, '_blank');
+                    } else {
+                        Swal.fire('Gagal', data.message || 'Tidak dapat membuat link pembayaran.', 'error');
+                    }
+                } catch (e) {
+                    Swal.close();
+                    Swal.fire('Error', 'Gagal memproses pembayaran. Coba lagi nanti.', 'error');
+                }
+            }
+        }));
     });
 </script>
+
 @endsection
