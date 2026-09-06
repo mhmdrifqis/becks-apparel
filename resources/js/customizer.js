@@ -915,6 +915,13 @@ export default () => ({
     previewModalImage: null,
     showSuccessSaveModal: false,
     packageSlug: "",
+    // AUTH & LOGIN STATE
+    isAuthenticated: false,
+    showRequireLoginModal: false,
+    loginInput: "",
+    passwordInput: "",
+    loginError: "",
+    isLoggingIn: false,
     // Auto-snapshot: setiap view di-capture otomatis saat renderLayers()
     viewSnapshots: { jersey_front: null, jersey_back: null, pants: null },
     // Toggle visibilitas setiap sisi di preview
@@ -1183,7 +1190,9 @@ export default () => ({
 
             this.initCanvas()
                 .then(async () => {
-                    // Initialize URLs from DOM
+                    // Initialize URLs & Auth state from DOM
+                    this.isAuthenticated =
+                        document.getElementById("is-authenticated")?.value === "1";
                     this.saveDesignUrl =
                         document.getElementById("save-design-url")?.value || "";
                     this.updateDesignUrl =
@@ -3000,6 +3009,12 @@ export default () => ({
     // SAVE LOGIC
     triggerSave() {
         this.showBackModal = false;
+        this.isAuthenticated =
+            document.getElementById("is-authenticated")?.value === "1";
+        if (!this.isAuthenticated) {
+            this.showRequireLoginModal = true;
+            return;
+        }
         this.showSaveModal = true;
     },
 
@@ -3022,6 +3037,44 @@ export default () => ({
 
     async saveDesign() {
         if (!this.designName) return;
+
+        // Check authentication state
+        this.isAuthenticated =
+            document.getElementById("is-authenticated")?.value === "1";
+        if (!this.isAuthenticated) {
+            this.showSaveModal = false;
+            // Save draft state to localStorage so progress is preserved
+            try {
+                const exportState = {
+                    viewStates: JSON.parse(JSON.stringify(this.viewStates)),
+                    textState: {
+                        input: this.textInput,
+                        font: this.activeFont,
+                        color: this.activeColor,
+                        size: this.textFontSize,
+                        spacing: this.textCharSpacing,
+                        arc: this.textArc,
+                    },
+                    designObjects: this.designObjects.map((obj) =>
+                        obj.toObject(["clipPath", "isSystemLayer", "view", "arc"]),
+                    ),
+                    currentModel: this.currentModel,
+                    currentView: this.currentView,
+                };
+                localStorage.setItem(
+                    "becks_pending_design",
+                    JSON.stringify({
+                        name: this.designName,
+                        design_json: exportState,
+                    }),
+                );
+            } catch (err) {
+                console.error("Failed to store pending design state:", err);
+            }
+            this.showRequireLoginModal = true;
+            return;
+        }
+
         this.isLoading = true;
         this.showSaveModal = false;
 
@@ -3089,17 +3142,20 @@ export default () => ({
                 response.status === 401 ||
                 result.message === "Unauthenticated."
             ) {
+                this.isAuthenticated = false;
+                const authInput = document.getElementById("is-authenticated");
+                if (authInput) authInput.value = "0";
                 // Simpan desain sementara ke localStorage
                 localStorage.setItem(
                     "becks_pending_design",
                     JSON.stringify({
                         name: this.designName,
                         design_json: exportState,
-                        preview_image: previewImage,
+                        preview_image: finalPreviewDataUrl,
                     }),
                 );
-                // Redirect ke halaman login
-                window.location.href = "/login?redirect_to=customizer";
+                this.isLoading = false;
+                this.showRequireLoginModal = true;
                 return;
             }
 
@@ -3122,14 +3178,73 @@ export default () => ({
                 this.showSuccessSaveModal = true;
                 this.isLoading = false;
             } else {
-                alert("Gagal menyimpan desain: " + result.message);
-                this.isLoading = false;
+                alert("Gagal menyimpan desain: " + (result.message || "Unknown error"));
                 this.isLoading = false;
             }
         } catch (error) {
             console.error("Error saving design:", error);
             alert("Terjadi kesalahan saat menyimpan desain.");
             this.isLoading = false;
+        }
+    },
+
+    async performInlineLogin() {
+        if (!this.loginInput || !this.passwordInput) {
+            this.loginError = "Silakan isi Email/No. WhatsApp dan Password Anda.";
+            return;
+        }
+        this.isLoggingIn = true;
+        this.loginError = "";
+
+        try {
+            const csrfToken = document.getElementById("csrf-token").value;
+            const response = await fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                body: JSON.stringify({
+                    login: this.loginInput,
+                    password: this.passwordInput,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok || response.status === 200) {
+                this.isAuthenticated = true;
+                const authInput = document.getElementById("is-authenticated");
+                if (authInput) authInput.value = "1";
+                this.showRequireLoginModal = false;
+                this.isLoggingIn = false;
+
+                // If designName was empty, set default
+                if (!this.designName) {
+                    this.designName =
+                        "Jersey Custom " +
+                        new Date().toLocaleDateString("id-ID");
+                }
+
+                // Auto save design after logging in
+                await this.saveDesign();
+            } else {
+                this.isLoggingIn = false;
+                if (result.errors) {
+                    const firstErrKey = Object.keys(result.errors)[0];
+                    this.loginError = result.errors[firstErrKey][0];
+                } else if (result.message) {
+                    this.loginError = result.message;
+                } else {
+                    this.loginError =
+                        "Login gagal. Silakan periksa kembali email/password Anda.";
+                }
+            }
+        } catch (err) {
+            console.error("Inline login error:", err);
+            this.isLoggingIn = false;
+            this.loginError = "Terjadi kesalahan jaringan saat mencoba login.";
         }
     },
 });
