@@ -25,9 +25,9 @@
                     <div class="h-1 w-full bg-[repeating-linear-gradient(45deg,#064e3b,#064e3b_10px,#fff_10px,#fff_20px,#ca8a04_20px,#ca8a04_30px,#fff_30px,#fff_40px)]"></div>
                     
                     <!-- Persistent Address Inputs (Hidden when not editing, but always submitted) -->
-                    <input type="hidden" name="recipient_name" :value="recipient_name" required>
-                    <input type="hidden" name="recipient_phone" :value="recipient_phone" required>
-                    <input type="hidden" name="shipping_address" :value="fullAddress" required>
+                    <input type="hidden" name="recipient_name" :value="recipient_name">
+                    <input type="hidden" name="recipient_phone" :value="recipient_phone">
+                    <input type="hidden" name="shipping_address" :value="fullAddress">
                     <input type="hidden" name="shipping_cost" :value="shippingCost">
                     <input type="hidden" name="shipping_service" :value="selectedService ? selectedService.service : ''">
                     <input type="hidden" name="courier_name" :value="selectedCourier.toUpperCase()">
@@ -100,12 +100,26 @@
                             <p class="text-sm text-slate-600 leading-relaxed font-medium" x-text="fullAddress || 'Silakan pilih atau buat alamat baru.'"></p>
                         </div>
 
+                        <!-- Skeleton Loading Courier -->
+                        <div class="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 shadow-sm relative overflow-hidden" x-show="isLoadingShipping" x-cloak>
+                            <div class="flex items-center justify-between gap-4 animate-pulse">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-2xl bg-slate-200"></div>
+                                    <div>
+                                        <div class="h-3 w-32 bg-slate-200 rounded-full mb-2"></div>
+                                        <div class="h-2 w-24 bg-slate-200 rounded-full"></div>
+                                    </div>
+                                </div>
+                                <div class="h-8 w-24 bg-slate-200 rounded-xl"></div>
+                            </div>
+                        </div>
+
                         <!-- Automated Cheapest Courier Display -->
-                        <div class="mt-4 p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/80 shadow-sm relative overflow-hidden" x-show="autoSelectedCourier">
+                        <div class="mt-4 p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/80 shadow-sm relative overflow-hidden" x-show="autoSelectedCourier && !isLoadingShipping" x-cloak>
                             <div class="flex items-center justify-between gap-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-2xl bg-emerald-700 text-white flex items-center justify-center font-black text-sm shadow-md shadow-emerald-700/20">
-                                        🚀
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                                     </div>
                                     <div>
                                         <div class="flex items-center gap-2">
@@ -363,10 +377,10 @@
                                                         <tr class="hover:bg-slate-50/50 transition-colors">
                                                             <td class="px-2 py-3 text-[9px] font-black text-slate-300 text-center" x-text="pIdx + 1"></td>
                                                             <td class="px-2 py-3">
-                                                                <input type="text" x-model="player.ref_name" :name="'roster['+item.id+']['+pIdx+'][ref_name]'" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold focus:ring-brand-900" placeholder="Pemain 1">
+                                                                <input type="text" x-model="player.ref_name" :name="'roster['+item.id+']['+pIdx+'][ref_name]'" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold focus:ring-brand-900" placeholder="Pemain ">
                                                             </td>
                                                             <td class="px-2 py-3">
-                                                                <input type="text" x-model="player.name" :name="'roster['+item.id+']['+pIdx+'][name]'" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold focus:ring-brand-900" placeholder="BECCKS">
+                                                                <input type="text" x-model="player.name" :name="'roster['+item.id+']['+pIdx+'][name]'" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-bold focus:ring-brand-900" placeholder="Nama Punggung">
                                                             </td>
                                                             <td class="px-2 py-3">
                                                                 <input type="text" x-model="player.number" :name="'roster['+item.id+']['+pIdx+'][number]'" class="w-12 bg-white border border-slate-200 rounded-lg px-2 py-2 text-[10px] font-bold text-center focus:ring-brand-900" placeholder="00">
@@ -513,33 +527,33 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Nama Penerima *</label>
-                                <input type="text" x-model="newAddress.nama_penerima" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Nama Lengkap">
+                                <input type="text" x-model="newAddress.nama_penerima" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Nama Lengkap">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">No. Telepon / WA *</label>
-                                <input type="text" x-model="newAddress.no_telepon" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="08xxxxxxxxxx">
+                                <input type="text" x-model="newAddress.no_telepon" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="08xxxxxxxxxx">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Alamat Lengkap *</label>
-                            <textarea x-model="newAddress.alamat_lengkap" required rows="2" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Jl. Nama Jalan, No, RT/RW, Patokan"></textarea>
+                            <textarea x-model="newAddress.alamat_lengkap" rows="2" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Jl. Nama Jalan, No, RT/RW, Patokan"></textarea>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Provinsi *</label>
-                                <input type="text" x-model="newAddress.provinsi" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Contoh: Jawa Barat">
+                                <input type="text" x-model="newAddress.provinsi" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Contoh: Jawa Barat">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Kota / Kabupaten *</label>
-                                <input type="text" x-model="newAddress.kota" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Contoh: Kota Bandung">
+                                <input type="text" x-model="newAddress.kota" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="Contoh: Kota Bandung">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Kode Pos *</label>
-                            <input type="text" x-model="newAddress.kode_pos" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="40123">
+                            <input type="text" x-model="newAddress.kode_pos" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-xl px-4 py-3 focus:ring-brand-900 focus:border-brand-900" placeholder="40123">
                         </div>
 
                         <div class="flex items-center gap-2 pt-2">
@@ -564,11 +578,11 @@
                     <div class="p-6 border-b border-slate-100 flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-900 flex items-center justify-center font-bold">
-                                🚚
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                             </div>
                             <div>
                                 <h3 class="font-black text-slate-900 uppercase tracking-widest text-sm">Pilih Opsi Ekspedisi</h3>
-                                <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Hasil Query RajaOngkir Starter</p>
+                                <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Pilih kurir pengiriman terbaik</p>
                             </div>
                         </div>
                         <button type="button" @click="showCourierOptionsModal = false" class="p-2 text-slate-400 hover:text-slate-700">
@@ -889,7 +903,7 @@
                 cityName = cityName ? ((cityName.type == 'Kota' ? 'Kota ' : 'Kab. ') + cityName.city_name) : '';
                 
                 let location = [cityName, provName].filter(Boolean).join(', ');
-                return this.shipping_address + (location ? '\\n' + location : '');
+                return this.shipping_address + (location ? ', ' + location : '');
             },
 
             availableUpgrades: {
@@ -991,7 +1005,7 @@
                 if (this.isSubmitting) return;
 
                 // Validation
-                if (!this.recipient_name || !this.recipient_phone || !this.shipping_address || !this.selectedCity || !this.selectedServiceRaw) {
+                if (!this.recipient_name || !this.recipient_phone || !this.shipping_address || !this.selectedCity || !this.selectedService) {
                     this.addressEditing = true;
                     
                     // Use SweetAlert if available, otherwise fallback to alert
@@ -1011,7 +1025,53 @@
 
                 // Proceed to submit
                 this.isSubmitting = true;
-                document.getElementById('checkoutForm').submit();
+                
+                // Show loading state
+                if (window.Swal) {
+                    Swal.fire({
+                        title: 'Memproses Pesanan',
+                        text: 'Mohon tunggu sebentar...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                }
+
+                const form = document.getElementById('checkoutForm');
+                
+                // Construct hidden inputs for roster and designs dynamically
+                this.items.forEach(item => {
+                    item.roster.forEach((player, idx) => {
+                        const createHidden = (name, value) => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = name;
+                            input.value = value;
+                            form.appendChild(input);
+                        };
+                        createHidden(`roster[${item.cartItemId}][${idx}][name]`, player.name || '');
+                        createHidden(`roster[${item.cartItemId}][${idx}][number]`, player.number || '');
+                        createHidden(`roster[${item.cartItemId}][${idx}][size]`, player.size || 'L');
+                        createHidden(`roster[${item.cartItemId}][${idx}][ref_name]`, player.ref_name || '');
+                        
+                        if (player.upgrades && player.upgrades.length > 0) {
+                            player.upgrades.forEach((uId, uIdx) => {
+                                createHidden(`roster[${item.cartItemId}][${idx}][upgrades][${uIdx}]`, uId);
+                            });
+                        }
+                    });
+
+                    if (item.design_id) {
+                        const dInput = document.createElement('input');
+                        dInput.type = 'hidden';
+                        dInput.name = `designs[${item.cartItemId}]`;
+                        dInput.value = item.design_id;
+                        form.appendChild(dInput);
+                    }
+                });
+
+                form.submit();
             }
         }
     }

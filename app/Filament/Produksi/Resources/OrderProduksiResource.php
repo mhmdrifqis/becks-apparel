@@ -18,13 +18,15 @@ class OrderProduksiResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationLabel = 'Antrean Produksi';
+    protected static ?string $navigationLabel = 'Manajemen Produksi';
 
     protected static ?string $modelLabel = 'Pesanan Produksi';
 
-    protected static ?string $pluralModelLabel = 'Antrean Produksi';
+    protected static ?string $pluralModelLabel = 'Manajemen Produksi';
+
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationGroup = 'Workshop';
 

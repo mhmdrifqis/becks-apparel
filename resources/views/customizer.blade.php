@@ -783,84 +783,18 @@
                 </button>
             </div>
 
-            <!-- Bento Grid Layout -->
+                        <!-- Dynamic Composite Preview Layout -->
             <div class="relative z-10 flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-                <div class="flex flex-col lg:flex-row gap-6 h-full min-h-[500px]">
-                    
-                    <!-- LEFT SIDE (70%): FRONT JERSEY -->
-                    <div class="lg:w-[70%] flex flex-col bg-white/85 backdrop-blur-[10px] border border-white/60 rounded-[24px] shadow-[0_10px_30px_rgba(0,0,0,0.05)] overflow-hidden relative group">
-                        <div class="absolute top-6 left-6 z-10 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
-                            <span class="text-xs font-bold text-gray-800 uppercase tracking-[1px]">FRONT VIEW</span>
+                <div class="w-full h-full min-h-[500px] flex items-center justify-center bg-white/85 backdrop-blur-[10px] border border-white/60 rounded-[24px] shadow-[0_10px_30px_rgba(0,0,0,0.05)] overflow-hidden relative group">
+                    <template x-if="previewModalImage">
+                        <img :src="previewModalImage" alt="Studio Preview" class="w-full h-full object-contain rounded-[24px]">
+                    </template>
+                    <template x-if="!previewModalImage">
+                        <div class="text-gray-400 text-sm text-center flex flex-col items-center gap-3">
+                            <div class="p-4 bg-gray-100 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>
+                            <span class="uppercase tracking-widest text-[10px] font-bold">Belum ada desain untuk di-preview</span>
                         </div>
-                        
-                        <div class="flex-1 w-full h-full flex items-center justify-center p-8 relative">
-                            <template x-if="viewSnapshots.jersey_front">
-                                <div class="relative w-full h-full flex items-center justify-center">
-                                    <!-- Floating Shadow beneath the jersey -->
-                                    <div class="absolute bottom-[5%] left-1/2 -translate-x-1/2 w-[60%] h-[20px] bg-black/10 blur-[15px] rounded-[100%] transition-opacity duration-500 group-hover:opacity-60"></div>
-                                    <img :src="viewSnapshots.jersey_front" alt="Front View" class="relative z-10 max-w-full max-h-full object-contain transform transition-transform duration-700 group-hover:-translate-y-2 group-hover:scale-105 drop-shadow-2xl">
-                                </div>
-                            </template>
-                            <template x-if="!viewSnapshots.jersey_front">
-                                <div class="text-gray-400 text-sm text-center flex flex-col items-center gap-3">
-                                    <div class="p-4 bg-gray-100 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>
-                                    <span class="uppercase tracking-widest text-[10px] font-bold">Buka tab Depan dulu</span>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-
-                    <!-- RIGHT SIDE (30%): BACK VIEW & SHORTS -->
-                    <div class="lg:w-[30%] flex flex-col gap-6">
-                        
-                        <!-- TOP CARD: BACK VIEW -->
-                        <div class="flex-1 bg-white/85 backdrop-blur-[10px] border border-white/60 rounded-[24px] shadow-[0_10px_30px_rgba(0,0,0,0.05)] overflow-hidden relative group min-h-[240px]">
-                            <div class="absolute top-5 left-5 z-10 flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                                <span class="text-[10px] font-bold text-gray-800 uppercase tracking-[1px]">BACK VIEW</span>
-                            </div>
-                            
-                            <div class="flex-1 w-full h-full flex items-center justify-center p-6 relative mt-4">
-                                <template x-if="viewSnapshots.jersey_back">
-                                    <div class="relative w-full h-full flex items-center justify-center">
-                                        <div class="absolute bottom-[2%] left-1/2 -translate-x-1/2 w-[50%] h-[15px] bg-black/10 blur-[10px] rounded-[100%] transition-opacity duration-500 group-hover:opacity-60"></div>
-                                        <img :src="viewSnapshots.jersey_back" alt="Back View" class="relative z-10 max-w-full max-h-full object-contain transform transition-transform duration-700 group-hover:-translate-y-1 group-hover:scale-105 drop-shadow-xl">
-                                    </div>
-                                </template>
-                                <template x-if="!viewSnapshots.jersey_back">
-                                    <div class="text-gray-400 text-xs text-center flex flex-col items-center gap-2">
-                                        <div class="p-3 bg-gray-100 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>
-                                        <span class="uppercase tracking-widest text-[9px] font-bold">Buka tab Belakang</span>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-
-                        <!-- BOTTOM CARD: SHORTS -->
-                        <div class="flex-1 bg-white/85 backdrop-blur-[10px] border border-white/60 rounded-[24px] shadow-[0_10px_30px_rgba(0,0,0,0.05)] overflow-hidden relative group min-h-[240px]">
-                            <div class="absolute top-5 left-5 z-10 flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                                <span class="text-[10px] font-bold text-gray-800 uppercase tracking-[1px]">SHORTS</span>
-                            </div>
-                            
-                            <div class="flex-1 w-full h-full flex items-center justify-center p-6 relative mt-4">
-                                <template x-if="viewSnapshots.pants">
-                                    <div class="relative w-full h-full flex items-center justify-center">
-                                        <div class="absolute bottom-[2%] left-1/2 -translate-x-1/2 w-[50%] h-[15px] bg-black/10 blur-[10px] rounded-[100%] transition-opacity duration-500 group-hover:opacity-60"></div>
-                                        <img :src="viewSnapshots.pants" alt="Shorts" class="relative z-10 max-w-full max-h-full object-contain transform transition-transform duration-700 group-hover:-translate-y-1 group-hover:scale-105 drop-shadow-xl">
-                                    </div>
-                                </template>
-                                <template x-if="!viewSnapshots.pants">
-                                    <div class="text-gray-400 text-xs text-center flex flex-col items-center gap-2">
-                                        <div class="p-3 bg-gray-100 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>
-                                        <span class="uppercase tracking-widest text-[9px] font-bold">Buka tab Celana</span>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-                        
-                    </div>
+                    </template>
                 </div>
             </div>
 

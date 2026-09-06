@@ -121,4 +121,4 @@ Route::get('/chatbot/poll', [\App\Http\Controllers\ChatbotController::class, 'po
 require __DIR__.'/auth.php';
 
 // Webhook for Midtrans (No Authentication Required)
-Route::post('/midtrans/callback', [App\Http\Controllers\PaymentController::class, 'callback'])->name('midtrans.callback');
+Route::post('/payment/callback', [App\Http\Controllers\PaymentController::class, 'callback'])->name('payment.callback');

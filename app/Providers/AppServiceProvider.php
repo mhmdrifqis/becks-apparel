@@ -30,10 +30,14 @@ class AppServiceProvider extends ServiceProvider
             if (\Illuminate\Support\Facades\Schema::hasTable('payment_settings')) {
                 $setting = \App\Models\PaymentSetting::first();
                 if ($setting) {
+                    $apiKey = $setting->environment === 'production' 
+                                ? $setting->production_api_key 
+                                : $setting->sandbox_api_key;
+                    
                     config([
-                        'services.midtrans.server_key' => $setting->midtrans_server_key,
-                        'services.midtrans.client_key' => $setting->midtrans_client_key,
-                        'services.midtrans.is_production' => $setting->is_production,
+                        'services.paywuz.api_key' => $apiKey,
+                        'services.paywuz.is_production' => $setting->environment === 'production',
+                        'services.paywuz.is_active' => $setting->is_active,
                     ]);
                 }
             }

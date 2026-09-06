@@ -8,7 +8,7 @@
     <div class="bg-white border-b border-slate-100 pt-28 pb-6 md:pt-36 md:pb-10">
         <div class="max-w-7xl mx-auto px-4 flex items-center justify-between">
             <h1 class="text-xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
-                <svg class="w-8 h-8 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                <svg class="w-8 h-8 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                 Keranjang <span class="text-brand-600">Saya</span>
             </h1>
             <div class="hidden md:flex items-center gap-4">
@@ -47,7 +47,7 @@
             <div class="space-y-4">
                 <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-visible divide-y divide-slate-50">
                     @foreach($cartItems as $item)
-                    <div class="p-4 md:p-8 lg:grid lg:grid-cols-[auto_1fr_120px_150px_150px_100px] lg:gap-6 items-center flex flex-col gap-6 group relative"
+                    <div id="cartItem-{{ $item->id }}" class="p-4 md:p-8 lg:grid lg:grid-cols-[auto_1fr_120px_150px_150px_100px] lg:gap-6 items-center flex flex-col gap-6 group relative"
                          :class="vPicker.itemId === {{ $item->id }} ? 'z-50' : 'z-10'">
                         <!-- Checkbox -->
                         <div class="absolute top-4 left-4 lg:static lg:w-6 flex lg:justify-center z-10">
@@ -81,19 +81,19 @@
                                         
                                         <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Pilih Bahan</h4>
                                         
-                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-                                            @foreach($materials as $material)
-                                            <button @click="vPicker.tempMatId = {{ $material->id }}" 
-                                                    class="relative px-2 py-2.5 text-[9px] font-bold uppercase border-2 rounded-xl transition-all text-center"
-                                                    :class="vPicker.tempMatId === {{ $material->id }} ? 'border-brand-900 bg-brand-50/30 text-brand-900' : 'border-slate-100 text-slate-600 hover:border-brand-900/10'">
-                                                {{ $material->name }}
-                                                <template x-if="vPicker.tempMatId === {{ $material->id }}">
-                                                    <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-brand-900 rounded-tl-lg rounded-br-lg flex items-center justify-center">
-                                                        <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                    </div>
-                                                </template>
-                                            </button>
-                                            @endforeach
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                                            <template x-for="material in getAvailableMaterials({{ $item->id }})" :key="material.id">
+                                                <button @click="vPicker.tempMatId = material.id" 
+                                                        class="relative px-2 py-2.5 text-[9px] font-bold uppercase border-2 rounded-xl transition-all text-center"
+                                                        :class="vPicker.tempMatId === material.id ? 'border-brand-900 bg-brand-50/30 text-brand-900' : 'border-slate-100 text-slate-600 hover:border-brand-900/10'">
+                                                    <span x-text="material.name"></span>
+                                                    <template x-if="vPicker.tempMatId === material.id">
+                                                        <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-brand-900 rounded-tl-lg rounded-br-lg flex items-center justify-center">
+                                                            <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                        </div>
+                                                    </template>
+                                                </button>
+                                            </template>
                                         </div>
 
                                         <div class="flex items-center gap-2 pt-2">
@@ -172,6 +172,8 @@
             items: @js($cartItems->map(fn($i) => [
                 'id' => $i->id,
                 'package_id' => $i->package_id,
+                'package_category' => strtolower($i->package->category ?? ''),
+                'package_name_lower' => strtolower($i->package->name ?? ''),
                 'name' => $i->package->name,
                 'qty' => (int) $i->quantity,
                 'price' => (float)$i->package->base_price, // Ensure number
@@ -179,6 +181,26 @@
                 'mat_name' => $i->material->name ?? '-',
                 'mat_price' => (float) ($i->material->additional_price ?? 0)
             ])),
+            getAvailableMaterials(itemId) {
+                let item = this.items.find(i => i.id === itemId);
+                if (!item) return [];
+                let pType = item.package_category;
+                let pName = item.package_name_lower;
+                
+                return this.materials.filter(m => {
+                    let validCategory = true;
+                    if (m.product_types && m.product_types.length > 0) {
+                        validCategory = m.product_types.includes(pType);
+                    }
+                    
+                    if ((pType === 'tshirt' || pType === 'kaos') && validCategory) {
+                        if (pName.includes('24s') && !m.name.toLowerCase().includes('24s')) return false;
+                        if (pName.includes('30s') && !m.name.toLowerCase().includes('30s')) return false;
+                    }
+                    
+                    return validCategory;
+                });
+            },
             materials: @js($materials),
             selectedItems: [],
             
@@ -244,7 +266,7 @@
                 if (!it) return;
                 
                 let newQty = parseInt(it.qty) + parseInt(delta);
-                if (newQty < 12) return;
+                if (newQty < 1) return;
 
                 // Optimistic UI
                 const oldQty = it.qty;
@@ -369,10 +391,26 @@
                         }
                     });
                     
-                    // Simple reload for simplicity on delete
-                    window.location.reload();
+                    if (res.ok) {
+                        // Remove from DOM without reloading page
+                        const row = document.getElementById('cartItem-' + id);
+                        if (row) row.remove();
+
+                        // Remove from items array and selectedItems
+                        this.items = this.items.filter(i => i.id !== id);
+                        this.selectedItems = this.selectedItems.filter(i => i !== id);
+                        
+                        window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Item berhasil dihapus', type: 'success' } }));
+                        
+                        // If cart is empty, reload to show empty state
+                        if (this.items.length === 0) {
+                            window.location.reload();
+                        }
+                    } else {
+                        window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Gagal menghapus item', type: 'error' } }));
+                    }
                 } catch (e) {
-                    window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Gagal hapus item', type: 'error' } }));
+                    window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Error: ' + e.message, type: 'error' } }));
                 }
             },
 
@@ -385,4 +423,20 @@
         }
     }
 </script>
+
+<style>
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent; 
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1; 
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; 
+}
+</style>
 @endsection

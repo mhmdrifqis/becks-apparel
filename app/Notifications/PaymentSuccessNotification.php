@@ -37,7 +37,7 @@ class PaymentSuccessNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $url = url('/customer/orders/' . $this->order->id);
+        $url = url('/pesanan/' . $this->order->order_number);
 
         return (new MailMessage)
                     ->subject('Pembayaran Berhasil Diterima #' . $this->order->order_number)
@@ -60,7 +60,7 @@ class PaymentSuccessNotification extends Notification implements ShouldQueue
             'order_number' => $this->order->order_number,
             'title' => 'Pembayaran Berhasil',
             'message' => 'Pembayaran pesanan #' . $this->order->order_number . ' telah diterima. Masuk antrean produksi.',
-            'url' => '/customer/orders/' . $this->order->id,
+            'url' => '/pesanan/' . $this->order->order_number,
         ];
     }
 }

@@ -3,139 +3,126 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Services\PaywuzService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
-    /**
-     * Set up Midtrans Config
-     */
-    protected function initMidtrans()
+    protected PaywuzService $paywuzService;
+
+    public function __construct(PaywuzService $paywuzService)
     {
-        \Midtrans\Config::$serverKey = config('services.midtrans.server_key');
-        \Midtrans\Config::$isProduction = config('services.midtrans.is_production');
-        \Midtrans\Config::$isSanitized = true;
-        \Midtrans\Config::$is3ds = true;
+        $this->paywuzService = $paywuzService;
     }
 
     /**
-     * Generate / Retrieve Snap Token for the Order
+     * Create / Redirect to Paywuz Payment
      */
     public function createPayment(Request $request, Order $order)
     {
-        $this->initMidtrans();
+        $paymentType = $request->input('type');
 
-        $paymentType = $request->input('type'); // 'dp', 'full', 'rest'
-
-        $grossAmount = 0;
-        if ($paymentType === 'dp') {
-            $grossAmount = $order->total_amount / 2;
-        } elseif ($paymentType === 'full') {
-            $grossAmount = $order->total_amount;
-        } elseif ($paymentType === 'rest') {
+        $grossAmount = $order->total_amount;
+        if ($paymentType === 'rest') {
             $grossAmount = $order->total_amount - $order->deposit_amount;
+        } else {
+            $paymentType = 'full';
         }
 
-        // Create a unique order_id for Midtrans (Format: {OrderNumber}-{Timestamp})
-        $midtransOrderId = $order->order_number . '-' . time();
+        $merchantOrderId = $order->order_number . '-' . $paymentType . '-' . time();
 
-        $params = [
-            'transaction_details' => [
-                'order_id' => $midtransOrderId,
-                'gross_amount' => (int) $grossAmount,
-            ],
-            'customer_details' => [
-                'first_name' => $order->user->name,
-                'email' => $order->user->email,
-            ],
-            // Custom data map to identify payment context inside webhook
-            'custom_field1' => $paymentType, // e.g. dp, full, rest
-            'custom_field2' => $order->id,
+        $payload = [
+            'amount' => (int) $grossAmount,
+            'orderId' => $merchantOrderId,
+            'customerName' => $order->user->name,
+            'customerEmail' => $order->user->email,
+            'customerPhone' => $order->user->phone ?? '080000000000',
+            'paymentMethod' => 'QRIS', // Default sementara
+            'redirectUrl' => route('customer.orders.show', $order->order_number),
         ];
 
         try {
-            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            $paymentResponse = $this->paywuzService->createTransaction($payload);
 
-            // Save the midtrans_order_id to the order so we can sync it later
+            // Gunakan merchantOrderId untuk pengecekan status ke depannya
+            $transactionId = $merchantOrderId;
+            $checkoutUrl = $paymentResponse['data']['paymentUrl'] ?? null;
+
             $order->update([
-                'midtrans_order_id' => $midtransOrderId,
-                'payment_token' => $snapToken // Optional: reuse this column for the token
+                'payment_gateway_id' => $transactionId,
             ]);
 
-            // Return to the invoice view with flash session snapToken
-            return redirect()->route('customer.orders.show', $order->order_number)
-                ->with('snapToken', $snapToken);
+            if ($checkoutUrl) {
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['success' => true, 'checkout_url' => $checkoutUrl]);
+                }
+                // Redirect user ke halaman pembayaran Paywuz
+                return redirect()->away($checkoutUrl);
+            }
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Gagal mendapatkan link pembayaran dari Paywuz.']);
+            }
+            return back()->with('error', 'Gagal mendapatkan link pembayaran dari Paywuz. ' . json_encode($paymentResponse));
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal memanggil layanan pembayaran: ' . $e->getMessage());
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()]);
+            }
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
     /**
-     * Handle Midtrans Webhook (Server-to-Server Callback)
+     * Handle Paywuz Webhook Callback
      */
     public function callback(Request $request)
     {
-        $this->initMidtrans();
-
-        try {
-            $notification = new \Midtrans\Notification();
-            Log::info('Midtrans Callback Received', [
-                'order_id' => $notification->order_id,
-                'transaction_status' => $notification->transaction_status,
-                'custom_field2' => $notification->custom_field2,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Midtrans Callback Error: ' . $e->getMessage());
-            return response()->json(['message' => 'Error processing notification'], 500);
+        if (!$this->paywuzService->verifyCallbackSignature($request)) {
+            return response()->json(['message' => 'Invalid signature'], 403);
         }
 
-        // Verifikasi Signature Key Midtrans untuk mencegah Spoofing Callback
-        $serverKey = config('services.midtrans.server_key');
-        if (!empty($serverKey) && $request->has('signature_key')) {
-            $expectedSignature = hash('sha512', $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
-            if ($request->signature_key !== $expectedSignature) {
-                Log::warning('Midtrans Callback Signature Mismatch', [
-                    'order_id' => $request->order_id,
-                    'received' => $request->signature_key,
-                    'expected' => $expectedSignature,
-                ]);
-                return response()->json(['message' => 'Invalid signature key'], 403);
+        try {
+            $data = $request->all();
+            Log::info('Paywuz Webhook Received', $data);
+
+            $transactionStatus = $data['status'] ?? 'pending';
+            $transactionId = $data['transactionId'] ?? null;
+            $referenceId = $data['referenceId'] ?? ''; 
+            $grossAmount = $data['amount'] ?? 0;
+
+            if (!$transactionId) {
+                return response()->json(['message' => 'Missing transaction ID'], 400);
             }
-        }
 
-        $transactionStatus = $notification->transaction_status;
-        $orderId = $notification->custom_field2; // We mapped Original Order ID here
-        $paymentType = $notification->custom_field1;
-        $grossAmount = $notification->gross_amount;
+            $order = Order::where('payment_gateway_id', $transactionId)->first();
+            if (!$order) {
+                return response()->json(['message' => 'Order not found'], 404);
+            }
 
-        Log::info('Processing Order Update', [
-            'order_id_from_custom' => $orderId,
-            'payment_type' => $paymentType
-        ]);
+            $isPaid = false;
+            $paymentType = 'full'; // Default fallback
+            if (str_contains($referenceId, '-dp-')) $paymentType = 'dp';
+            if (str_contains($referenceId, '-rest-')) $paymentType = 'rest';
 
-        $order = Order::find($orderId);
-        if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
-        }
-
-        DB::beginTransaction();
-
-        try {
-            if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
-                $isPaid = false;
+            DB::beginTransaction();
+            
+            if (in_array($transactionStatus, ['success', 'settlement', 'paid'])) {
                 if ($paymentType === 'dp') {
                     $order->payment_status = 'partial';
                     $order->deposit_amount = $grossAmount;
-                    if ($order->status === 'unpaid' || $order->status === 'pending') {
-                        $order->status = 'paid';
+                    if (in_array($order->status, ['unpaid', 'pending'])) {
+                        $order->status = 'production';
                         $isPaid = true;
                     }
-                } elseif ($paymentType === 'full' || $paymentType === 'rest') {
+                } elseif ($paymentType === 'rest') {
                     $order->payment_status = 'paid';
                     $order->deposit_amount = $order->total_amount;
-                    if ($order->status === 'unpaid' || $order->status === 'pending') {
+                } else {
+                    $order->payment_status = 'paid';
+                    $order->deposit_amount = $order->total_amount;
+                    if (in_array($order->status, ['unpaid', 'pending'])) {
                         $order->status = 'paid';
                         $isPaid = true;
                     }
@@ -144,11 +131,6 @@ class PaymentController extends Controller
                 if ($isPaid && $order->user) {
                     $order->user->notify(new \App\Notifications\PaymentSuccessNotification($order));
                 }
-            } elseif ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
-                // If expire on a pending order, we might just let it be, 
-                // but if they retry they get a new token anyway.
-            } else if ($transactionStatus == 'pending') {
-                // Keep pending, waiting for user to pay
             }
 
             $order->save();
@@ -157,70 +139,67 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Callback processed']);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Callback DB Error: ' . $e->getMessage());
+            Log::error('Paywuz Callback Error: ' . $e->getMessage());
             return response()->json(['message' => 'Server Error'], 500);
         }
     }
 
     /**
-     * Manual Sync Status (for missing webhooks or local development)
+     * Manual Sync Status
      */
     public function syncStatus(Order $order)
     {
-        $this->initMidtrans();
+        $transactionId = $order->payment_gateway_id;
 
-        $midtransOrderId = $order->midtrans_order_id;
-
-        if (!$midtransOrderId) {
-            return back()->with('error', 'ID Transaksi Midtrans tidak ditemukan untuk pesanan ini.');
+        if (!$transactionId) {
+            return back()->with('error', 'ID Transaksi pembayaran tidak ditemukan untuk pesanan ini.');
         }
 
         try {
-            $status = \Midtrans\Transaction::status($midtransOrderId);
-            Log::info('Midtrans Sync Status Response', (array) $status);
+            $statusResponse = $this->paywuzService->getTransactionStatus($transactionId);
+            Log::info('Paywuz Sync Response', (array) $statusResponse);
             
-            $transactionStatus = $status->transaction_status;
-            $paymentType = isset($status->custom_field1) ? $status->custom_field1 : null;
-            $grossAmount = $status->gross_amount;
+            $status = $statusResponse['data']['status'] ?? 'pending';
 
-            Log::info("Manual Sync Debug: Order ID: {$order->id}, Midtrans ID: {$midtransOrderId}, Status: {$transactionStatus}, Type: {$paymentType}");
-
-            DB::beginTransaction();
-            
-            if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
-                $isPaid = false;
+            if (in_array($status, ['success', 'settlement', 'paid'])) {
+                DB::beginTransaction();
+                
+                // Parse paymentType dari transactionId: ORD-YYYYMMDD-HEXID-dp-TIMESTAMP
+                $parts = explode('-', $transactionId);
+                $paymentType = count($parts) >= 4 ? $parts[3] : 'full';
+                
                 if ($paymentType === 'dp') {
                     $order->payment_status = 'partial';
-                    $order->deposit_amount = $grossAmount;
-                    // Initial status after payment should be 'paid' (Antrean Masuk)
-                    if ($order->status === 'unpaid' || $order->status === 'pending') {
-                        $order->status = 'paid';
-                        $isPaid = true;
+                    $order->deposit_amount = $order->total_amount / 2;
+                    if (in_array($order->status, ['unpaid', 'pending'])) {
+                        $order->status = 'production';
+                        if ($order->user) {
+                            $order->user->notify(new \App\Notifications\PaymentSuccessNotification($order));
+                        }
                     }
-                } elseif ($paymentType === 'full' || $paymentType === 'rest') {
+                } elseif ($paymentType === 'rest') {
                     $order->payment_status = 'paid';
                     $order->deposit_amount = $order->total_amount;
-                    
-                    // Set to 'paid' if it was unpaid or pending
-                    if ($order->status === 'unpaid' || $order->status === 'pending') {
+                    // Status order biasanya tetap dikirim (shipped) atau selesai
+                } else {
+                    $order->payment_status = 'paid';
+                    $order->deposit_amount = $order->total_amount;
+                    if (in_array($order->status, ['unpaid', 'pending'])) {
                         $order->status = 'paid';
-                        $isPaid = true;
+                        if ($order->user) {
+                            $order->user->notify(new \App\Notifications\PaymentSuccessNotification($order));
+                        }
                     }
-                }
-                
-                if ($isPaid && $order->user) {
-                    $order->user->notify(new \App\Notifications\PaymentSuccessNotification($order));
                 }
                 
                 $order->save();
                 DB::commit();
-                Log::info("Order {$order->order_number} successfully synced to PAID/PARTIAL");
-                return back()->with('success', 'Status pembayaran berhasil diperbarui: ' . strtoupper($transactionStatus));
-            } else {
-                DB::rollBack();
-                Log::info("Order {$order->order_number} sync skipped. Midtrans Status: {$transactionStatus}");
-                return back()->with('info', 'Status pembayaran di Midtrans saat ini: ' . strtoupper($transactionStatus) . '. Silakan selesaikan pembayaran di simulator.');
+                
+                $statusMessage = $order->payment_status === 'partial' ? 'DP' : 'LUNAS';
+                return back()->with('success', "Status pembayaran berhasil diperbarui: $statusMessage");
             }
+
+            return back()->with('info', 'Status pembayaran saat ini: ' . strtoupper($status));
 
         } catch (\Exception $e) {
             Log::error('Manual Sync Error: ' . $e->getMessage());

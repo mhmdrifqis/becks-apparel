@@ -37,7 +37,7 @@ class OrderCreatedNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $url = url('/customer/orders/' . $this->order->id);
+        $url = url('/pesanan/' . $this->order->order_number);
 
         return (new MailMessage)
                     ->subject('Pesanan Berhasil Dibuat #' . $this->order->order_number)
@@ -61,7 +61,7 @@ class OrderCreatedNotification extends Notification implements ShouldQueue
             'order_number' => $this->order->order_number,
             'title' => 'Pesanan Dibuat',
             'message' => 'Pesanan #' . $this->order->order_number . ' berhasil dibuat. Segera lakukan pembayaran.',
-            'url' => '/customer/orders/' . $this->order->id,
+            'url' => '/pesanan/' . $this->order->order_number,
         ];
     }
 }

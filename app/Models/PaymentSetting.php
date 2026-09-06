@@ -10,13 +10,15 @@ class PaymentSetting extends Model
     use HasFactory;
 
     protected $fillable = [
-        'midtrans_server_key',
-        'midtrans_client_key',
-        'is_production',
+        'is_active',
+        'environment',
+        'sandbox_api_key',
+        'production_api_key',
     ];
 
     protected $casts = [
-        'midtrans_server_key' => 'encrypted',
-        'is_production' => 'boolean',
+        'is_active' => 'boolean',
+        'sandbox_api_key' => 'encrypted',
+        'production_api_key' => 'encrypted',
     ];
 }
