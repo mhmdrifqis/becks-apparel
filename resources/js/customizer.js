@@ -3136,7 +3136,52 @@ export default () => ({
                 }),
             });
 
-            const result = await response.json();
+            // Check if response redirected to login or is unauthenticated
+            if (
+                response.status === 401 ||
+                response.redirected ||
+                response.url.includes("/login")
+            ) {
+                this.isAuthenticated = false;
+                const authInput = document.getElementById("is-authenticated");
+                if (authInput) authInput.value = "0";
+                localStorage.setItem(
+                    "becks_pending_design",
+                    JSON.stringify({
+                        name: this.designName,
+                        design_json: exportState,
+                        preview_image: finalPreviewDataUrl,
+                    }),
+                );
+                this.isLoading = false;
+                this.showRequireLoginModal = true;
+                return;
+            }
+
+            let result = {};
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                result = await response.json();
+            } else {
+                const responseText = await response.text();
+                if (responseText.includes("login") || responseText.includes("Masuk")) {
+                    this.isAuthenticated = false;
+                    const authInput = document.getElementById("is-authenticated");
+                    if (authInput) authInput.value = "0";
+                    localStorage.setItem(
+                        "becks_pending_design",
+                        JSON.stringify({
+                            name: this.designName,
+                            design_json: exportState,
+                            preview_image: finalPreviewDataUrl,
+                        }),
+                    );
+                    this.isLoading = false;
+                    this.showRequireLoginModal = true;
+                    return;
+                }
+                throw new Error("Respon server bukan format JSON valid.");
+            }
 
             if (
                 response.status === 401 ||
@@ -3183,7 +3228,11 @@ export default () => ({
             }
         } catch (error) {
             console.error("Error saving design:", error);
-            alert("Terjadi kesalahan saat menyimpan desain.");
+            if (!this.isAuthenticated) {
+                this.showRequireLoginModal = true;
+            } else {
+                alert("Terjadi kesalahan saat menyimpan desain: " + (error.message || ""));
+            }
             this.isLoading = false;
         }
     },
