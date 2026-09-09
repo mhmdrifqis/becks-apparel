@@ -4,9 +4,9 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\Order;
+use App\Channels\WhatsAppChannel;
 
 class PaymentSuccessNotification extends Notification implements ShouldQueue
 {
@@ -29,23 +29,24 @@ class PaymentSuccessNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return ['database', WhatsAppChannel::class];
     }
 
     /**
-     * Get the mail representation of the notification.
+     * Get the WhatsApp representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toWhatsApp(object $notifiable): string
     {
         $url = url('/pesanan/' . $this->order->order_number);
+        $recipientName = $this->order->recipient_name ?? $notifiable->name ?? 'Pelanggan';
+        $orderNo = "*#{$this->order->order_number}*";
 
-        return (new MailMessage)
-                    ->subject('Pembayaran Berhasil Diterima #' . $this->order->order_number)
-                    ->greeting('Halo ' . $this->order->recipient_name . ',')
-                    ->line('Kami telah menerima pembayaran untuk pesanan Anda #' . $this->order->order_number . '.')
-                    ->line('Pesanan Anda akan segera diproses ke tahap produksi.')
-                    ->action('Pantau Pesanan Anda', $url)
-                    ->line('Terima kasih atas kepercayaannya!');
+        return "Halo Kak *{$recipientName}*! 🎉\n\n"
+            . "Kami telah menerima pembayaran untuk pesanan Anda {$orderNo}.\n\n"
+            . "Pesanan Anda kini resmi masuk dalam antrean produksi tim Becks Apparel! 🧵✨\n\n"
+            . "Pantau progres pesanan Anda kapan saja di sini:\n"
+            . "🔗 {$url}\n\n"
+            . "Terima kasih atas kepercayaannya!";
     }
 
     /**

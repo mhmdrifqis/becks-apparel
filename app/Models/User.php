@@ -88,4 +88,14 @@ class User extends Authenticatable implements FilamentUser
         return $this->orders()->whereNotIn('status', ['cancelled', 'completed'])->count();
     }
 
+    /**
+     * Route notifications for the WhatsApp channel.
+     *
+     * @param  \Illuminate\Notifications\Notification|null  $notification
+     * @return string|null
+     */
+    public function routeNotificationForWhatsapp($notification = null)
+    {
+        return \App\Helpers\PhoneHelper::normalize($this->phone);
+    }
 }

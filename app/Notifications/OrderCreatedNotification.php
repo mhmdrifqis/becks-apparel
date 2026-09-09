@@ -4,9 +4,9 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\Order;
+use App\Channels\WhatsAppChannel;
 
 class OrderCreatedNotification extends Notification implements ShouldQueue
 {
@@ -29,24 +29,25 @@ class OrderCreatedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return ['database', WhatsAppChannel::class];
     }
 
     /**
-     * Get the mail representation of the notification.
+     * Get the WhatsApp representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toWhatsApp(object $notifiable): string
     {
         $url = url('/pesanan/' . $this->order->order_number);
+        $recipientName = $this->order->recipient_name ?? $notifiable->name ?? 'Pelanggan';
+        $totalAmount = 'Rp ' . number_format($this->order->total_amount, 0, ',', '.');
 
-        return (new MailMessage)
-                    ->subject('Pesanan Berhasil Dibuat #' . $this->order->order_number)
-                    ->greeting('Halo ' . $this->order->recipient_name . ',')
-                    ->line('Terima kasih telah berbelanja di Becks Apparel!')
-                    ->line('Pesanan Anda dengan nomor ' . $this->order->order_number . ' telah berhasil dibuat dan menunggu pembayaran.')
-                    ->line('Total Tagihan: Rp ' . number_format($this->order->total_amount, 0, ',', '.'))
-                    ->action('Bayar Sekarang / Lihat Pesanan', $url)
-                    ->line('Harap segera melakukan pembayaran agar pesanan dapat segera diproses.');
+        return "Halo Kak *{$recipientName}*! 👋\n\n"
+            . "Terima kasih telah berbelanja di *Becks Apparel*! 👕✨\n\n"
+            . "Pesanan Anda dengan nomor *#{$this->order->order_number}* telah berhasil dibuat dan menunggu pembayaran.\n\n"
+            . "💰 *Total Tagihan:* {$totalAmount}\n\n"
+            . "Silakan lakukan pembayaran dan cek rincian pesanan Anda melalui link berikut:\n"
+            . "🔗 {$url}\n\n"
+            . "Harap segera melakukan pembayaran agar pesanan dapat segera diproses ke tahap produksi. Terima kasih!";
     }
 
     /**

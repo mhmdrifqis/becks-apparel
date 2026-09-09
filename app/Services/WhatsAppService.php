@@ -24,6 +24,13 @@ class WhatsAppService
      */
     public function sendMessage(string $recipient, string $message): array
     {
+        $recipient = \App\Helpers\PhoneHelper::normalize($recipient);
+
+        if (empty($recipient)) {
+            Log::warning('Fonnte WhatsApp: Nomor penerima kosong atau tidak valid.');
+            return ['status' => false, 'reason' => 'Empty recipient phone number'];
+        }
+
         if (empty($this->token)) {
             Log::warning('Fonnte Token tidak ditemukan. Pesan WA tidak terkirim.');
             return ['status' => false, 'reason' => 'No Token'];
@@ -42,15 +49,15 @@ class WhatsAppService
             $result = $response->json();
             
             if (!$response->successful() || (isset($result['status']) && $result['status'] === false)) {
-                Log::error('Fonnte API Warning/Error: ' . json_encode($result));
+                Log::error("Fonnte API Warning/Error for target ({$recipient}): " . json_encode($result));
             } else {
-                Log::info('Fonnte API Success: ' . json_encode($result));
+                Log::info("Fonnte API Success for target ({$recipient}): " . json_encode($result));
             }
 
             return is_array($result) ? $result : ['status' => false, 'reason' => 'Invalid Response'];
 
         } catch (\Exception $e) {
-            Log::error('WhatsApp Service Exception: ' . $e->getMessage());
+            Log::error("WhatsApp Service Exception for target ({$recipient}): " . $e->getMessage());
             return ['status' => false, 'reason' => $e->getMessage()];
         }
     }
