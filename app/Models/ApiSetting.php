@@ -54,8 +54,38 @@ class ApiSetting extends Model
         'gemini_is_active' => 'boolean',
         'google_is_active' => 'boolean',
         'chatbot_timeout' => 'integer',
-        'google_client_secret' => 'encrypted',
     ];
+
+    /**
+     * Accessor for google_client_secret with safe decryption fallback
+     */
+    public function getGoogleClientSecretAttribute($value)
+    {
+        if (empty($value)) {
+            return $value;
+        }
+        try {
+            return \Illuminate\Support\Facades\Crypt::decryptString($value);
+        } catch (\Exception $e) {
+            return $value;
+        }
+    }
+
+    /**
+     * Mutator for google_client_secret with safe encryption
+     */
+    public function setGoogleClientSecretAttribute($value)
+    {
+        if (!empty($value)) {
+            try {
+                $this->attributes['google_client_secret'] = \Illuminate\Support\Facades\Crypt::encryptString($value);
+            } catch (\Exception $e) {
+                $this->attributes['google_client_secret'] = $value;
+            }
+        } else {
+            $this->attributes['google_client_secret'] = null;
+        }
+    }
 
     /**
      * Singleton instance helper
