@@ -29,7 +29,31 @@
                 <a href="{{ route('catalog.index') }}" class="inline-flex px-8 py-4 bg-brand-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-brand-900/20 active:scale-95 transition-all">Lihat Katalog</a>
             </div>
         @else
-            <div x-data="{ currentTab: 'semua', searchQuery: '' }">
+            <div x-data="{ 
+                currentTab: 'semua', 
+                searchQuery: '',
+                showTrackingModal: false,
+                trackingLoading: false,
+                trackingData: null,
+                async fetchTracking(orderId) {
+                    this.showTrackingModal = true;
+                    this.trackingLoading = true;
+                    this.trackingData = null;
+                    try {
+                        let res = await fetch('/shipping/track/' + orderId);
+                        let data = await res.json();
+                        if (data.success) {
+                            this.trackingData = data;
+                        } else {
+                            Swal.fire('Info', data.message || 'Gagal mengambil data resi.', 'info');
+                        }
+                    } catch(e) {
+                        Swal.fire('Error', 'Gagal memuat status lacak pengiriman.', 'error');
+                    } finally {
+                        this.trackingLoading = false;
+                    }
+                }
+            }">
                 <!-- Shopee Style Status Tabs -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8 overflow-hidden">
                     <div class="flex overflow-x-auto no-scrollbar">
@@ -45,8 +69,8 @@
                         @endphp
                         @foreach($tabs as $key => $label)
                             <button @click="currentTab = '{{ $key }}'" 
-                                    class="flex-1 min-w-[100px] py-4 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 relative"
-                                    :class="currentTab === '{{ $key }}' ? 'text-brand-900 border-brand-900 bg-brand-50/30' : 'text-slate-400 border-transparent hover:text-slate-600'">
+                                     class="flex-1 min-w-[100px] py-4 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 relative"
+                                     :class="currentTab === '{{ $key }}' ? 'text-brand-900 border-brand-900 bg-brand-50/30' : 'text-slate-400 border-transparent hover:text-slate-600'">
                                 {{ $label }}
                                 @php
                                     $count = 0;
@@ -144,6 +168,12 @@
                                     </div>
                                 </div>
                                 <div class="mt-6 flex flex-wrap justify-end gap-3">
+                                    @if($order->tracking_number)
+                                        <button @click="fetchTracking({{ $order->id }})" class="px-6 py-3 bg-brand-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-800 transition-all shadow-md flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                            Lacak Resi
+                                        </button>
+                                    @endif
                                     @if($order->payment_status === 'unpaid' && $order->status !== 'cancelled')
                                         <a href="{{ route('customer.orders.show', $order->order_number) }}" class="px-8 py-3 bg-brand-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-800 transition-all shadow-xl shadow-brand-900/20 active:scale-95 text-center">Bayar Sekarang</a>
                                     @endif
@@ -155,6 +185,99 @@
                             </div>
                         </div>
                     @endforeach
+                </div>
+
+                <!-- Dynamic Webview Tracking Modal -->
+                <div x-show="showTrackingModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak style="display: none;">
+                    <div class="bg-white rounded-3xl w-full max-w-xl max-h-[85vh] overflow-hidden shadow-2xl flex flex-col" @click.away="showTrackingModal = false">
+                        <!-- Modal Header -->
+                        <div class="p-6 md:p-8 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-brand-900 to-slate-900 text-white">
+                            <div>
+                                <span class="px-2.5 py-1 bg-white/20 text-white text-[9px] font-black uppercase tracking-widest rounded-md backdrop-blur-md">Biteship Tracking Engine</span>
+                                <h2 class="text-lg md:text-xl font-black uppercase tracking-tight mt-2 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    Lacak Resi Real-Time
+                                </h2>
+                            </div>
+                            <button @click="showTrackingModal = false" class="p-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-white transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- Modal Content Body -->
+                        <div class="flex-1 overflow-y-auto p-6 md:p-8">
+                            <!-- Loading State -->
+                            <template x-if="trackingLoading">
+                                <div class="py-12 text-center">
+                                    <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-brand-900 border-t-transparent mb-4"></div>
+                                    <p class="text-xs font-black text-slate-700 uppercase tracking-widest">Menghubungkan ke API Biteship...</p>
+                                    <p class="text-[10px] text-slate-400 font-bold mt-1">Mengambil histori perjalanan resi pengiriman Anda</p>
+                                </div>
+                            </template>
+
+                            <!-- Data State -->
+                            <template x-if="!trackingLoading && trackingData">
+                                <div class="space-y-6">
+                                    <!-- Summary Bar -->
+                                    <div class="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex flex-wrap items-center justify-between gap-4">
+                                        <div>
+                                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Ekspedisi / Kurir</p>
+                                            <p class="text-sm font-black text-slate-900 uppercase" x-text="trackingData.courier"></p>
+                                            <p class="text-xs font-bold text-brand-900 tracking-wider mt-0.5" x-text="'No. Resi: ' + trackingData.tracking_number"></p>
+                                        </div>
+                                        <div>
+                                            <span class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border"
+                                                  :class="{
+                                                      'bg-green-50 text-green-700 border-green-200': trackingData.status === 'DELIVERED' || trackingData.status === 'SELESAI',
+                                                      'bg-blue-50 text-blue-700 border-blue-200': trackingData.status === 'IN_TRANSIT' || trackingData.status === 'ON_DELIVERY',
+                                                      'bg-amber-50 text-amber-700 border-amber-200': trackingData.status === 'PENDING' || trackingData.status === 'PICKUP'
+                                                  }"
+                                                  x-text="trackingData.status">
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Timeline -->
+                                    <div>
+                                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Histori Perjalanan Paket</h4>
+                                        <ol class="relative border-s-2 border-slate-200 ms-3 space-y-6">
+                                            <template x-for="(item, index) in trackingData.history" :key="index">
+                                                <li class="ms-6">
+                                                    <span class="absolute flex items-center justify-center w-6 h-6 rounded-full -start-3 ring-4 ring-white"
+                                                          :class="index === 0 ? 'bg-brand-900 text-white' : 'bg-slate-200 text-slate-500'">
+                                                        <template x-if="index === 0">
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                        </template>
+                                                        <template x-if="index !== 0">
+                                                            <div class="w-1.5 h-1.5 bg-slate-400 rounded-full"></div>
+                                                        </template>
+                                                    </span>
+                                                    <div class="bg-slate-50/70 border border-slate-100 rounded-xl p-3.5">
+                                                        <div class="flex items-center justify-between gap-2 mb-1">
+                                                            <time class="text-[9px] font-black text-brand-900 uppercase tracking-widest" x-text="item.date"></time>
+                                                            <span x-show="item.location" class="text-[8px] font-bold text-slate-400 uppercase" x-text="item.location"></span>
+                                                        </div>
+                                                        <p class="text-xs font-bold text-slate-800 leading-snug" x-text="item.note"></p>
+                                                    </div>
+                                                </li>
+                                            </template>
+                                        </ol>
+                                    </div>
+
+                                    <!-- External Fallback Links -->
+                                    <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[10px]">
+                                        <span class="text-slate-400 font-bold">Cek via tautan luar:</span>
+                                        <div class="flex gap-2">
+                                            <a :href="trackingData.parcelsapp_url" target="_blank" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black uppercase tracking-wider rounded-lg transition-colors inline-flex items-center gap-1">
+                                                ParcelsApp
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
                 </div>
             </div>
         @endif

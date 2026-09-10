@@ -290,4 +290,82 @@ class ShippingController extends Controller
             ], 500);
         }
     }
+
+    public function trackOrder(Request $request, \App\Models\Order $order)
+    {
+        $trackingNumber = trim($order->tracking_number);
+
+        if (empty($trackingNumber)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nomor resi pengiriman belum diinput oleh Admin.'
+            ], 400);
+        }
+
+        $courier = strtolower($order->shipping_service ?: 'jne');
+        if (str_contains($courier, 'jne')) $courier = 'jne';
+        elseif (str_contains($courier, 'sicepat')) $courier = 'sicepat';
+        elseif (str_contains($courier, 'jnt') || str_contains($courier, 'j&t')) $courier = 'jnt';
+        elseif (str_contains($courier, 'pos')) $courier = 'pos';
+        elseif (str_contains($courier, 'tiki')) $courier = 'tiki';
+        elseif (str_contains($courier, 'anteraja')) $courier = 'anteraja';
+        elseif (str_contains($courier, 'lion')) $courier = 'lion';
+        elseif (str_contains($courier, 'ninja')) $courier = 'ninja';
+        else $courier = 'jne';
+
+        $biteshipKey = config('services.biteship.api_key', env('BITESHIP_API_KEY'));
+
+        $history = [];
+        $courierName = strtoupper($courier);
+        $status = 'IN_TRANSIT';
+
+        if (!empty($biteshipKey)) {
+            try {
+                $biteshipRes = Http::withHeaders([
+                    'Authorization' => $biteshipKey,
+                    'Content-Type' => 'application/json',
+                ])->get("https://api.biteship.com/v1/trackings/{$trackingNumber}?courier={$courier}");
+
+                if ($biteshipRes->successful()) {
+                    $bData = $biteshipRes->json();
+
+                    if (!empty($bData['courier']['name'])) {
+                        $courierName = $bData['courier']['name'];
+                    }
+
+                    if (!empty($bData['status'])) {
+                        $status = strtoupper($bData['status']);
+                    }
+
+                    foreach ($bData['history'] ?? [] as $item) {
+                        $history[] = [
+                            'note' => $item['note'] ?? $item['description'] ?? 'Status terupdate',
+                            'date' => isset($item['updated_at']) ? date('d M Y, H:i', strtotime($item['updated_at'])) : date('d M Y, H:i'),
+                            'location' => $item['location'] ?? ''
+                        ];
+                    }
+                }
+            } catch (\Exception $e) {
+                // Safe fallback
+            }
+        }
+
+        if (empty($history)) {
+            $history[] = [
+                'note' => "Paket dalam pengiriman via " . $courierName . " dengan No. Resi " . $trackingNumber,
+                'date' => $order->updated_at ? $order->updated_at->format('d M Y, H:i') : date('d M Y, H:i'),
+                'location' => 'Transit Gudang'
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'tracking_number' => $trackingNumber,
+            'courier' => $courierName,
+            'status' => $status,
+            'history' => $history,
+            'biteship_url' => "https://biteship.com/id/tracking/" . $trackingNumber,
+            'parcelsapp_url' => "https://parcelsapp.com/id/tracking/" . $trackingNumber
+        ]);
+    }
 }
