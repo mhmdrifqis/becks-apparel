@@ -19,35 +19,35 @@ return new class extends Migration
                 // 1. Paywuz Gateway
                 $table->boolean('paywuz_is_active')->default(true);
                 $table->string('paywuz_environment')->default('sandbox');
-                $table->string('paywuz_sandbox_api_key')->nullable();
-                $table->string('paywuz_production_api_key')->nullable();
+                $table->text('paywuz_sandbox_api_key')->nullable();
+                $table->text('paywuz_production_api_key')->nullable();
 
                 // 2. RajaOngkir Shipping
                 $table->boolean('rajaongkir_is_active')->default(true);
                 $table->string('rajaongkir_account_type')->default('starter');
-                $table->string('rajaongkir_api_key')->nullable();
+                $table->text('rajaongkir_api_key')->nullable();
                 $table->string('rajaongkir_origin_city_id')->default('456');
 
                 // 3. Fonnte WhatsApp Gateway
                 $table->boolean('fonnte_is_active')->default(true);
-                $table->string('fonnte_token')->nullable();
+                $table->text('fonnte_token')->nullable();
                 $table->string('fonnte_country_code')->default('62');
 
                 // 4. FastAPI Chatbot Integration
                 $table->boolean('chatbot_is_active')->default(true);
-                $table->string('chatbot_url')->default('http://127.0.0.1:8000/chatbot');
+                $table->text('chatbot_url')->default('http://127.0.0.1:8000/chatbot');
                 $table->integer('chatbot_timeout')->default(10);
 
                 // 5. Google Gemini AI
                 $table->boolean('gemini_is_active')->default(true);
-                $table->string('gemini_api_key')->nullable();
+                $table->text('gemini_api_key')->nullable();
                 $table->string('gemini_model')->default('gemini-1.5-flash');
 
                 // 6. Google OAuth Socialite
                 $table->boolean('google_is_active')->default(true);
-                $table->string('google_client_id')->nullable();
+                $table->text('google_client_id')->nullable();
                 $table->text('google_client_secret')->nullable();
-                $table->string('google_redirect_uri')->default('https://becksapparel.com/auth/google/callback');
+                $table->text('google_redirect_uri')->default('https://becksapparel.com/auth/google/callback');
 
                 $table->timestamps();
             });

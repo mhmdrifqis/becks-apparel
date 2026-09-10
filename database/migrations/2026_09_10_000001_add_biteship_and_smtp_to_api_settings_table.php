@@ -17,7 +17,7 @@ return new class extends Migration
                 $table->boolean('biteship_is_active')->default(false);
             }
             if (!Schema::hasColumn('api_settings', 'biteship_api_key')) {
-                $table->string('biteship_api_key')->nullable();
+                $table->text('biteship_api_key')->nullable();
             }
             if (!Schema::hasColumn('api_settings', 'biteship_origin_postal_code')) {
                 $table->string('biteship_origin_postal_code')->nullable();
