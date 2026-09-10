@@ -145,32 +145,75 @@ class ApiSetting extends Model
     public function setSmtpPasswordAttribute($v) { $this->attributes['smtp_password'] = $this->encryptSecret($v); }
 
     /**
-     * Singleton instance helper
+     * Singleton instance helper with automatic env/config hydration
      */
     public static function instance(): self
     {
         try {
-            $setting = static::first();
-            if ($setting) {
-                return $setting;
+            $setting = static::orderBy('id', 'desc')->first();
+            if (!$setting) {
+                $setting = new static();
             }
 
-            return static::create([
-                'paywuz_is_active' => true,
-                'paywuz_environment' => 'sandbox',
-                'rajaongkir_is_active' => true,
-                'rajaongkir_account_type' => 'starter',
-                'rajaongkir_origin_city_id' => '456',
-                'fonnte_is_active' => true,
-                'fonnte_country_code' => '62',
-                'chatbot_is_active' => true,
-                'chatbot_url' => 'http://127.0.0.1:8000/chatbot',
-                'chatbot_timeout' => 10,
-                'gemini_is_active' => true,
-                'gemini_model' => 'gemini-1.5-flash',
-                'google_is_active' => true,
-                'google_redirect_uri' => 'https://becksapparel.com/auth/google/callback',
-            ]);
+            $dirty = false;
+
+            // Hydrate empty fields from env/config so nothing is lost
+            if (empty($setting->paywuz_sandbox_api_key) && env('PAYWUZ_API_KEY')) {
+                $setting->paywuz_sandbox_api_key = env('PAYWUZ_API_KEY');
+                $dirty = true;
+            }
+            if (empty($setting->paywuz_production_api_key) && env('PAYWUZ_API_KEY')) {
+                $setting->paywuz_production_api_key = env('PAYWUZ_API_KEY');
+                $dirty = true;
+            }
+            if (empty($setting->rajaongkir_api_key) && env('RAJAONGKIR_API_KEY')) {
+                $setting->rajaongkir_api_key = env('RAJAONGKIR_API_KEY');
+                $dirty = true;
+            }
+            if (empty($setting->rajaongkir_origin_city_id) && env('RAJAONGKIR_ORIGIN_CITY_ID')) {
+                $setting->rajaongkir_origin_city_id = env('RAJAONGKIR_ORIGIN_CITY_ID', '456');
+                $dirty = true;
+            }
+            if (empty($setting->fonnte_token) && env('FONNTE_TOKEN')) {
+                $setting->fonnte_token = env('FONNTE_TOKEN');
+                $dirty = true;
+            }
+            if (empty($setting->chatbot_url) && env('FASTAPI_CHATBOT_URL')) {
+                $setting->chatbot_url = env('FASTAPI_CHATBOT_URL', 'http://127.0.0.1:8000/chatbot');
+                $dirty = true;
+            }
+            if (empty($setting->gemini_api_key) && env('GEMINI_API_KEY')) {
+                $setting->gemini_api_key = env('GEMINI_API_KEY');
+                $dirty = true;
+            }
+            if (empty($setting->google_client_id) && env('GOOGLE_CLIENT_ID')) {
+                $setting->google_client_id = env('GOOGLE_CLIENT_ID');
+                $dirty = true;
+            }
+            if (empty($setting->google_client_secret) && env('GOOGLE_CLIENT_SECRET')) {
+                $setting->google_client_secret = env('GOOGLE_CLIENT_SECRET');
+                $dirty = true;
+            }
+
+            if (!$setting->exists) {
+                $setting->paywuz_is_active = true;
+                $setting->paywuz_environment = 'sandbox';
+                $setting->rajaongkir_is_active = true;
+                $setting->rajaongkir_account_type = 'starter';
+                $setting->fonnte_is_active = true;
+                $setting->fonnte_country_code = '62';
+                $setting->chatbot_is_active = true;
+                $setting->chatbot_timeout = 10;
+                $setting->gemini_is_active = true;
+                $setting->gemini_model = 'gemini-1.5-flash';
+                $setting->google_is_active = true;
+                $setting->google_redirect_uri = 'https://becksapparel.com/auth/google/callback';
+                $setting->save();
+            } elseif ($dirty) {
+                $setting->save();
+            }
+
+            return $setting;
         } catch (\Exception $e) {
             return new static();
         }

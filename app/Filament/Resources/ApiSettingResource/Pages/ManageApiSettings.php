@@ -30,6 +30,30 @@ class ManageApiSettings extends EditRecord
         return static::getResource()::getUrl('index');
     }
 
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $existing = ApiSetting::instance();
+
+        $secretKeys = [
+            'paywuz_sandbox_api_key',
+            'paywuz_production_api_key',
+            'rajaongkir_api_key',
+            'fonnte_token',
+            'gemini_api_key',
+            'google_client_secret',
+            'biteship_api_key',
+            'smtp_password',
+        ];
+
+        foreach ($secretKeys as $key) {
+            if (empty($data[$key]) && !empty($existing->{$key})) {
+                $data[$key] = $existing->{$key};
+            }
+        }
+
+        return $data;
+    }
+
     protected function afterSave(): void
     {
         try {
