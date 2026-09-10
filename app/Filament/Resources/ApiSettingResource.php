@@ -268,7 +268,16 @@ class ApiSettingResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->after(function () {
+                    ->after(function (ApiSetting $record) {
+                        try {
+                            \App\Models\PaymentSetting::updateOrCreate([], [
+                                'is_active' => $record->paywuz_is_active,
+                                'environment' => $record->paywuz_environment,
+                                'sandbox_api_key' => $record->paywuz_sandbox_api_key,
+                                'production_api_key' => $record->paywuz_production_api_key,
+                            ]);
+                        } catch (\Exception $e) {}
+
                         \App\Helpers\ApiSettingHelper::loadIntoConfig();
                     }),
             ]);
