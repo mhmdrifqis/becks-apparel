@@ -72,10 +72,21 @@ class ApiSetting extends Model
         'smtp_port' => 'integer',
     ];
 
+    protected $hidden = [
+        'paywuz_sandbox_api_key',
+        'paywuz_production_api_key',
+        'rajaongkir_api_key',
+        'fonnte_token',
+        'gemini_api_key',
+        'google_client_secret',
+        'biteship_api_key',
+        'smtp_password',
+    ];
+
     /**
-     * Accessor for google_client_secret with safe decryption fallback
+     * Helper to safely decrypt secret values
      */
-    public function getGoogleClientSecretAttribute($value)
+    protected function decryptSecret($value)
     {
         if (empty($value)) {
             return $value;
@@ -83,25 +94,55 @@ class ApiSetting extends Model
         try {
             return \Illuminate\Support\Facades\Crypt::decryptString($value);
         } catch (\Exception $e) {
-            return $value;
+            return $value; // Fallback to raw value if not encrypted yet
         }
     }
 
     /**
-     * Mutator for google_client_secret with safe encryption
+     * Helper to safely encrypt secret values
      */
-    public function setGoogleClientSecretAttribute($value)
+    protected function encryptSecret($value)
     {
-        if (!empty($value)) {
+        if (empty($value)) {
+            return null;
+        }
+        try {
+            // Only encrypt if it's not already encrypted
             try {
-                $this->attributes['google_client_secret'] = \Illuminate\Support\Facades\Crypt::encryptString($value);
+                \Illuminate\Support\Facades\Crypt::decryptString($value);
+                return $value; // Already encrypted
             } catch (\Exception $e) {
-                $this->attributes['google_client_secret'] = $value;
+                return \Illuminate\Support\Facades\Crypt::encryptString($value);
             }
-        } else {
-            $this->attributes['google_client_secret'] = null;
+        } catch (\Exception $e) {
+            return $value;
         }
     }
+
+    // Accessors & Mutators for all 8 sensitive credentials
+    public function getPaywuzSandboxApiKeyAttribute($v) { return $this->decryptSecret($v); }
+    public function setPaywuzSandboxApiKeyAttribute($v) { $this->attributes['paywuz_sandbox_api_key'] = $this->encryptSecret($v); }
+
+    public function getPaywuzProductionApiKeyAttribute($v) { return $this->decryptSecret($v); }
+    public function setPaywuzProductionApiKeyAttribute($v) { $this->attributes['paywuz_production_api_key'] = $this->encryptSecret($v); }
+
+    public function getRajaongkirApiKeyAttribute($v) { return $this->decryptSecret($v); }
+    public function setRajaongkirApiKeyAttribute($v) { $this->attributes['rajaongkir_api_key'] = $this->encryptSecret($v); }
+
+    public function getFonnteTokenAttribute($v) { return $this->decryptSecret($v); }
+    public function setFonnteTokenAttribute($v) { $this->attributes['fonnte_token'] = $this->encryptSecret($v); }
+
+    public function getGeminiApiKeyAttribute($v) { return $this->decryptSecret($v); }
+    public function setGeminiApiKeyAttribute($v) { $this->attributes['gemini_api_key'] = $this->encryptSecret($v); }
+
+    public function getGoogleClientSecretAttribute($v) { return $this->decryptSecret($v); }
+    public function setGoogleClientSecretAttribute($v) { $this->attributes['google_client_secret'] = $this->encryptSecret($v); }
+
+    public function getBiteshipApiKeyAttribute($v) { return $this->decryptSecret($v); }
+    public function setBiteshipApiKeyAttribute($v) { $this->attributes['biteship_api_key'] = $this->encryptSecret($v); }
+
+    public function getSmtpPasswordAttribute($v) { return $this->decryptSecret($v); }
+    public function setSmtpPasswordAttribute($v) { $this->attributes['smtp_password'] = $this->encryptSecret($v); }
 
     /**
      * Singleton instance helper

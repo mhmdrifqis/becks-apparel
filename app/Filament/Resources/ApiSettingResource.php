@@ -49,6 +49,7 @@ class ApiSettingResource extends Resource
                                     ->label('Sandbox API Key')
                                     ->password()
                                     ->revealable()
+                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
                                     ->placeholder('pk_sand_...')
                                     ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
 
@@ -56,6 +57,7 @@ class ApiSettingResource extends Resource
                                     ->label('Production API Key')
                                     ->password()
                                     ->revealable()
+                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
                                     ->placeholder('pk_live_...')
                                     ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
 
@@ -89,6 +91,7 @@ class ApiSettingResource extends Resource
                                     ->label('RajaOngkir API Key')
                                     ->password()
                                     ->revealable()
+                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
                                     ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
 
                                 Forms\Components\TextInput::make('rajaongkir_origin_city_id')
@@ -113,6 +116,7 @@ class ApiSettingResource extends Resource
                                     ->label('Fonnte Device Token')
                                     ->password()
                                     ->revealable()
+                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
                                     ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan Device Token'),
 
                                 Forms\Components\TextInput::make('fonnte_country_code')
@@ -160,6 +164,7 @@ class ApiSettingResource extends Resource
                                     ->label('Gemini API Key')
                                     ->password()
                                     ->revealable()
+                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
                                     ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
 
                                 Forms\Components\Select::make('gemini_model')
@@ -190,6 +195,7 @@ class ApiSettingResource extends Resource
                                     ->label('Google Client Secret')
                                     ->password()
                                     ->revealable()
+                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
                                     ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan Client Secret'),
 
                                 Forms\Components\TextInput::make('google_redirect_uri')
@@ -213,6 +219,7 @@ class ApiSettingResource extends Resource
                                     ->label('Biteship API Key')
                                     ->password()
                                     ->revealable()
+                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
                                     ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
 
                                 Forms\Components\TextInput::make('biteship_origin_postal_code')
@@ -251,6 +258,7 @@ class ApiSettingResource extends Resource
                                     ->label('SMTP Password')
                                     ->password()
                                     ->revealable()
+                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
                                     ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan Password'),
 
                                 Forms\Components\Select::make('smtp_encryption')
