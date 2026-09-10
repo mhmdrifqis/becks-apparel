@@ -148,53 +148,113 @@ class ShippingController extends Controller
         $request->validate([
             'destination' => 'required',
             'weight' => 'required|numeric|min:1',
-            'courier' => 'nullable|string'
+            'courier' => 'nullable|string',
+            'postal_code' => 'nullable|string'
         ]);
 
         $destination = $request->destination;
         $weight = max(1, (int) $request->weight);
         $origin = config('services.rajaongkir.origin_city_id', env('RAJAONGKIR_ORIGIN_CITY_ID', 456));
         $targetCourier = $request->input('courier');
+        $postalCode = $request->input('postal_code', '57123');
 
-        $cacheKey = "shipping_auto_{$origin}_{$destination}_{$weight}_" . ($targetCourier ?: 'all');
+        $cacheKey = "shipping_auto_{$origin}_{$destination}_{$weight}_" . ($targetCourier ?: 'all') . "_{$postalCode}";
 
         try {
-            $result = \Illuminate\Support\Facades\Cache::remember($cacheKey, 600, function () use ($origin, $destination, $weight, $targetCourier) {
-                $couriers = $targetCourier ? [$targetCourier] : ['jne', 'pos', 'tiki'];
+            $result = \Illuminate\Support\Facades\Cache::remember($cacheKey, 600, function () use ($origin, $destination, $weight, $targetCourier, $postalCode) {
                 $allOptions = [];
 
-                foreach ($couriers as $courierCode) {
+                // 1. Fetch from RajaOngkir if active and API key is present
+                $rajaOngkirActive = config('services.rajaongkir.is_active', true);
+                if ($rajaOngkirActive && !empty($this->apiKey)) {
+                    $couriers = $targetCourier ? [$targetCourier] : ['jne', 'pos', 'tiki'];
+
+                    foreach ($couriers as $courierCode) {
+                        try {
+                            $response = Http::asForm()->withHeaders([
+                                'key' => $this->apiKey
+                            ])->post("{$this->baseUrl}/calculate/domestic-cost", [
+                                'origin' => $origin,
+                                'destination' => $destination,
+                                'weight' => $weight,
+                                'courier' => $courierCode
+                            ]);
+
+                            $data = $response->json();
+                            if (!isset($data['meta']['code']) || $data['meta']['code'] === 200) {
+                                $rawCosts = $data['data'][0]['costs'] ?? $data['data'] ?? [];
+                                foreach ($rawCosts as $item) {
+                                    $val = $item['cost'][0]['value'] ?? $item['cost']['value'] ?? (is_numeric($item['cost']) ? $item['cost'] : 0);
+                                    $etd = $item['cost'][0]['etd'] ?? $item['cost']['etd'] ?? $item['etd'] ?? '';
+
+                                    if ($val > 0) {
+                                        $allOptions[] = [
+                                            'source' => 'RajaOngkir',
+                                            'courier' => $courierCode,
+                                            'courier_name' => strtoupper($courierCode),
+                                            'service' => $item['service'] ?? 'REG',
+                                            'description' => $item['description'] ?? '',
+                                            'cost' => (int) $val,
+                                            'etd' => $etd,
+                                        ];
+                                    }
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            // Safe fallback
+                        }
+                    }
+                }
+
+                // 2. Fetch from Biteship if active and API key is present
+                $biteshipKey = config('services.biteship.api_key', env('BITESHIP_API_KEY'));
+                $biteshipActive = config('services.biteship.is_active', false);
+
+                if (($biteshipActive || !empty($biteshipKey)) && !empty($biteshipKey)) {
                     try {
-                        $response = Http::asForm()->withHeaders([
-                            'key' => $this->apiKey
-                        ])->post("{$this->baseUrl}/calculate/domestic-cost", [
-                            'origin' => $origin,
-                            'destination' => $destination,
-                            'weight' => $weight,
-                            'courier' => $courierCode
+                        $originPostal = config('services.biteship.origin_postal_code', '57123');
+
+                        $biteshipRes = Http::withHeaders([
+                            'Authorization' => $biteshipKey,
+                            'Content-Type' => 'application/json',
+                        ])->post('https://api.biteship.com/v1/rates/couriers', [
+                            'origin_postal_code' => (int) $originPostal,
+                            'destination_postal_code' => (int) $postalCode,
+                            'couriers' => $targetCourier ?: 'jne,sicepat,jnt,anteraja,grab,gosend',
+                            'items' => [
+                                [
+                                    'name' => 'Jersey Apparel Order',
+                                    'value' => 150000,
+                                    'weight' => (int) $weight,
+                                    'quantity' => 1
+                                ]
+                            ]
                         ]);
 
-                        $data = $response->json();
-                        if (!isset($data['meta']['code']) || $data['meta']['code'] === 200) {
-                            $rawCosts = $data['data'][0]['costs'] ?? $data['data'] ?? [];
-                            foreach ($rawCosts as $item) {
-                                $val = $item['cost'][0]['value'] ?? $item['cost']['value'] ?? (is_numeric($item['cost']) ? $item['cost'] : 0);
-                                $etd = $item['cost'][0]['etd'] ?? $item['cost']['etd'] ?? $item['etd'] ?? '';
-                                
-                                if ($val > 0) {
+                        if ($biteshipRes->successful()) {
+                            $bData = $biteshipRes->json();
+                            foreach ($bData['pricing'] ?? [] as $price) {
+                                $cCode = strtolower($price['courier_code'] ?? 'biteship');
+                                $cName = strtoupper($price['courier_name'] ?? $cCode);
+                                $service = $price['courier_service_name'] ?? 'REG';
+                                $costVal = (int) ($price['price'] ?? 0);
+                                $etdStr = $price['duration'] ?? '';
+
+                                if ($costVal > 0) {
                                     $allOptions[] = [
-                                        'courier' => $courierCode,
-                                        'courier_name' => strtoupper($courierCode),
-                                        'service' => $item['service'] ?? 'REG',
-                                        'description' => $item['description'] ?? '',
-                                        'cost' => (int) $val,
-                                        'etd' => $etd,
+                                        'source' => 'Biteship',
+                                        'courier' => $cCode,
+                                        'courier_name' => $cName . ' (Biteship)',
+                                        'service' => $service,
+                                        'description' => $price['service_type'] ?? '',
+                                        'cost' => $costVal,
+                                        'etd' => $etdStr,
                                     ];
                                 }
                             }
                         }
                     } catch (\Exception $e) {
-                        continue;
+                        // Safe fallback
                     }
                 }
 
@@ -202,6 +262,7 @@ class ShippingController extends Controller
                     return null;
                 }
 
+                // Sort all combined options by cost (cheapest first)
                 usort($allOptions, fn($a, $b) => $a['cost'] <=> $b['cost']);
 
                 return [
@@ -213,7 +274,7 @@ class ShippingController extends Controller
             if (!$result) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Layanan pengiriman tidak tersedia untuk kota tujuan ini atau API mengalami gangguan.'
+                    'message' => 'Layanan pengiriman tidak tersedia untuk lokasi ini atau API mengalami gangguan.'
                 ], 400);
             }
 
