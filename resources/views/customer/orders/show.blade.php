@@ -428,9 +428,36 @@
                                              Status: {{ strtoupper($order->returnRequest->status) }}
                                          </span>
                                      </div>
-                                     <p class="text-[10px] text-slate-600 font-bold mb-1 line-clamp-2">Alasan: {{ $order->returnRequest->reason }}</p>
+                                     <p class="text-[10px] text-slate-600 font-bold mb-1">Alasan: {{ $order->returnRequest->reason }}</p>
+                                     
+                                     @if(is_array($order->returnRequest->proof_images) && count($order->returnRequest->proof_images) > 0)
+                                         <div class="mt-3 pt-3 border-t border-slate-200/50">
+                                             <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Bukti Upload:</p>
+                                             <div class="flex flex-wrap gap-2">
+                                                 @foreach($order->returnRequest->proof_images as $file)
+                                                     @php
+                                                         $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                                                         $url = Storage::disk('public')->url($file);
+                                                     @endphp
+                                                     @if(in_array($ext, ['mp4', 'mov', 'avi']))
+                                                         <a href="{{ $url }}" target="_blank" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-[9px] font-black text-slate-700 hover:text-brand-900 flex items-center gap-1.5 shadow-sm">
+                                                             <svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                             Video Bukti
+                                                         </a>
+                                                     @else
+                                                         <a href="{{ $url }}" target="_blank" class="w-12 h-12 bg-white rounded-lg border border-slate-200 overflow-hidden inline-block hover:border-brand-900 transition-all shadow-sm">
+                                                             <img src="{{ $url }}" class="w-full h-full object-cover">
+                                                         </a>
+                                                     @endif
+                                                 @endforeach
+                                             </div>
+                                         </div>
+                                     @endif
+
                                      @if($order->returnRequest->admin_note)
-                                         <p class="text-[9px] text-slate-500 italic mt-2 line-clamp-2">Admin: {{ $order->returnRequest->admin_note }}</p>
+                                         <div class="mt-3 p-2.5 bg-white/70 rounded-lg border border-slate-200/60">
+                                             <p class="text-[9px] text-slate-700 font-bold italic"><span class="font-black not-italic uppercase text-slate-900">Catatan Admin:</span> {{ $order->returnRequest->admin_note }}</p>
+                                         </div>
                                      @endif
                                  </div>
                              @else

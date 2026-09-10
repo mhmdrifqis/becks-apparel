@@ -52,10 +52,13 @@ class ReturnRequestResource extends Resource
                             ->columnSpanFull(),
 
                         Forms\Components\FileUpload::make('proof_images')
-                            ->label('Bukti Foto')
+                            ->label('Bukti Foto / Video')
                             ->multiple()
-                            ->image()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'video/mp4', 'video/quicktime', 'video/x-msvideo'])
+                            ->disk('public')
                             ->directory('returns')
+                            ->openable()
+                            ->downloadable()
                             ->columnSpanFull(),
                     ])->columns(2),
 
@@ -91,6 +94,10 @@ class ReturnRequestResource extends Resource
                     ->label('Pelanggan')
                     ->searchable(),
 
+                Tables\Columns\TextColumn::make('proof_images')
+                    ->label('Lampiran Bukti')
+                    ->formatStateUsing(fn ($state) => is_array($state) && count($state) > 0 ? count($state) . ' File' : 'Tanpa File'),
+
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Status')
                     ->colors([
@@ -109,7 +116,7 @@ class ReturnRequestResource extends Resource
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tgl Diajukan')
-                    ->dateTime('d M Y')
+                    ->dateTime('d M Y, H:i')
                     ->sortable(),
             ])
             ->filters([
