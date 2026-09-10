@@ -24,218 +24,245 @@ class ApiSettingResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Tabs::make('API Settings')
-                    ->tabs([
-                        // Tab 1: Paywuz Gateway
-                        Forms\Components\Tabs\Tab::make('Paywuz Gateway')
+                Forms\Components\Grid::make(2)
+                    ->schema([
+                        // Card 1: Paywuz Gateway
+                        Forms\Components\Section::make('API 1: 💳 Paywuz Payment Gateway')
+                            ->description('Integrasi Payment Gateway Paywuz untuk checkout transaksi.')
                             ->icon('heroicon-o-credit-card')
+                            ->collapsible()
+                            ->columnSpan(1)
                             ->schema([
-                                Forms\Components\Section::make('Webhook URL Callback Paywuz')
-                                    ->description('Pasang URL ini sebagai Webhook URL di dashboard Paywuz.')
-                                    ->icon('heroicon-o-link')
-                                    ->schema([
-                                        Forms\Components\Placeholder::make('paywuz_webhook_url')
-                                            ->label('')
-                                            ->content(route('payment.callback'))
-                                            ->extraAttributes(['class' => 'bg-slate-50 p-3 rounded-lg font-mono text-sm border border-slate-200 select-all block w-full']),
-                                    ]),
+                                Forms\Components\Toggle::make('paywuz_is_active')
+                                    ->label('Aktifkan Paywuz Payment Gateway')
+                                    ->default(true),
 
-                                Forms\Components\Section::make('Konfigurasi Credential Paywuz')
-                                    ->schema([
-                                        Forms\Components\Toggle::make('paywuz_is_active')
-                                            ->label('Aktifkan Paywuz Payment Gateway')
-                                            ->helperText('Jika aktif, metode transaksi Paywuz akan tersedia saat checkout.')
-                                            ->default(true)
-                                            ->columnSpanFull(),
+                                Forms\Components\Select::make('paywuz_environment')
+                                    ->label('Environment Status')
+                                    ->options([
+                                        'sandbox' => 'Sandbox (Uji Coba)',
+                                        'production' => 'Production (Transaksi Live)',
+                                    ])
+                                    ->default('sandbox'),
 
-                                        Forms\Components\Select::make('paywuz_environment')
-                                            ->label('Environment Paywuz')
-                                            ->options([
-                                                'sandbox' => 'Sandbox (Uji Coba)',
-                                                'production' => 'Production (Live Transaksi Nyata)',
-                                            ])
-                                            ->default('sandbox')
-                                            ->columnSpanFull(),
+                                Forms\Components\TextInput::make('paywuz_sandbox_api_key')
+                                    ->label('Sandbox API Key')
+                                    ->password()
+                                    ->revealable()
+                                    ->placeholder('pk_sand_...')
+                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
 
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\TextInput::make('paywuz_sandbox_api_key')
-                                                    ->label('Sandbox API Key')
-                                                    ->password()
-                                                    ->revealable()
-                                                    ->helperText('API Key Sandbox berawalan pk_sand_...'),
+                                Forms\Components\TextInput::make('paywuz_production_api_key')
+                                    ->label('Production API Key')
+                                    ->password()
+                                    ->revealable()
+                                    ->placeholder('pk_live_...')
+                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
 
-                                                Forms\Components\TextInput::make('paywuz_production_api_key')
-                                                    ->label('Production API Key')
-                                                    ->password()
-                                                    ->revealable()
-                                                    ->helperText('API Key Production berawalan pk_live_...'),
-                                            ]),
-                                    ]),
+                                Forms\Components\Placeholder::make('paywuz_webhook_url')
+                                    ->label('Webhook URL Callback Paywuz')
+                                    ->content(route('payment.callback'))
+                                    ->extraAttributes(['class' => 'bg-slate-50 p-2.5 rounded-lg font-mono text-xs border border-slate-200 select-all block w-full']),
                             ]),
 
-                        // Tab 2: RajaOngkir
-                        Forms\Components\Tabs\Tab::make('RajaOngkir')
+                        // Card 2: RajaOngkir Shipping
+                        Forms\Components\Section::make('API 2: 🚚 RajaOngkir Shipping API')
+                            ->description('Kalkulator perhitungan ongkos kirim ekspedisi Indonesia.')
                             ->icon('heroicon-o-truck')
+                            ->collapsible()
+                            ->columnSpan(1)
                             ->schema([
-                                Forms\Components\Section::make('Konfigurasi Ongkos Kirim RajaOngkir')
-                                    ->description('Kelola API Key dan lokasi kota pengiriman toko/gudang.')
-                                    ->schema([
-                                        Forms\Components\Toggle::make('rajaongkir_is_active')
-                                            ->label('Aktifkan Kalkulator RajaOngkir')
-                                            ->default(true)
-                                            ->columnSpanFull(),
+                                Forms\Components\Toggle::make('rajaongkir_is_active')
+                                    ->label('Aktifkan Kalkulator RajaOngkir')
+                                    ->default(true),
 
-                                        Forms\Components\Select::make('rajaongkir_account_type')
-                                            ->label('Tipe Akun RajaOngkir')
-                                            ->options([
-                                                'starter' => 'Starter (Gratis)',
-                                                'basic' => 'Basic',
-                                                'pro' => 'Pro',
-                                            ])
-                                            ->default('starter')
-                                            ->columnSpanFull(),
+                                Forms\Components\Select::make('rajaongkir_account_type')
+                                    ->label('Tipe Akun RajaOngkir')
+                                    ->options([
+                                        'starter' => 'Starter (Gratis)',
+                                        'basic' => 'Basic',
+                                        'pro' => 'Pro',
+                                    ])
+                                    ->default('starter'),
 
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\TextInput::make('rajaongkir_api_key')
-                                                    ->label('RajaOngkir API Key')
-                                                    ->password()
-                                                    ->revealable()
-                                                    ->helperText('API Key dari dashboard rajaongkir.com'),
+                                Forms\Components\TextInput::make('rajaongkir_api_key')
+                                    ->label('RajaOngkir API Key')
+                                    ->password()
+                                    ->revealable()
+                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
 
-                                                Forms\Components\TextInput::make('rajaongkir_origin_city_id')
-                                                    ->label('ID Kota Asal Pengiriman (Origin City ID)')
-                                                    ->numeric()
-                                                    ->default('456')
-                                                    ->helperText('ID Kota asal toko/gudang (Contoh: 456 untuk Sukoharjo / Surakarta)'),
-                                            ]),
-                                    ]),
+                                Forms\Components\TextInput::make('rajaongkir_origin_city_id')
+                                    ->label('ID Kota Asal Toko/Gudang')
+                                    ->numeric()
+                                    ->default('456')
+                                    ->helperText('ID Kota asal pengiriman toko (Contoh: 456)'),
                             ]),
 
-                        // Tab 3: Fonnte WhatsApp
-                        Forms\Components\Tabs\Tab::make('Fonnte WhatsApp')
+                        // Card 3: Fonnte WhatsApp Gateway
+                        Forms\Components\Section::make('API 3: 💬 Fonnte WhatsApp Gateway')
+                            ->description('Pengiriman notifikasi status pesanan, produksi & WA OTP.')
                             ->icon('heroicon-o-chat-bubble-left-right')
+                            ->collapsible()
+                            ->columnSpan(1)
                             ->schema([
-                                Forms\Components\Section::make('Konfigurasi Gateway WhatsApp (Fonnte)')
-                                    ->description('Digunakan untuk notifikasi pesanan, update produksi, dan OTP WhatsApp.')
-                                    ->schema([
-                                        Forms\Components\Toggle::make('fonnte_is_active')
-                                            ->label('Aktifkan Gateway WhatsApp Fonnte')
-                                            ->default(true)
-                                            ->columnSpanFull(),
+                                Forms\Components\Toggle::make('fonnte_is_active')
+                                    ->label('Aktifkan Gateway WhatsApp Fonnte')
+                                    ->default(true),
 
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\TextInput::make('fonnte_token')
-                                                    ->label('Fonnte Device Token')
-                                                    ->password()
-                                                    ->revealable()
-                                                    ->helperText('Token device dari dashboard fonnte.com'),
+                                Forms\Components\TextInput::make('fonnte_token')
+                                    ->label('Fonnte Device Token')
+                                    ->password()
+                                    ->revealable()
+                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan Device Token'),
 
-                                                Forms\Components\TextInput::make('fonnte_country_code')
-                                                    ->label('Default Kode Negara')
-                                                    ->default('62')
-                                                    ->helperText('Kode negara tanpa tanda + (Contoh: 62)'),
-                                            ]),
-                                    ]),
+                                Forms\Components\TextInput::make('fonnte_country_code')
+                                    ->label('Default Kode Negara')
+                                    ->default('62')
+                                    ->helperText('Kode negara pengiriman tanpa tanda + (Contoh: 62)'),
                             ]),
 
-                        // Tab 4: FastAPI Chatbot
-                        Forms\Components\Tabs\Tab::make('FastAPI Chatbot')
+                        // Card 4: FastAPI Chatbot Integration
+                        Forms\Components\Section::make('API 4: 🤖 FastAPI NLP Chatbot')
+                            ->description('Integrasi service backend kecerdasan buatan NLP Chatbot.')
                             ->icon('heroicon-o-cpu-chip')
+                            ->collapsible()
+                            ->columnSpan(1)
                             ->schema([
-                                Forms\Components\Section::make('Konfigurasi Service NLP Chatbot')
-                                    ->description('Digunakan oleh sistem AI Chatbot di aplikasi web.')
-                                    ->schema([
-                                        Forms\Components\Toggle::make('chatbot_is_active')
-                                            ->label('Aktifkan Service FastAPI Chatbot')
-                                            ->default(true)
-                                            ->columnSpanFull(),
+                                Forms\Components\Toggle::make('chatbot_is_active')
+                                    ->label('Aktifkan Service FastAPI Chatbot')
+                                    ->default(true),
 
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\TextInput::make('chatbot_url')
-                                                    ->label('FastAPI Chatbot Endpoint URL')
-                                                    ->url()
-                                                    ->default('http://127.0.0.1:8000/chatbot')
-                                                    ->helperText('URL Endpoint FastAPI (Contoh: http://127.0.0.1:8000/chatbot)'),
+                                Forms\Components\TextInput::make('chatbot_url')
+                                    ->label('FastAPI Chatbot Endpoint URL')
+                                    ->url()
+                                    ->default('http://127.0.0.1:8000/chatbot')
+                                    ->helperText('URL API FastAPI NLP Chatbot'),
 
-                                                Forms\Components\TextInput::make('chatbot_timeout')
-                                                    ->label('Connection Timeout (Detik)')
-                                                    ->numeric()
-                                                    ->default(10)
-                                                    ->helperText('Batas waktu request sebelum fallback'),
-                                            ]),
-                                    ]),
+                                Forms\Components\TextInput::make('chatbot_timeout')
+                                    ->label('Connection Timeout (Detik)')
+                                    ->numeric()
+                                    ->default(10)
+                                    ->helperText('Batas waktu respons sebelum fallback'),
                             ]),
 
-                        // Tab 5: Google Gemini AI
-                        Forms\Components\Tabs\Tab::make('Google Gemini AI')
+                        // Card 5: Google Gemini AI
+                        Forms\Components\Section::make('API 5: ✨ Google Gemini AI API')
+                            ->description('Kecerdasan AI untuk fallback respons pertanyaan umum pelanggan.')
                             ->icon('heroicon-o-sparkles')
+                            ->collapsible()
+                            ->columnSpan(1)
                             ->schema([
-                                Forms\Components\Section::make('Konfigurasi Google Gemini AI')
-                                    ->description('Digunakan untuk kecerdasan fallback respons AI Chatbot.')
-                                    ->schema([
-                                        Forms\Components\Toggle::make('gemini_is_active')
-                                            ->label('Aktifkan Google Gemini AI')
-                                            ->default(true)
-                                            ->columnSpanFull(),
+                                Forms\Components\Toggle::make('gemini_is_active')
+                                    ->label('Aktifkan Google Gemini AI')
+                                    ->default(true),
 
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\TextInput::make('gemini_api_key')
-                                                    ->label('Gemini API Key')
-                                                    ->password()
-                                                    ->revealable()
-                                                    ->helperText('API Key dari Google AI Studio (aistudio.google.com)'),
+                                Forms\Components\TextInput::make('gemini_api_key')
+                                    ->label('Gemini API Key')
+                                    ->password()
+                                    ->revealable()
+                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
 
-                                                Forms\Components\Select::make('gemini_model')
-                                                    ->label('Model AI Gemini')
-                                                    ->options([
-                                                        'gemini-1.5-flash' => 'Gemini 1.5 Flash (Sangat Cepat)',
-                                                        'gemini-pro' => 'Gemini Pro (Standar)',
-                                                    ])
-                                                    ->default('gemini-1.5-flash'),
-                                            ]),
-                                    ]),
+                                Forms\Components\Select::make('gemini_model')
+                                    ->label('Model AI Gemini')
+                                    ->options([
+                                        'gemini-1.5-flash' => 'Gemini 1.5 Flash (Sangat Cepat)',
+                                        'gemini-pro' => 'Gemini Pro (Standar)',
+                                    ])
+                                    ->default('gemini-1.5-flash'),
                             ]),
 
-                        // Tab 6: Google OAuth
-                        Forms\Components\Tabs\Tab::make('Google OAuth')
+                        // Card 6: Google OAuth Socialite
+                        Forms\Components\Section::make('API 6: 🔑 Google OAuth Social Login')
+                            ->description('Otentikasi Login & Registrasi cepat via Akun Google.')
                             ->icon('heroicon-o-user-group')
+                            ->collapsible()
+                            ->columnSpan(1)
                             ->schema([
-                                Forms\Components\Section::make('Konfigurasi Social Login Google')
-                                    ->description('Digunakan untuk fitur Login / Daftar dengan Akun Google.')
-                                    ->schema([
-                                        Forms\Components\Toggle::make('google_is_active')
-                                            ->label('Aktifkan Login via Akun Google')
-                                            ->default(true)
-                                            ->columnSpanFull(),
+                                Forms\Components\Toggle::make('google_is_active')
+                                    ->label('Aktifkan Login via Google')
+                                    ->default(true),
 
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\TextInput::make('google_client_id')
-                                                    ->label('Google OAuth Client ID')
-                                                    ->helperText('Client ID dari Google Cloud Console'),
+                                Forms\Components\TextInput::make('google_client_id')
+                                    ->label('Google Client ID')
+                                    ->helperText('OAuth Client ID dari Google Cloud Console'),
 
-                                                Forms\Components\TextInput::make('google_client_secret')
-                                                    ->label('Google OAuth Client Secret')
-                                                    ->password()
-                                                    ->revealable()
-                                                    ->helperText('Client Secret dari Google Cloud Console'),
-                                            ]),
+                                Forms\Components\TextInput::make('google_client_secret')
+                                    ->label('Google Client Secret')
+                                    ->password()
+                                    ->revealable()
+                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan Client Secret'),
 
-                                        Forms\Components\TextInput::make('google_redirect_uri')
-                                            ->label('Google Redirect Callback URI')
-                                            ->url()
-                                            ->default('https://becksapparel.com/auth/google/callback')
-                                            ->helperText('URL Callback yang didaftarkan pada Google Cloud Console')
-                                            ->columnSpanFull(),
-                                    ]),
+                                Forms\Components\TextInput::make('google_redirect_uri')
+                                    ->label('Redirect Callback URI')
+                                    ->url()
+                                    ->default('https://becksapparel.com/auth/google/callback'),
                             ]),
-                    ])
-                    ->columnSpanFull()
+
+                        // Card 7: Biteship Logistics API
+                        Forms\Components\Section::make('API 7: 📦 Biteship Logistics & Tracking')
+                            ->description('Integrasi kurir ekspedisi lanjutan & lacak resi otomatis.')
+                            ->icon('heroicon-o-archive-box')
+                            ->collapsible()
+                            ->columnSpan(1)
+                            ->schema([
+                                Forms\Components\Toggle::make('biteship_is_active')
+                                    ->label('Aktifkan Biteship Logistics')
+                                    ->default(false),
+
+                                Forms\Components\TextInput::make('biteship_api_key')
+                                    ->label('Biteship API Key')
+                                    ->password()
+                                    ->revealable()
+                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
+
+                                Forms\Components\TextInput::make('biteship_origin_postal_code')
+                                    ->label('Kode Pos Asal Pengiriman')
+                                    ->numeric()
+                                    ->placeholder('Contoh: 57123'),
+                            ]),
+
+                        // Card 8: SMTP Mail Gateway
+                        Forms\Components\Section::make('API 8: 📧 SMTP Mail Gateway Service')
+                            ->description('Layanan pengiriman email sistem (Password Reset & Notifikasi).')
+                            ->icon('heroicon-o-envelope')
+                            ->collapsible()
+                            ->columnSpan(1)
+                            ->schema([
+                                Forms\Components\Toggle::make('smtp_is_active')
+                                    ->label('Aktifkan Layanan Email SMTP')
+                                    ->default(true),
+
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\TextInput::make('smtp_host')
+                                            ->label('SMTP Host')
+                                            ->default('mail.becksapparel.com'),
+
+                                        Forms\Components\TextInput::make('smtp_port')
+                                            ->label('SMTP Port')
+                                            ->numeric()
+                                            ->default(465),
+                                    ]),
+
+                                Forms\Components\TextInput::make('smtp_username')
+                                    ->label('SMTP Username'),
+
+                                Forms\Components\TextInput::make('smtp_password')
+                                    ->label('SMTP Password')
+                                    ->password()
+                                    ->revealable()
+                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan Password'),
+
+                                Forms\Components\Select::make('smtp_encryption')
+                                    ->label('Tipe Enkripsi')
+                                    ->options([
+                                        'ssl' => 'SSL (Port 465)',
+                                        'tls' => 'TLS (Port 587)',
+                                        'none' => 'Tanpa Enkripsi',
+                                    ])
+                                    ->default('ssl'),
+                            ]),
+                    ]),
             ]);
     }
 
@@ -260,6 +287,12 @@ class ApiSettingResource extends Resource
                     ->boolean(),
                 Tables\Columns\IconColumn::make('google_is_active')
                     ->label('Google OAuth')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('biteship_is_active')
+                    ->label('Biteship')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('smtp_is_active')
+                    ->label('SMTP Email')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Terakhir Diperbarui')

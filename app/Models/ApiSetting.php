@@ -44,6 +44,19 @@ class ApiSetting extends Model
         'google_client_id',
         'google_client_secret',
         'google_redirect_uri',
+
+        // Biteship Logistics
+        'biteship_is_active',
+        'biteship_api_key',
+        'biteship_origin_postal_code',
+
+        // SMTP Mail Gateway
+        'smtp_is_active',
+        'smtp_host',
+        'smtp_port',
+        'smtp_username',
+        'smtp_password',
+        'smtp_encryption',
     ];
 
     protected $casts = [
@@ -53,7 +66,10 @@ class ApiSetting extends Model
         'chatbot_is_active' => 'boolean',
         'gemini_is_active' => 'boolean',
         'google_is_active' => 'boolean',
+        'biteship_is_active' => 'boolean',
+        'smtp_is_active' => 'boolean',
         'chatbot_timeout' => 'integer',
+        'smtp_port' => 'integer',
     ];
 
     /**

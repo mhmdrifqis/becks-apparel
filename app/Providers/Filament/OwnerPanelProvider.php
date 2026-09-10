@@ -38,7 +38,7 @@ class OwnerPanelProvider extends PanelProvider
             ])
             ->brandLogo(fn () => view('filament.components.logo'))
             ->brandLogoHeight('2.5rem')
-            ->favicon(asset('favicon.ico'))
+            ->favicon(asset('assets/images/logo-becks.png'))
             ->discoverResources(in: app_path('Filament/Owner/Resources'), for: 'App\\Filament\\Owner\\Resources')
             ->discoverPages(in: app_path('Filament/Owner/Pages'), for: 'App\\Filament\\Owner\\Pages')
             ->pages([

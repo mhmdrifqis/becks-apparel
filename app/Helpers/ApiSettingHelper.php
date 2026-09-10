@@ -71,6 +71,36 @@ class ApiSettingHelper
             }
             config(['services.google.is_active' => $setting->google_is_active]);
 
+            // 7. Biteship Logistics
+            if ($setting->biteship_api_key) {
+                config(['services.biteship.api_key' => $setting->biteship_api_key]);
+            }
+            config(['services.biteship.is_active' => $setting->biteship_is_active]);
+
+            // 8. SMTP Email Gateway
+            if ($setting->smtp_host) {
+                config(['mail.mailers.smtp.host' => $setting->smtp_host]);
+            }
+            if ($setting->smtp_port) {
+                config(['mail.mailers.smtp.port' => (int) $setting->smtp_port]);
+            }
+            if ($setting->smtp_username) {
+                config(['mail.mailers.smtp.username' => $setting->smtp_username]);
+            }
+            if ($setting->smtp_password) {
+                config(['mail.mailers.smtp.password' => $setting->smtp_password]);
+            }
+            if ($setting->smtp_encryption) {
+                config(['mail.mailers.smtp.encryption' => $setting->smtp_encryption]);
+            }
+            if ($setting->smtp_from_address) {
+                config(['mail.from.address' => $setting->smtp_from_address]);
+            }
+            if ($setting->smtp_from_name) {
+                config(['mail.from.name' => $setting->smtp_from_name]);
+            }
+            config(['services.smtp.is_active' => $setting->smtp_is_active]);
+
         } catch (\Exception $e) {
             Log::warning("ApiSettingHelper: Failed to load dynamic API settings - " . $e->getMessage());
         }
