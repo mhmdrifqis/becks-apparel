@@ -61,7 +61,7 @@ class ApiSettingResource extends Resource
 
                                 Forms\Components\Placeholder::make('paywuz_webhook_url')
                                     ->label('Webhook URL Callback Paywuz')
-                                    ->content(route('payment.callback'))
+                                    ->content(fn () => url('/payment/callback'))
                                     ->extraAttributes(['class' => 'bg-slate-50 p-2.5 rounded-lg font-mono text-xs border border-slate-200 select-all block w-full']),
                             ]),
 
@@ -268,37 +268,49 @@ class ApiSettingResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $hasBiteship = \Illuminate\Support\Facades\Schema::hasColumn('api_settings', 'biteship_is_active');
+        $hasSmtp = \Illuminate\Support\Facades\Schema::hasColumn('api_settings', 'smtp_is_active');
+
+        $columns = [
+            Tables\Columns\IconColumn::make('paywuz_is_active')
+                ->label('Paywuz')
+                ->boolean(),
+            Tables\Columns\IconColumn::make('rajaongkir_is_active')
+                ->label('RajaOngkir')
+                ->boolean(),
+            Tables\Columns\IconColumn::make('fonnte_is_active')
+                ->label('Fonnte WA')
+                ->boolean(),
+            Tables\Columns\IconColumn::make('chatbot_is_active')
+                ->label('Chatbot')
+                ->boolean(),
+            Tables\Columns\IconColumn::make('gemini_is_active')
+                ->label('Gemini AI')
+                ->boolean(),
+            Tables\Columns\IconColumn::make('google_is_active')
+                ->label('Google OAuth')
+                ->boolean(),
+        ];
+
+        if ($hasBiteship) {
+            $columns[] = Tables\Columns\IconColumn::make('biteship_is_active')
+                ->label('Biteship')
+                ->boolean();
+        }
+
+        if ($hasSmtp) {
+            $columns[] = Tables\Columns\IconColumn::make('smtp_is_active')
+                ->label('SMTP Email')
+                ->boolean();
+        }
+
+        $columns[] = Tables\Columns\TextColumn::make('updated_at')
+            ->label('Terakhir Diperbarui')
+            ->dateTime('d M Y H:i')
+            ->sortable();
+
         return $table
-            ->columns([
-                Tables\Columns\IconColumn::make('paywuz_is_active')
-                    ->label('Paywuz')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('rajaongkir_is_active')
-                    ->label('RajaOngkir')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('fonnte_is_active')
-                    ->label('Fonnte WA')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('chatbot_is_active')
-                    ->label('Chatbot')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('gemini_is_active')
-                    ->label('Gemini AI')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('google_is_active')
-                    ->label('Google OAuth')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('biteship_is_active')
-                    ->label('Biteship')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('smtp_is_active')
-                    ->label('SMTP Email')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Terakhir Diperbarui')
-                    ->dateTime('d M Y H:i')
-                    ->sortable(),
-            ])
+            ->columns($columns)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->after(function (ApiSetting $record) {

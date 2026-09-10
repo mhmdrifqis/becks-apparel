@@ -108,22 +108,31 @@ class ApiSetting extends Model
      */
     public static function instance(): self
     {
-        return static::firstOrCreate([], [
-            'paywuz_is_active' => true,
-            'paywuz_environment' => 'sandbox',
-            'rajaongkir_is_active' => true,
-            'rajaongkir_account_type' => 'starter',
-            'rajaongkir_origin_city_id' => '456',
-            'fonnte_is_active' => true,
-            'fonnte_country_code' => '62',
-            'chatbot_is_active' => true,
-            'chatbot_url' => 'http://127.0.0.1:8000/chatbot',
-            'chatbot_timeout' => 10,
-            'gemini_is_active' => true,
-            'gemini_model' => 'gemini-1.5-flash',
-            'google_is_active' => true,
-            'google_redirect_uri' => 'https://becksapparel.com/auth/google/callback',
-        ]);
+        try {
+            $setting = static::first();
+            if ($setting) {
+                return $setting;
+            }
+
+            return static::create([
+                'paywuz_is_active' => true,
+                'paywuz_environment' => 'sandbox',
+                'rajaongkir_is_active' => true,
+                'rajaongkir_account_type' => 'starter',
+                'rajaongkir_origin_city_id' => '456',
+                'fonnte_is_active' => true,
+                'fonnte_country_code' => '62',
+                'chatbot_is_active' => true,
+                'chatbot_url' => 'http://127.0.0.1:8000/chatbot',
+                'chatbot_timeout' => 10,
+                'gemini_is_active' => true,
+                'gemini_model' => 'gemini-1.5-flash',
+                'google_is_active' => true,
+                'google_redirect_uri' => 'https://becksapparel.com/auth/google/callback',
+            ]);
+        } catch (\Exception $e) {
+            return new static();
+        }
     }
 
     /**

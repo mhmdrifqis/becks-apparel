@@ -21,6 +21,7 @@ class PaymentSettingResource extends Resource
     protected static ?string $modelLabel = 'Pengaturan Paywuz';
     protected static ?string $pluralModelLabel = 'Pengaturan Paywuz';
     protected static ?string $navigationGroup = 'Sistem';
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Form $form): Form
     {
