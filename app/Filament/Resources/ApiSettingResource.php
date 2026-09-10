@@ -328,9 +328,25 @@ class ApiSettingResource extends Resource
             ]);
     }
 
+    public static function canViewAny(): bool
+    {
+        try {
+            return \Illuminate\Support\Facades\Schema::hasTable('api_settings');
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     public static function canCreate(): bool
     {
-        return ApiSetting::count() === 0;
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('api_settings')) {
+                return false;
+            }
+            return ApiSetting::count() === 0;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public static function getPages(): array
