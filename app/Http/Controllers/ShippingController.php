@@ -206,58 +206,6 @@ class ShippingController extends Controller
                     }
                 }
 
-                // 2. Fetch from Biteship if active and API key is present
-                $biteshipKey = config('services.biteship.api_key', env('BITESHIP_API_KEY'));
-                $biteshipActive = config('services.biteship.is_active', false);
-
-                if (($biteshipActive || !empty($biteshipKey)) && !empty($biteshipKey)) {
-                    try {
-                        $originPostal = config('services.biteship.origin_postal_code', '57123');
-
-                        $biteshipRes = Http::withHeaders([
-                            'Authorization' => $biteshipKey,
-                            'Content-Type' => 'application/json',
-                        ])->post('https://api.biteship.com/v1/rates/couriers', [
-                            'origin_postal_code' => (int) $originPostal,
-                            'destination_postal_code' => (int) $postalCode,
-                            'couriers' => $targetCourier ?: 'jne,sicepat,jnt,anteraja,grab,gosend',
-                            'items' => [
-                                [
-                                    'name' => 'Jersey Apparel Order',
-                                    'value' => 150000,
-                                    'weight' => (int) $weight,
-                                    'quantity' => 1
-                                ]
-                            ]
-                        ]);
-
-                        if ($biteshipRes->successful()) {
-                            $bData = $biteshipRes->json();
-                            foreach ($bData['pricing'] ?? [] as $price) {
-                                $cCode = strtolower($price['courier_code'] ?? 'biteship');
-                                $cName = strtoupper($price['courier_name'] ?? $cCode);
-                                $service = $price['courier_service_name'] ?? 'REG';
-                                $costVal = (int) ($price['price'] ?? 0);
-                                $etdStr = $price['duration'] ?? '';
-
-                                if ($costVal > 0) {
-                                    $allOptions[] = [
-                                        'source' => 'Biteship',
-                                        'courier' => $cCode,
-                                        'courier_name' => $cName . ' (Biteship)',
-                                        'service' => $service,
-                                        'description' => $price['service_type'] ?? '',
-                                        'cost' => $costVal,
-                                        'etd' => $etdStr,
-                                    ];
-                                }
-                            }
-                        }
-                    } catch (\Exception $e) {
-                        // Safe fallback
-                    }
-                }
-
                 if (empty($allOptions)) {
                     return null;
                 }
