@@ -339,14 +339,7 @@ class ApiSettingResource extends Resource
 
     public static function canCreate(): bool
     {
-        try {
-            if (!\Illuminate\Support\Facades\Schema::hasTable('api_settings')) {
-                return false;
-            }
-            return ApiSetting::count() === 0;
-        } catch (\Exception $e) {
-            return false;
-        }
+        return false;
     }
 
     public static function getPages(): array
