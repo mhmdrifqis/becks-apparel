@@ -13,17 +13,35 @@ return new class extends Migration
     {
         Schema::table('api_settings', function (Blueprint $table) {
             // 7. Biteship Logistics API
-            $table->boolean('biteship_is_active')->default(false)->after('google_redirect_uri');
-            $table->string('biteship_api_key')->nullable()->after('biteship_is_active');
-            $table->string('biteship_origin_postal_code')->nullable()->after('biteship_api_key');
+            if (!Schema::hasColumn('api_settings', 'biteship_is_active')) {
+                $table->boolean('biteship_is_active')->default(false);
+            }
+            if (!Schema::hasColumn('api_settings', 'biteship_api_key')) {
+                $table->string('biteship_api_key')->nullable();
+            }
+            if (!Schema::hasColumn('api_settings', 'biteship_origin_postal_code')) {
+                $table->string('biteship_origin_postal_code')->nullable();
+            }
 
             // 8. SMTP Email Gateway
-            $table->boolean('smtp_is_active')->default(true)->after('biteship_origin_postal_code');
-            $table->string('smtp_host')->nullable()->default('mail.becksapparel.com')->after('smtp_is_active');
-            $table->integer('smtp_port')->default(465)->after('smtp_host');
-            $table->string('smtp_username')->nullable()->after('smtp_port');
-            $table->text('smtp_password')->nullable()->after('smtp_username');
-            $table->string('smtp_encryption')->default('ssl')->after('smtp_password');
+            if (!Schema::hasColumn('api_settings', 'smtp_is_active')) {
+                $table->boolean('smtp_is_active')->default(true);
+            }
+            if (!Schema::hasColumn('api_settings', 'smtp_host')) {
+                $table->string('smtp_host')->nullable()->default('mail.becksapparel.com');
+            }
+            if (!Schema::hasColumn('api_settings', 'smtp_port')) {
+                $table->integer('smtp_port')->default(465);
+            }
+            if (!Schema::hasColumn('api_settings', 'smtp_username')) {
+                $table->string('smtp_username')->nullable();
+            }
+            if (!Schema::hasColumn('api_settings', 'smtp_password')) {
+                $table->text('smtp_password')->nullable();
+            }
+            if (!Schema::hasColumn('api_settings', 'smtp_encryption')) {
+                $table->string('smtp_encryption')->default('ssl');
+            }
         });
     }
 
