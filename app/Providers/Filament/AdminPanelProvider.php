@@ -46,6 +46,20 @@ class AdminPanelProvider extends PanelProvider
                 Pages\Dashboard::class,
             ])
             ->sidebarCollapsibleOnDesktop()
+            ->navigationGroups([
+                \Filament\Navigation\NavigationGroup::make()
+                    ->label('Operasional')
+                    ->icon('heroicon-o-shopping-bag'),
+                \Filament\Navigation\NavigationGroup::make()
+                    ->label('Data Master')
+                    ->icon('heroicon-o-cube'),
+                \Filament\Navigation\NavigationGroup::make()
+                    ->label('Customer Support')
+                    ->icon('heroicon-o-chat-bubble-left-right'),
+                \Filament\Navigation\NavigationGroup::make()
+                    ->label('Sistem')
+                    ->icon('heroicon-o-cog-6-tooth'),
+            ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
