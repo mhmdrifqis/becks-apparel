@@ -81,7 +81,7 @@ class ShippingController extends Controller
         ]);
 
         try {
-            $origin = env('RAJAONGKIR_ORIGIN_CITY_ID', 456); // Default 456 (Tangerang) jika tidak diset
+            $origin = config('services.rajaongkir.origin_city_id', env('RAJAONGKIR_ORIGIN_CITY_ID', 456)); // Default 456 (Tangerang) jika tidak diset
 
             $response = Http::asForm()->withHeaders([
                 'key' => $this->apiKey
@@ -148,53 +148,61 @@ class ShippingController extends Controller
         $request->validate([
             'destination' => 'required',
             'weight' => 'required|numeric|min:1',
-            'courier' => 'nullable|string'
+            'courier' => 'nullable|string',
+            'postal_code' => 'nullable|string'
         ]);
 
         $destination = $request->destination;
         $weight = max(1, (int) $request->weight);
-        $origin = env('RAJAONGKIR_ORIGIN_CITY_ID', 456);
+        $origin = config('services.rajaongkir.origin_city_id', env('RAJAONGKIR_ORIGIN_CITY_ID', 456));
         $targetCourier = $request->input('courier');
+        $postalCode = $request->input('postal_code', '57123');
 
-        $cacheKey = "shipping_auto_{$origin}_{$destination}_{$weight}_" . ($targetCourier ?: 'all');
+        $cacheKey = "shipping_auto_{$origin}_{$destination}_{$weight}_" . ($targetCourier ?: 'all') . "_{$postalCode}";
 
         try {
-            $result = \Illuminate\Support\Facades\Cache::remember($cacheKey, 600, function () use ($origin, $destination, $weight, $targetCourier) {
-                $couriers = $targetCourier ? [$targetCourier] : ['jne', 'pos', 'tiki'];
+            $result = \Illuminate\Support\Facades\Cache::remember($cacheKey, 600, function () use ($origin, $destination, $weight, $targetCourier, $postalCode) {
                 $allOptions = [];
 
-                foreach ($couriers as $courierCode) {
-                    try {
-                        $response = Http::asForm()->withHeaders([
-                            'key' => $this->apiKey
-                        ])->post("{$this->baseUrl}/calculate/domestic-cost", [
-                            'origin' => $origin,
-                            'destination' => $destination,
-                            'weight' => $weight,
-                            'courier' => $courierCode
-                        ]);
+                // 1. Fetch from RajaOngkir if active and API key is present
+                $rajaOngkirActive = config('services.rajaongkir.is_active', true);
+                if ($rajaOngkirActive && !empty($this->apiKey)) {
+                    $couriers = $targetCourier ? [$targetCourier] : ['jne', 'pos', 'tiki'];
 
-                        $data = $response->json();
-                        if (!isset($data['meta']['code']) || $data['meta']['code'] === 200) {
-                            $rawCosts = $data['data'][0]['costs'] ?? $data['data'] ?? [];
-                            foreach ($rawCosts as $item) {
-                                $val = $item['cost'][0]['value'] ?? $item['cost']['value'] ?? (is_numeric($item['cost']) ? $item['cost'] : 0);
-                                $etd = $item['cost'][0]['etd'] ?? $item['cost']['etd'] ?? $item['etd'] ?? '';
-                                
-                                if ($val > 0) {
-                                    $allOptions[] = [
-                                        'courier' => $courierCode,
-                                        'courier_name' => strtoupper($courierCode),
-                                        'service' => $item['service'] ?? 'REG',
-                                        'description' => $item['description'] ?? '',
-                                        'cost' => (int) $val,
-                                        'etd' => $etd,
-                                    ];
+                    foreach ($couriers as $courierCode) {
+                        try {
+                            $response = Http::asForm()->withHeaders([
+                                'key' => $this->apiKey
+                            ])->post("{$this->baseUrl}/calculate/domestic-cost", [
+                                'origin' => $origin,
+                                'destination' => $destination,
+                                'weight' => $weight,
+                                'courier' => $courierCode
+                            ]);
+
+                            $data = $response->json();
+                            if (!isset($data['meta']['code']) || $data['meta']['code'] === 200) {
+                                $rawCosts = $data['data'][0]['costs'] ?? $data['data'] ?? [];
+                                foreach ($rawCosts as $item) {
+                                    $val = $item['cost'][0]['value'] ?? $item['cost']['value'] ?? (is_numeric($item['cost']) ? $item['cost'] : 0);
+                                    $etd = $item['cost'][0]['etd'] ?? $item['cost']['etd'] ?? $item['etd'] ?? '';
+
+                                    if ($val > 0) {
+                                        $allOptions[] = [
+                                            'source' => 'RajaOngkir',
+                                            'courier' => $courierCode,
+                                            'courier_name' => strtoupper($courierCode),
+                                            'service' => $item['service'] ?? 'REG',
+                                            'description' => $item['description'] ?? '',
+                                            'cost' => (int) $val,
+                                            'etd' => $etd,
+                                        ];
+                                    }
                                 }
                             }
+                        } catch (\Exception $e) {
+                            // Safe fallback
                         }
-                    } catch (\Exception $e) {
-                        continue;
                     }
                 }
 
@@ -202,6 +210,7 @@ class ShippingController extends Controller
                     return null;
                 }
 
+                // Sort all combined options by cost (cheapest first)
                 usort($allOptions, fn($a, $b) => $a['cost'] <=> $b['cost']);
 
                 return [
@@ -213,7 +222,7 @@ class ShippingController extends Controller
             if (!$result) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Layanan pengiriman tidak tersedia untuk kota tujuan ini atau API mengalami gangguan.'
+                    'message' => 'Layanan pengiriman tidak tersedia untuk lokasi ini atau API mengalami gangguan.'
                 ], 400);
             }
 
@@ -228,5 +237,83 @@ class ShippingController extends Controller
                 'message' => 'Gagal menghitung ongkos kirim: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function trackOrder(Request $request, \App\Models\Order $order)
+    {
+        $trackingNumber = trim($order->tracking_number);
+
+        if (empty($trackingNumber)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nomor resi pengiriman belum diinput oleh Admin.'
+            ], 400);
+        }
+
+        $courier = strtolower($order->shipping_service ?: 'jne');
+        if (str_contains($courier, 'jne')) $courier = 'jne';
+        elseif (str_contains($courier, 'sicepat')) $courier = 'sicepat';
+        elseif (str_contains($courier, 'jnt') || str_contains($courier, 'j&t')) $courier = 'jnt';
+        elseif (str_contains($courier, 'pos')) $courier = 'pos';
+        elseif (str_contains($courier, 'tiki')) $courier = 'tiki';
+        elseif (str_contains($courier, 'anteraja')) $courier = 'anteraja';
+        elseif (str_contains($courier, 'lion')) $courier = 'lion';
+        elseif (str_contains($courier, 'ninja')) $courier = 'ninja';
+        else $courier = 'jne';
+
+        $biteshipKey = config('services.biteship.api_key', env('BITESHIP_API_KEY'));
+
+        $history = [];
+        $courierName = strtoupper($courier);
+        $status = 'IN_TRANSIT';
+
+        if (!empty($biteshipKey)) {
+            try {
+                $biteshipRes = Http::withHeaders([
+                    'Authorization' => $biteshipKey,
+                    'Content-Type' => 'application/json',
+                ])->get("https://api.biteship.com/v1/trackings/{$trackingNumber}?courier={$courier}");
+
+                if ($biteshipRes->successful()) {
+                    $bData = $biteshipRes->json();
+
+                    if (!empty($bData['courier']['name'])) {
+                        $courierName = $bData['courier']['name'];
+                    }
+
+                    if (!empty($bData['status'])) {
+                        $status = strtoupper($bData['status']);
+                    }
+
+                    foreach ($bData['history'] ?? [] as $item) {
+                        $history[] = [
+                            'note' => $item['note'] ?? $item['description'] ?? 'Status terupdate',
+                            'date' => isset($item['updated_at']) ? date('d M Y, H:i', strtotime($item['updated_at'])) : date('d M Y, H:i'),
+                            'location' => $item['location'] ?? ''
+                        ];
+                    }
+                }
+            } catch (\Exception $e) {
+                // Safe fallback
+            }
+        }
+
+        if (empty($history)) {
+            $history[] = [
+                'note' => "Paket dalam pengiriman via " . $courierName . " dengan No. Resi " . $trackingNumber,
+                'date' => $order->updated_at ? $order->updated_at->format('d M Y, H:i') : date('d M Y, H:i'),
+                'location' => 'Transit Gudang'
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'tracking_number' => $trackingNumber,
+            'courier' => $courierName,
+            'status' => $status,
+            'history' => $history,
+            'biteship_url' => "https://biteship.com/id/tracking/" . $trackingNumber,
+            'parcelsapp_url' => "https://parcelsapp.com/id/tracking/" . $trackingNumber
+        ]);
     }
 }

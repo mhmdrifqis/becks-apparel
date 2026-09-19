@@ -59,4 +59,13 @@ return [
         'origin_city_id' => env('RAJAONGKIR_ORIGIN_CITY_ID', '456'),
     ],
 
+    'biteship' => [
+        'api_key' => env('BITESHIP_API_KEY'),
+        'is_active' => env('BITESHIP_IS_ACTIVE', false),
+    ],
+
+    'smtp' => [
+        'is_active' => env('SMTP_IS_ACTIVE', true),
+    ],
+
 ];

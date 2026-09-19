@@ -3,25 +3,25 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PaymentSettingResource\Pages;
-use App\Filament\Resources\PaymentSettingResource\RelationManagers;
 use App\Models\PaymentSetting;
+use App\Models\ApiSetting;
+use App\Helpers\ApiSettingHelper;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PaymentSettingResource extends Resource
 {
     protected static ?string $model = PaymentSetting::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
-    protected static ?string $navigationLabel = 'Paywuz Gateway';
+    protected static ?string $navigationLabel = 'Pengaturan Paywuz';
     protected static ?string $modelLabel = 'Pengaturan Paywuz';
     protected static ?string $pluralModelLabel = 'Pengaturan Paywuz';
     protected static ?string $navigationGroup = 'Sistem';
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Form $form): Form
     {
@@ -33,7 +33,7 @@ class PaymentSettingResource extends Resource
                     ->schema([
                         Forms\Components\Placeholder::make('webhook_url')
                             ->label('')
-                            ->content(route('payment.callback')) // Tampilkan absolute URL
+                            ->content(route('payment.callback'))
                             ->extraAttributes(['class' => 'bg-slate-50 p-3 rounded-lg font-mono text-sm border border-slate-200 select-all block w-full']),
                     ]),
 
@@ -90,17 +90,24 @@ class PaymentSettingResource extends Resource
                     ->formatStateUsing(fn (string $state): string => ucfirst($state)),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                //
+                    ->sortable(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                //
+                Tables\Actions\EditAction::make()
+                    ->after(function (PaymentSetting $record) {
+                        // Sync with ApiSetting and config
+                        try {
+                            $apiSetting = ApiSetting::instance();
+                            $apiSetting->update([
+                                'paywuz_is_active' => $record->is_active,
+                                'paywuz_environment' => $record->environment,
+                                'paywuz_sandbox_api_key' => $record->sandbox_api_key,
+                                'paywuz_production_api_key' => $record->production_api_key,
+                            ]);
+                        } catch (\Exception $e) {}
+
+                        ApiSettingHelper::loadIntoConfig();
+                    }),
             ]);
     }
 

@@ -38,7 +38,7 @@ class ProduksiPanelProvider extends PanelProvider
             ])
             ->brandLogo(fn () => view('filament.components.logo'))
             ->brandLogoHeight('2.5rem')
-            ->favicon(asset('favicon.ico'))
+            ->favicon(asset('assets/images/logo-becks.png'))
             ->discoverResources(in: app_path('Filament/Produksi/Resources'), for: 'App\\Filament\\Produksi\\Resources')
             ->discoverPages(in: app_path('Filament/Produksi/Pages'), for: 'App\\Filament\\Produksi\\Pages')
             ->pages([

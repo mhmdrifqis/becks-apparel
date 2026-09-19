@@ -39,7 +39,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->brandLogo(fn () => view('filament.components.logo'))
             ->brandLogoHeight('2.5rem')
-            ->favicon(asset('favicon.ico'))
+            ->favicon(asset('assets/images/logo-becks.png'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([

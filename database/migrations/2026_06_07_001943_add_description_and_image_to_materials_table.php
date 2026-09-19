@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('materials', function (Blueprint $table) {
-            $table->text('description')->nullable();
-            $table->string('image_path')->nullable();
+            if (!Schema::hasColumn('materials', 'description')) {
+                $table->text('description')->nullable();
+            }
+            if (!Schema::hasColumn('materials', 'image_path')) {
+                $table->string('image_path')->nullable();
+            }
         });
     }
 
@@ -23,7 +27,16 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('materials', function (Blueprint $table) {
-            $table->dropColumn(['description', 'image_path']);
+            $columnsToDrop = [];
+            if (Schema::hasColumn('materials', 'description')) {
+                $columnsToDrop[] = 'description';
+            }
+            if (Schema::hasColumn('materials', 'image_path')) {
+                $columnsToDrop[] = 'image_path';
+            }
+            if (!empty($columnsToDrop)) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 };

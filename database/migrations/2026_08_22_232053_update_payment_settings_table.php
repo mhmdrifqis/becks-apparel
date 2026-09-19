@@ -8,18 +8,39 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('payment_settings', function (Blueprint $table) {
-            $table->dropColumn(['midtrans_server_key', 'midtrans_client_key']);
-            $table->text('api_key')->nullable()->after('id');
-        });
+        if (Schema::hasTable('payment_settings')) {
+            Schema::table('payment_settings', function (Blueprint $table) {
+                $columnsToDrop = [];
+                if (Schema::hasColumn('payment_settings', 'midtrans_server_key')) {
+                    $columnsToDrop[] = 'midtrans_server_key';
+                }
+                if (Schema::hasColumn('payment_settings', 'midtrans_client_key')) {
+                    $columnsToDrop[] = 'midtrans_client_key';
+                }
+                if (!empty($columnsToDrop)) {
+                    $table->dropColumn($columnsToDrop);
+                }
+                if (!Schema::hasColumn('payment_settings', 'api_key')) {
+                    $table->text('api_key')->nullable()->after('id');
+                }
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('payment_settings', function (Blueprint $table) {
-            $table->text('midtrans_server_key')->nullable();
-            $table->text('midtrans_client_key')->nullable();
-            $table->dropColumn('api_key');
-        });
+        if (Schema::hasTable('payment_settings')) {
+            Schema::table('payment_settings', function (Blueprint $table) {
+                if (!Schema::hasColumn('payment_settings', 'midtrans_server_key')) {
+                    $table->text('midtrans_server_key')->nullable();
+                }
+                if (!Schema::hasColumn('payment_settings', 'midtrans_client_key')) {
+                    $table->text('midtrans_client_key')->nullable();
+                }
+                if (Schema::hasColumn('payment_settings', 'api_key')) {
+                    $table->dropColumn('api_key');
+                }
+            });
+        }
     }
 };

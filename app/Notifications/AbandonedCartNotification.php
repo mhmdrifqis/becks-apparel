@@ -4,8 +4,8 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Channels\WhatsAppChannel;
 
 class AbandonedCartNotification extends Notification
 {
@@ -26,22 +26,23 @@ class AbandonedCartNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return ['database', WhatsAppChannel::class];
     }
 
     /**
-     * Get the mail representation of the notification.
+     * Get the WhatsApp representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toWhatsApp(object $notifiable): string
     {
-        return (new MailMessage)
-                    ->subject('Jangan Sampai Kehabisan Slot Produksi, Kak! 🛒')
-                    ->greeting('Halo ' . $notifiable->name . '!')
-                    ->line('Kami perhatikan ada desain jersey keren yang udah nungguin di keranjang kakak nih.')
-                    ->line('Yuk segera selesaikan pembayarannya sebelum kehabisan slot produksi dan bahan yang kakak inginkan kehabisan.')
-                    ->action('Lanjutkan ke Keranjang', route('customer.cart.index'))
-                    ->line('Jika ada pertanyaan atau butuh bantuan, jangan ragu untuk membalas email ini.')
-                    ->salutation('Salam hangat, Tim Becks Apparel');
+        $url = route('customer.cart.index');
+        $name = $notifiable->name ?? 'Kak';
+
+        return "Halo Kak *{$name}*! 🛒🔥\n\n"
+            . "Kami perhatikan ada desain jersey keren yang sedang menunggu di keranjang Anda nih!\n\n"
+            . "Yuk segera selesaikan pemesanan sebelum kehabisan slot produksi dan ketersediaan bahan yang Anda pilih.\n\n"
+            . "Klik link berikut untuk membuka keranjang Anda:\n"
+            . "🔗 {$url}\n\n"
+            . "Salam hangat,\n*Tim Becks Apparel*";
     }
 
     /**
@@ -57,7 +58,7 @@ class AbandonedCartNotification extends Notification
             'message' => 'Kak, desain jerseynya udah nungguin di keranjang nih! Yuk selesaikan pembayarannya sebelum kehabisan slot produksi.',
             'action_url' => route('customer.cart.index'),
             'icon' => 'shopping-cart',
-            'color' => 'brand' // Optional: for styling
+            'color' => 'brand'
         ];
     }
 }

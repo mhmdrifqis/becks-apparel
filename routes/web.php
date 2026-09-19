@@ -63,11 +63,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/{cartItem}', [App\Http\Controllers\CartController::class, 'destroy'])->name('cart.destroy');
     Route::get('/cart/counts', [App\Http\Controllers\CartController::class, 'getCounts'])->name('cart.counts');
 
-    // Shipping Routes (RajaOngkir)
+    // Shipping Routes (RajaOngkir & Biteship)
     Route::get('/shipping/provinces', [App\Http\Controllers\ShippingController::class, 'getProvinces'])->name('shipping.provinces');
     Route::get('/shipping/cities/{province}', [App\Http\Controllers\ShippingController::class, 'getCities'])->name('shipping.cities');
     Route::post('/shipping/cost', [App\Http\Controllers\ShippingController::class, 'calculateCost'])->name('shipping.cost');
     Route::post('/shipping/auto-calculate', [App\Http\Controllers\ShippingController::class, 'autoCalculate'])->name('shipping.auto-calculate');
+    Route::get('/shipping/track/{order}', [App\Http\Controllers\ShippingController::class, 'trackOrder'])->name('shipping.track');
 
     // User Address Routes
     Route::get('/user/addresses', [App\Http\Controllers\UserAddressController::class, 'index'])->name('user.addresses.index');

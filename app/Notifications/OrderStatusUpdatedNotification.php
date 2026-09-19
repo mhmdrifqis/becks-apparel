@@ -4,9 +4,9 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\Order;
+use App\Channels\WhatsAppChannel;
 
 class OrderStatusUpdatedNotification extends Notification implements ShouldQueue
 {
@@ -31,28 +31,30 @@ class OrderStatusUpdatedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return ['database', WhatsAppChannel::class];
     }
 
     /**
-     * Get the mail representation of the notification.
+     * Get the WhatsApp representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toWhatsApp(object $notifiable): string
     {
         $url = url('/pesanan/' . $this->order->order_number);
-        
-        $message = (new MailMessage)
-                    ->subject('Update Status Pesanan #' . $this->order->order_number)
-                    ->greeting('Halo ' . $this->order->recipient_name . ',')
-                    ->line('Status pesanan Anda #' . $this->order->order_number . ' kini telah diupdate menjadi: **' . $this->newStatusLabel . '**.');
+        $recipientName = $this->order->recipient_name ?? $notifiable->name ?? 'Pelanggan';
+        $orderNo = "*#{$this->order->order_number}*";
+
+        $message = "Halo Kak *{$recipientName}*! 👋\n\n"
+            . "Status pesanan Anda {$orderNo} kini telah diperbarui menjadi: *{$this->newStatusLabel}*.\n";
 
         if ($this->order->status === 'shipped') {
-            $message->line('Kurir: ' . ($this->order->courier_name ?? '-'));
-            $message->line('Nomor Resi: ' . ($this->order->tracking_number ?? 'Belum ada resi'));
+            $courier = $this->order->courier_name ?? '-';
+            $tracking = $this->order->tracking_number ?? 'Belum ada resi';
+            $message .= "\n🚚 *Kurir:* {$courier}\n📦 *No. Resi:* {$tracking}\n";
         }
 
-        $message->action('Lacak Pesanan', $url)
-                ->line('Terima kasih telah berbelanja!');
+        $message .= "\nLacak detail pesanan Anda di sini:\n"
+            . "🔗 {$url}\n\n"
+            . "Terima kasih telah berbelanja di *Becks Apparel*! ⚽🔥";
 
         return $message;
     }

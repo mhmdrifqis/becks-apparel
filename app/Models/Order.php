@@ -51,6 +51,17 @@ class Order extends Model
         return $this->hasMany(OrderStatusLog::class);
     }
 
+    /**
+     * Route notifications for the WhatsApp channel.
+     *
+     * @param  \Illuminate\Notifications\Notification|null  $notification
+     * @return string|null
+     */
+    public function routeNotificationForWhatsapp($notification = null)
+    {
+        return \App\Helpers\PhoneHelper::normalize($this->recipient_phone ?: ($this->user->phone ?? ''));
+    }
+
     protected static function booted()
     {
         static::updated(function ($order) {
@@ -72,11 +83,6 @@ class Order extends Model
                     'status' => $order->status,
                     'description' => $label
                 ]);
-
-                // Send notification
-                if ($order->user && $order->status !== 'paid' && $order->status !== 'pending' && $order->status !== 'unpaid') {
-                    $order->user->notify(new \App\Notifications\OrderStatusUpdatedNotification($order, $label));
-                }
             }
         });
     }

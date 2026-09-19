@@ -28,8 +28,8 @@ class ReturnRequestController extends Controller
 
         $request->validate([
             'reason' => 'required|string|max:1000',
-            'proof_files' => 'required|array|max:3',
-            'proof_files.*' => 'required|file|mimes:jpeg,png,jpg,mp4,mov|max:10240', // Max 10MB
+            'proof_files' => 'required|array|min:1|max:3',
+            'proof_files.*' => 'required|file|mimes:jpeg,png,jpg,webp,mp4,mov,avi,quicktime|max:10240', // Max 10MB per file
         ]);
 
         $filePaths = [];

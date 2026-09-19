@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->decimal('shipping_cost', 15, 2)->default(0)->after('status');
-            $table->string('shipping_service')->nullable()->after('shipping_cost');
+            if (!Schema::hasColumn('orders', 'shipping_cost')) {
+                $table->decimal('shipping_cost', 15, 2)->default(0)->after('status');
+            }
+            if (!Schema::hasColumn('orders', 'shipping_service')) {
+                $table->string('shipping_service')->nullable()->after('shipping_cost');
+            }
         });
     }
 
@@ -23,7 +27,16 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn(['shipping_cost', 'shipping_service']);
+            $columnsToDrop = [];
+            if (Schema::hasColumn('orders', 'shipping_cost')) {
+                $columnsToDrop[] = 'shipping_cost';
+            }
+            if (Schema::hasColumn('orders', 'shipping_service')) {
+                $columnsToDrop[] = 'shipping_service';
+            }
+            if (!empty($columnsToDrop)) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 };
