@@ -60,8 +60,14 @@ class FinancialReportResource extends Resource
                     ->colors([
                         'danger'  => 'unpaid',
                         'success' => 'paid',
-                        'warning' => 'expired',
-                    ]),
+                        'warning' => 'partial',
+                    ])
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'unpaid'  => 'Belum Lunas',
+                        'partial' => 'DP',
+                        'paid'    => 'Lunas',
+                        default   => ucfirst($state),
+                    }),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
@@ -85,7 +91,14 @@ class FinancialReportResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
             ])
-            ->bulkActions([]);
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\ExportBulkAction::make()
+                        ->exporter(\App\Filament\Exports\OrderExporter::class)
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->label('Unduh Data Terpilih (CSV)'),
+                ]),
+            ]);
     }
 
     public static function getPages(): array

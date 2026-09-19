@@ -66,7 +66,7 @@ class CheckoutController extends Controller
             'shipping_service' => $request->shipping_service,
             'courier_name' => $request->courier_name,
             'notes' => $request->notes,
-            'order_number' => 'ORD-' . date('Ymd') . '-' . strtoupper(uniqid()),
+            'order_number' => 'BCK-' . date('Ymd') . '-' . strtoupper(\Illuminate\Support\Str::random(5)),
             'status' => 'pending',
             'total_amount' => 0, 
         ]);

@@ -46,8 +46,8 @@ class OrderResource extends Resource
                         Forms\Components\Select::make('status')
                             ->label('Status Produksi')
                             ->options([
-                                'pending'   => 'Pending',
-                                'paid'      => 'Antrean Masuk',
+                                'pending'   => 'Menunggu',
+                                'paid'      => 'Antrian Masuk',
                                 'printing'  => 'Proses Cetak',
                                 'sewing'    => 'Proses Jahit',
                                 'qc'        => 'Quality Control',
@@ -209,22 +209,22 @@ class OrderResource extends Resource
                         'unpaid'  => 'Belum Bayar',
                         'partial' => 'DP',
                         'paid'    => 'Lunas',
-                        default   => $state,
+                        default   => ucfirst($state),
                     }),
 
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Status')
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'pending'   => 'Pending',
-                        'paid'      => 'Antrean Masuk',
-                        'printing'  => 'Cetak',
-                        'sewing'    => 'Jahit',
-                        'qc'        => 'QC',
+                        'pending'   => 'Menunggu',
+                        'paid'      => 'Antrian Masuk',
+                        'printing'  => 'Proses Cetak',
+                        'sewing'    => 'Proses Jahit',
+                        'qc'        => 'Quality Control',
                         'ready'     => 'Siap Kirim',
                         'shipped'   => 'Dikirim',
                         'completed' => 'Selesai',
                         'cancelled' => 'Dibatalkan',
-                        default     => $state,
+                        default     => ucfirst($state),
                     })
                     ->colors([
                         'gray'    => 'pending',
@@ -249,8 +249,8 @@ class OrderResource extends Resource
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Status Produksi')
                     ->options([
-                        'pending'   => 'Pending',
-                        'paid'      => 'Antrean Masuk',
+                        'pending'   => 'Menunggu',
+                        'paid'      => 'Antrian Masuk',
                         'printing'  => 'Cetak',
                         'sewing'    => 'Jahit',
                         'qc'        => 'QC',
@@ -322,17 +322,21 @@ class OrderResource extends Resource
                             ->send();
                     }),
                 Tables\Actions\ViewAction::make()
-                    ->label('Detail')
+                    ->label('Lihat')
                     ->slideOver()
                     ->modalWidth(\Filament\Support\Enums\MaxWidth::ExtraLarge),
                 Tables\Actions\EditAction::make()
-                    ->label('Update')
+                    ->label('Ubah')
                     ->slideOver()
                     ->modalWidth(\Filament\Support\Enums\MaxWidth::ExtraLarge),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ExportBulkAction::make()
+                        ->exporter(\App\Filament\Exports\OrderExporter::class)
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->label('Unduh Laporan (CSV)'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

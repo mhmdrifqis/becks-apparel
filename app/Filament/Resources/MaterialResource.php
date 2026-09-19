@@ -125,7 +125,7 @@ class MaterialResource extends Resource
                     ->formatStateUsing(fn ($state) => ucfirst($state)),
 
                 Tables\Columns\TextColumn::make('additional_price')
-                    ->label('Extra Price')
+                    ->label('Harga Tambahan')
                     ->money('IDR'),
 
                 Tables\Columns\TextColumn::make('stock')

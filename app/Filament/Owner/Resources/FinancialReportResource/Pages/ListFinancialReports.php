@@ -11,6 +11,12 @@ class ListFinancialReports extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [];
+        return [
+            \Filament\Actions\ExportAction::make()
+                ->exporter(\App\Filament\Exports\OrderExporter::class)
+                ->color('primary')
+                ->icon('heroicon-o-document-arrow-down')
+                ->label('Unduh Seluruh Laporan (CSV)'),
+        ];
     }
 }

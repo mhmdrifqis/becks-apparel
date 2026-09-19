@@ -117,16 +117,21 @@ class OrderProduksiResource extends Resource
                         'success' => 'paid',
                         'info'    => 'printing',
                         'warning' => 'sewing',
-                        'warning' => 'qc',
+                        'danger'  => 'qc',
                         'primary' => 'ready',
+                        'gray'    => 'completed',
                     ])
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'paid'     => 'Antrean',
-                        'printing' => 'Cetak',
-                        'sewing'   => 'Jahit',
-                        'qc'       => 'QC',
-                        'ready'    => 'Selesai',
-                        default    => $state,
+                        'pending'   => 'Menunggu',
+                        'paid'      => 'Antrian',
+                        'printing'  => 'Cetak',
+                        'sewing'    => 'Jahit',
+                        'qc'        => 'QC',
+                        'ready'     => 'Siap Kirim',
+                        'shipped'   => 'Dikirim',
+                        'completed' => 'Selesai',
+                        'cancelled' => 'Dibatalkan',
+                        default     => ucfirst($state),
                     }),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -139,16 +144,32 @@ class OrderProduksiResource extends Resource
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Tahapan')
                     ->options([
-                        'paid'     => 'Antrean',
+                        'paid'     => 'Antrian',
                         'printing' => 'Cetak',
                         'sewing'   => 'Jahit',
                         'qc'       => 'QC',
                         'ready'    => 'Selesai',
                     ]),
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        \Filament\Forms\Components\DatePicker::make('from')->label('Dari Tanggal'),
+                        \Filament\Forms\Components\DatePicker::make('until')->label('Hingga Tanggal'),
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                        return $query
+                            ->when(
+                                $data['from'],
+                                fn (\Illuminate\Database\Eloquent\Builder $query, $date): \Illuminate\Database\Eloquent\Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['until'],
+                                fn (\Illuminate\Database\Eloquent\Builder $query, $date): \Illuminate\Database\Eloquent\Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->label('Detail'),
-                Tables\Actions\EditAction::make()->label('Update'),
+                Tables\Actions\ViewAction::make()->label('Lihat'),
+                Tables\Actions\EditAction::make()->label('Ubah'),
                 
                 // FITUR: Catat Pemakaian Bahan
                 Tables\Actions\Action::make('log_material_usage')
@@ -184,7 +205,14 @@ class OrderProduksiResource extends Resource
                     ->modalHeading('Input Pemakaian Bahan Baku')
                     ->modalSubmitActionLabel('Potong Stok Sekarang'),
             ])
-            ->bulkActions([]);
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\ExportBulkAction::make()
+                        ->exporter(\App\Filament\Exports\OrderExporter::class)
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->label('Unduh Rekap Produksi (CSV)'),
+                ]),
+            ]);
     }
 
     public static function getRelations(): array

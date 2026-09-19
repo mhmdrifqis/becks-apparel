@@ -20,14 +20,14 @@ class ListOrderProduksi extends ListRecords
 
     public function getTabs(): array
     {
-        $antreanCount = \App\Models\Order::whereIn('status', ['paid', 'printing', 'sewing', 'qc', 'ready'])
+        $antrianCount = \App\Models\Order::whereIn('status', ['paid', 'printing', 'sewing', 'qc', 'ready'])
                             ->whereIn('payment_status', ['paid', 'partial'])->count();
 
         return [
             'Semua' => Tab::make(),
-            'Antrean' => Tab::make()
+            'Antrian' => Tab::make()
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereIn('status', ['paid', 'printing', 'sewing', 'qc', 'ready']))
-                ->badge($antreanCount > 0 ? $antreanCount : null)
+                ->badge($antrianCount > 0 ? $antrianCount : null)
                 ->badgeColor('warning'),
             'Selesai' => Tab::make()
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereIn('status', ['completed', 'shipped']))
