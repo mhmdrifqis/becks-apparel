@@ -13,7 +13,7 @@ class ViewOrderProduksi extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->label('Update Progress'),
+            Actions\EditAction::make()->label('Perbarui Proses'),
         ];
     }
 }

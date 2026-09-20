@@ -274,7 +274,7 @@
                 try {
                     let res = await fetch('{{ route("shipping.provinces") }}');
                     let data = await res.json();
-                    this.provinces = data.rajaongkir?.results || [];
+                    this.provinces = Array.isArray(data) ? data : (data.rajaongkir?.results || []);
                 } catch (e) {
                     console.error("Failed to load provinces", e);
                 }
@@ -289,7 +289,7 @@
                 try {
                     let res = await fetch(`{{ url('/shipping/cities') }}/${provinceId}`);
                     let data = await res.json();
-                    this.cities = data.rajaongkir?.results || [];
+                    this.cities = Array.isArray(data) ? data : (data.rajaongkir?.results || []);
                 } catch (e) {
                     console.error("Failed to load cities", e);
                 } finally {

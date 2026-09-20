@@ -47,6 +47,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/payment/{order}/create', [App\Http\Controllers\PaymentController::class, 'createPayment'])->name('payment.create');
     Route::post('/payment/{order}/sync', [App\Http\Controllers\PaymentController::class, 'syncStatus'])->name('payment.sync');
 
+    // PDF Download Routes
+    Route::get('/pesanan/{order}/invoice', [App\Http\Controllers\PdfController::class, 'invoice'])->name('download.invoice');
+    Route::get('/pesanan/{order}/spk', [App\Http\Controllers\PdfController::class, 'spk'])->name('download.spk');
+    Route::get('/laporan-massal/{type}/{token}', [App\Http\Controllers\PdfController::class, 'bulkPreview'])->name('pdf.preview_bulk');
+
     Route::get('/desain', [App\Http\Controllers\DesignController::class, 'index'])->name('customer.designs');
     Route::post('/desain', [App\Http\Controllers\DesignController::class, 'store'])->name('customer.designs.store');
     Route::get('/desain/{design}/edit', [App\Http\Controllers\DesignController::class, 'edit'])->name('customer.designs.edit');

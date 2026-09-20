@@ -27,7 +27,7 @@ class ApiSettingResource extends Resource
                 Forms\Components\Grid::make(2)
                     ->schema([
                         // Card 1: Paywuz Gateway
-                        Forms\Components\Section::make('API 1: 💳 Paywuz Payment Gateway')
+                        Forms\Components\Section::make('Paywuz Payment Gateway')
                             ->description('Integrasi Payment Gateway Paywuz untuk checkout transaksi.')
                             ->icon('heroicon-o-credit-card')
                             ->collapsible()
@@ -50,16 +50,14 @@ class ApiSettingResource extends Resource
                                     ->password()
                                     ->revealable()
                                     ->extraInputAttributes(['autocomplete' => 'new-password'])
-                                    ->placeholder('pk_sand_...')
-                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
+                                    ->placeholder('pk_sand_...'),
 
                                 Forms\Components\TextInput::make('paywuz_production_api_key')
                                     ->label('Production API Key')
                                     ->password()
                                     ->revealable()
                                     ->extraInputAttributes(['autocomplete' => 'new-password'])
-                                    ->placeholder('pk_live_...')
-                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
+                                    ->placeholder('pk_live_...'),
 
                                 Forms\Components\Placeholder::make('paywuz_webhook_url')
                                     ->label('Webhook URL Callback Paywuz')
@@ -68,7 +66,7 @@ class ApiSettingResource extends Resource
                             ]),
 
                         // Card 2: RajaOngkir Shipping
-                        Forms\Components\Section::make('API 2: 🚚 RajaOngkir Shipping API')
+                        Forms\Components\Section::make('RajaOngkir Shipping API')
                             ->description('Kalkulator perhitungan ongkos kirim ekspedisi Indonesia.')
                             ->icon('heroicon-o-truck')
                             ->collapsible()
@@ -91,9 +89,7 @@ class ApiSettingResource extends Resource
                                     ->label('RajaOngkir API Key')
                                     ->password()
                                     ->revealable()
-                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
-                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
-
+                                    ->extraInputAttributes(['autocomplete' => 'new-password']),
                                 Forms\Components\TextInput::make('rajaongkir_origin_city_id')
                                     ->label('ID Kota Asal Toko/Gudang')
                                     ->numeric()
@@ -102,7 +98,7 @@ class ApiSettingResource extends Resource
                             ]),
 
                         // Card 3: Fonnte WhatsApp Gateway
-                        Forms\Components\Section::make('API 3: 💬 Fonnte WhatsApp Gateway')
+                        Forms\Components\Section::make('Fonnte WhatsApp Gateway')
                             ->description('Pengiriman notifikasi status pesanan, produksi & WA OTP.')
                             ->icon('heroicon-o-chat-bubble-left-right')
                             ->collapsible()
@@ -116,9 +112,7 @@ class ApiSettingResource extends Resource
                                     ->label('Fonnte Device Token')
                                     ->password()
                                     ->revealable()
-                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
-                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan Device Token'),
-
+                                    ->extraInputAttributes(['autocomplete' => 'new-password']),
                                 Forms\Components\TextInput::make('fonnte_country_code')
                                     ->label('Default Kode Negara')
                                     ->default('62')
@@ -126,7 +120,7 @@ class ApiSettingResource extends Resource
                             ]),
 
                         // Card 4: FastAPI Chatbot Integration
-                        Forms\Components\Section::make('API 4: 🤖 FastAPI NLP Chatbot')
+                        Forms\Components\Section::make('FastAPI NLP Chatbot')
                             ->description('Integrasi service backend kecerdasan buatan NLP Chatbot.')
                             ->icon('heroicon-o-cpu-chip')
                             ->collapsible()
@@ -150,7 +144,7 @@ class ApiSettingResource extends Resource
                             ]),
 
                         // Card 5: Google Gemini AI
-                        Forms\Components\Section::make('API 5: ✨ Google Gemini AI API')
+                        Forms\Components\Section::make('Google Gemini AI API')
                             ->description('Kecerdasan AI untuk fallback respons pertanyaan umum pelanggan.')
                             ->icon('heroicon-o-sparkles')
                             ->collapsible()
@@ -164,9 +158,7 @@ class ApiSettingResource extends Resource
                                     ->label('Gemini API Key')
                                     ->password()
                                     ->revealable()
-                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
-                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
-
+                                    ->extraInputAttributes(['autocomplete' => 'new-password']),
                                 Forms\Components\Select::make('gemini_model')
                                     ->label('Model AI Gemini')
                                     ->options([
@@ -177,7 +169,7 @@ class ApiSettingResource extends Resource
                             ]),
 
                         // Card 6: Google OAuth Socialite
-                        Forms\Components\Section::make('API 6: 🔑 Google OAuth Social Login')
+                        Forms\Components\Section::make('Google OAuth Social Login')
                             ->description('Otentikasi Login & Registrasi cepat via Akun Google.')
                             ->icon('heroicon-o-user-group')
                             ->collapsible()
@@ -195,9 +187,7 @@ class ApiSettingResource extends Resource
                                     ->label('Google Client Secret')
                                     ->password()
                                     ->revealable()
-                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
-                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan Client Secret'),
-
+                                    ->extraInputAttributes(['autocomplete' => 'new-password']),
                                 Forms\Components\TextInput::make('google_redirect_uri')
                                     ->label('Redirect Callback URI')
                                     ->url()
@@ -205,7 +195,7 @@ class ApiSettingResource extends Resource
                             ]),
 
                         // Card 7: Biteship Logistics API
-                        Forms\Components\Section::make('API 7: 📦 Biteship Logistics & Tracking')
+                        Forms\Components\Section::make('Biteship Logistics & Tracking')
                             ->description('Integrasi kurir ekspedisi lanjutan & lacak resi otomatis.')
                             ->icon('heroicon-o-archive-box')
                             ->collapsible()
@@ -219,9 +209,7 @@ class ApiSettingResource extends Resource
                                     ->label('Biteship API Key')
                                     ->password()
                                     ->revealable()
-                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
-                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan API Key'),
-
+                                    ->extraInputAttributes(['autocomplete' => 'new-password']),
                                 Forms\Components\TextInput::make('biteship_origin_postal_code')
                                     ->label('Kode Pos Asal Pengiriman')
                                     ->numeric()
@@ -229,7 +217,7 @@ class ApiSettingResource extends Resource
                             ]),
 
                         // Card 8: SMTP Mail Gateway
-                        Forms\Components\Section::make('API 8: 📧 SMTP Mail Gateway Service')
+                        Forms\Components\Section::make('SMTP Mail Gateway Service')
                             ->description('Layanan pengiriman email sistem (Password Reset & Notifikasi).')
                             ->icon('heroicon-o-envelope')
                             ->collapsible()
@@ -258,9 +246,7 @@ class ApiSettingResource extends Resource
                                     ->label('SMTP Password')
                                     ->password()
                                     ->revealable()
-                                    ->extraInputAttributes(['autocomplete' => 'new-password'])
-                                    ->helperText('Klik ikon mata 👁️ untuk melihat atau menyembunyikan Password'),
-
+                                    ->extraInputAttributes(['autocomplete' => 'new-password']),
                                 Forms\Components\Select::make('smtp_encryption')
                                     ->label('Tipe Enkripsi')
                                     ->options([
@@ -357,3 +343,4 @@ class ApiSettingResource extends Resource
         ];
     }
 }
+

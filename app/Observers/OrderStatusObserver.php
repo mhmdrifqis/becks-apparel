@@ -20,7 +20,7 @@ class OrderStatusObserver
         }
 
         $statusLabels = [
-            'paid'      => 'Antrean Masuk (Pembayaran Diterima)',
+            'paid'      => 'Antrian Masuk (Pembayaran Diterima)',
             'printing'  => 'Proses Cetak Sublim',
             'sewing'    => 'Proses Jahit Jersey',
             'qc'        => 'Quality Control & Finishing',

@@ -10,6 +10,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\HtmlString;
 class ReturnRequestResource extends Resource
 {
     protected static ?string $model = ReturnRequest::class;
@@ -49,18 +51,32 @@ class ReturnRequestResource extends Resource
                         Forms\Components\Textarea::make('reason')
                             ->label('Alasan Retur')
                             ->required()
+                            ->disabledOn('edit')
                             ->columnSpanFull(),
 
-                        Forms\Components\FileUpload::make('proof_images')
-                            ->label('Bukti Foto / Video')
-                            ->multiple()
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'video/mp4', 'video/quicktime', 'video/x-msvideo'])
-                            ->disk('public')
-                            ->directory('returns')
-                            ->openable()
-                            ->downloadable()
-                            ->columnSpanFull(),
                     ])->columns(2),
+
+                Forms\Components\Section::make('Lampiran Bukti Pelanggan')
+                    ->description('Klik gambar untuk melihat ukuran asli dan unduh bukti bila diperlukan.')
+                    ->schema([
+                        Forms\Components\Placeholder::make('proof_gallery')
+                            ->label('Foto / Video Bukti')
+                            ->content(function (?ReturnRequest $record): HtmlString {
+                                $files = array_values(array_filter($record?->proof_images ?? []));
+                                if ($files === []) return new HtmlString('<span style="font-size:14px;color:#6b7280">Belum ada lampiran bukti dari pelanggan.</span>');
+                                $html = '<div style="display:flex;flex-wrap:wrap;gap:12px">';
+                                foreach ($files as $index => $file) {
+                                    $url = e(Storage::disk('public')->url($file));
+                                    $filename = e(basename($file));
+                                    $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                                    $preview = in_array($extension, ['mp4', 'mov', 'avi', 'webm'], true) ? '<div style="display:flex;width:100px;height:100px;align-items:center;justify-content:center;border-radius:8px;background:#111827;color:#fff;font-size:11px">Video</div>' : '<img src="' . $url . '" alt="Bukti retur ' . ($index + 1) . '" style="display:block;width:100px;height:100px;object-fit:cover;border-radius:8px">';
+                                    $html .= '<div style="width:124px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;padding:8px"><a href="' . $url . '" target="_blank" rel="noopener" title="Buka ukuran asli">' . $preview . '</a><a href="' . $url . '" download style="display:block;text-align:center;margin-top:6px;font-size:10px;font-weight:600;color:#2563eb">Unduh</a></div>';
+                                }
+                                return new HtmlString($html . '</div>');
+                            })
+                            ->columnSpanFull(),
+                    ])
+                    ->visible(fn (?ReturnRequest $record): bool => $record !== null),
 
                 Forms\Components\Section::make('Validasi Admin')
                     ->schema([
@@ -94,9 +110,11 @@ class ReturnRequestResource extends Resource
                     ->label('Pelanggan')
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('proof_images')
-                    ->label('Lampiran Bukti')
-                    ->formatStateUsing(fn ($state) => is_array($state) && count($state) > 0 ? count($state) . ' File' : 'Tanpa File'),
+                Tables\Columns\ImageColumn::make('proof_images')
+                    ->label('Lampiran')
+                    ->stacked()
+                    ->limit(3)
+                    ->square(),
 
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Status')
@@ -129,7 +147,14 @@ class ReturnRequestResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->label('Validasi'),
+                Tables\Actions\EditAction::make()
+                    ->label('Validasi')
+                    ->tooltip('Validasi Retur')
+                    ->icon('heroicon-o-check-badge')
+                    ->iconButton()
+                    ->slideOver()
+                    ->modalWidth(\Filament\Support\Enums\MaxWidth::ExtraLarge)
+                    ->modalSubmitActionLabel('Simpan Validasi'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -142,8 +167,6 @@ class ReturnRequestResource extends Resource
     {
         return [
             'index' => Pages\ListReturnRequests::route('/'),
-            'create' => Pages\CreateReturnRequest::route('/create'),
-            'edit' => Pages\EditReturnRequest::route('/{record}/edit'),
         ];
     }
 

@@ -26,18 +26,18 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
             x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            class="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[2rem] bg-white text-gray-900 shadow-2xl border border-gray-100"
+            class="relative w-full max-w-md max-h-[98vh] overflow-y-auto rounded-[2rem] bg-white text-gray-900 shadow-2xl border border-gray-100"
         >
-            <div class="px-6 py-6 sm:px-8 sm:py-8">
+            <div class="px-6 py-6 sm:px-5 sm:py-6">
                 <!-- Close Button -->
                 <button @click="showAuthModal = false" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
 
                 <!-- Logo & Title -->
-                <div class="text-center mb-8">
-                    <div class="flex justify-center mb-4">
-                        <x-application-logo class="h-12 w-auto fill-current text-brand-900 dark:text-brand-400" />
+                <div class="text-center mb-5">
+                    <div class="flex justify-center mb-3">
+                        <x-application-logo class="h-10 w-auto fill-current text-brand-900 dark:text-brand-400" />
                     </div>
                     <h2 class="text-3xl font-black tracking-tighter" x-text="authMode === 'login' ? 'Selamat Datang Kembali' : 'Bergabung Sekarang'"></h2>
                     <p class="text-gray-500 dark:text-zinc-400 text-sm mt-2" x-text="authMode === 'login' ? 'Masuk ke akun Becks Apparel Anda' : 'Buat akun untuk mulai kustomisasi jersey'"></p>
@@ -55,35 +55,38 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                    <form method="POST" action="{{ route('login') }}" class="space-y-3">
                         @csrf
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Nomor WhatsApp / Email</label>
-                            <input type="text" name="login" value="{{ old('login') }}" required autofocus class="w-full px-5 py-3 rounded-2xl bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900" placeholder="08xxxxxxxxxx atau email">
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-1">Nomor WhatsApp / Email</label>
+                            <input type="text" name="login" value="{{ old('login') }}" required autofocus class="w-full px-4 py-2.5 rounded-xl text-sm bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900" placeholder="08xxxxxxxxxx atau email">
                             @error('login') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <div class="flex justify-between mb-2">
-                                <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">Password</label>
-                                <a href="{{ route('password.otp.request') }}" class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline">Lupa Password via WhatsApp?</a>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">Password</label>
+                                @if (Route::has('password.request'))
+                                    <a href="{{ route('password.request') }}" class="text-[10px] font-bold text-brand-600 hover:text-brand-500 transition-colors">
+                                        Lupa Password via WhatsApp?
+                                    </a>
+                                @endif
                             </div>
-                            <input type="password" name="password" required class="w-full px-5 py-3 rounded-2xl bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900" placeholder="••••••••">
+                            <input type="password" name="password" required class="w-full px-4 py-2.5 rounded-xl text-sm bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900" placeholder="••••••••">
+                            @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div class="flex items-center">
-                            <label class="inline-flex items-center cursor-pointer group">
-                                <input type="checkbox" name="remember" class="rounded-md bg-gray-100 dark:bg-zinc-800 border-transparent text-brand-900 focus:ring-brand-500 transition-all">
-                                <span class="ml-2 text-sm text-gray-600 dark:text-zinc-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">Ingat saya</span>
-                            </label>
+                            <input id="remember_me" type="checkbox" name="remember" class="w-4 h-4 text-brand-600 bg-gray-100 border-gray-300 rounded focus:ring-brand-500 focus:ring-2">
+                            <label for="remember_me" class="ml-2 text-sm font-medium text-gray-600 dark:text-zinc-400">Ingat saya</label>
                         </div>
 
-                        <button type="submit" class="w-full py-4 bg-brand-900 border border-brand-700 hover:bg-brand-800 text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-950/20 transition-all active:scale-95 uppercase tracking-tighter">
+                        <button type="submit" class="w-full py-3 bg-brand-900 border border-brand-700 hover:bg-brand-800 text-white rounded-xl font-bold text-base shadow-xl shadow-brand-950/20 transition-all active:scale-95 uppercase tracking-tighter">
                             Masuk Ke Akun
                         </button>
                     </form>
 
-                    <div class="mt-6">
+                    <div class="mt-4">
                         <div class="relative">
                             <div class="absolute inset-0 flex items-center">
                                 <div class="w-full border-t border-gray-200 dark:border-zinc-800"></div>
@@ -93,8 +96,8 @@
                             </div>
                         </div>
 
-                        <div class="mt-6">
-                            <a href="{{ route('auth.google') }}" class="w-full flex items-center justify-center px-4 py-3 border border-gray-200 dark:border-zinc-700 rounded-2xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all active:scale-95">
+                        <div class="mt-4">
+                            <a href="{{ route('auth.google') }}" class="w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-2xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all active:scale-95">
                                 <svg class="h-5 w-5 mr-3" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
                                     <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                                         <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"/>
@@ -108,7 +111,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-8 pt-8 border-t border-gray-100 dark:border-zinc-800 text-center">
+                    <div class="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800 text-center">
                         <p class="text-sm text-gray-600 dark:text-zinc-400">
                             Belum punya akun? 
                             <button @click="authMode = 'register'" class="font-bold text-brand-900 dark:text-brand-400 hover:underline">Daftar Sekarang</button>
@@ -128,43 +131,45 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('register') }}" class="space-y-4">
+                    <form method="POST" action="{{ route('register') }}" class="space-y-3">
                         @csrf
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Nama Lengkap</label>
-                            <input type="text" name="name" value="{{ old('name') }}" required class="w-full px-5 py-3 rounded-2xl bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900" placeholder="Nama Lengkap Anda">
+                            <input type="text" name="name" value="{{ old('name') }}" required class="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900 text-sm" placeholder="Nama Lengkap Anda">
                             @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Nomor WhatsApp / Telepon</label>
-                            <input type="text" name="phone" value="{{ old('phone') }}" required class="w-full px-5 py-3 rounded-2xl bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900" placeholder="Contoh: 08123456789">
+                            <input type="text" name="phone" value="{{ old('phone') }}" required class="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900 text-sm" placeholder="Contoh: 08123456789">
                             @error('phone') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Email Address (Opsional)</label>
-                            <input type="email" name="email" value="{{ old('email') }}" class="w-full px-5 py-3 rounded-2xl bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900" placeholder="nama@email.com (opsional)">
+                            <input type="email" name="email" value="{{ old('email') }}" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900 text-sm" placeholder="nama@email.com (opsional)">
                             @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Password</label>
-                            <input type="password" name="password" required class="w-full px-5 py-3 rounded-2xl bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900" placeholder="Minimal 8 karakter">
-                            @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-1">Password</label>
+                                <input type="password" name="password" required class="w-full px-4 py-2.5 rounded-xl text-sm bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900" placeholder="Min. 8 char">
+                                @error('password') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-1">Konfirmasi</label>
+                                <input type="password" name="password_confirmation" required class="w-full px-4 py-2.5 rounded-xl text-sm bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900" placeholder="Ulangi">
+                            </div>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Konfirmasi Password</label>
-                            <input type="password" name="password_confirmation" required class="w-full px-5 py-3 rounded-2xl bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900" placeholder="Ulangi password">
-                        </div>
-
-                        <button type="submit" class="w-full py-4 bg-brand-900 border border-brand-700 hover:bg-brand-800 text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-950/20 transition-all active:scale-95 uppercase tracking-tighter">
+                        <button type="submit" class="w-full py-3 mt-2 bg-brand-900 border border-brand-700 hover:bg-brand-800 text-white rounded-xl font-bold text-base shadow-xl shadow-brand-950/20 transition-all active:scale-95 uppercase tracking-tighter">
                             Buat Akun Baru
                         </button>
                     </form>
 
-                    <div class="mt-6">
+                    <div class="mt-4">
                         <div class="relative">
                             <div class="absolute inset-0 flex items-center">
                                 <div class="w-full border-t border-gray-200 dark:border-zinc-800"></div>
@@ -174,8 +179,8 @@
                             </div>
                         </div>
 
-                        <div class="mt-6">
-                            <a href="{{ route('auth.google') }}" class="w-full flex items-center justify-center px-4 py-3 border border-gray-200 dark:border-zinc-700 rounded-2xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all active:scale-95">
+                        <div class="mt-4">
+                            <a href="{{ route('auth.google') }}" class="w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-2xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all active:scale-95">
                                 <svg class="h-5 w-5 mr-3" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
                                     <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                                         <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"/>
@@ -189,7 +194,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-6 pt-6 border-t border-gray-100 dark:border-zinc-800 text-center">
+                    <div class="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800 text-center">
                         <p class="text-sm text-gray-600 dark:text-zinc-400">
                             Sudah punya akun? 
                             <button @click="authMode = 'login'" class="font-bold text-brand-900 dark:text-brand-400 hover:underline">Masuk Di Sini</button>
@@ -200,3 +205,4 @@
         </div>
     </div>
 </div>
+

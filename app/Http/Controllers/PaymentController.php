@@ -159,7 +159,11 @@ class PaymentController extends Controller
             $statusResponse = $this->paywuzService->getTransactionStatus($transactionId);
             Log::info('Paywuz Sync Response', (array) $statusResponse);
             
-            $status = $statusResponse['data']['status'] ?? 'pending';
+            if (!$statusResponse) {
+                return back()->with('error', 'Gagal terhubung ke server pembayaran (Timeout). Silakan coba lagi nanti.');
+            }
+            
+            $status = isset($statusResponse['data']['status']) ? $statusResponse['data']['status'] : 'pending';
 
             if (in_array($status, ['success', 'settlement', 'paid'])) {
                 DB::beginTransaction();

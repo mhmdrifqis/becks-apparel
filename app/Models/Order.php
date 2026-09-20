@@ -67,7 +67,7 @@ class Order extends Model
         static::updated(function ($order) {
             if ($order->isDirty('status')) {
                 $statusLabels = [
-                    'paid'      => 'Antrean Masuk',
+                    'paid'      => 'Antrian Masuk',
                     'printing'  => 'Proses Cetak',
                     'sewing'    => 'Proses Jahit',
                     'qc'        => 'Quality Control',

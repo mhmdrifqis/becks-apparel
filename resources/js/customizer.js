@@ -1505,6 +1505,9 @@ export default () => ({
         await this.updatePattern();
         this.renderLayers();
         this.isHistoryAction = wasHistoryAction;
+        
+        await this._waitForRender();
+        this.captureSnapshot();
     },
 
     async ensureAllSnapshots() {
@@ -3019,7 +3022,10 @@ export default () => ({
     },
 
     redirectToCatalog() {
-        if (this.packageSlug) {
+        // If there's a referrer from our own site (and not the customizer itself), go back
+        if (document.referrer && document.referrer.includes(window.location.host) && !document.referrer.includes('/customizer')) {
+            window.history.back();
+        } else if (this.packageSlug) {
             window.location.href = "/catalog/" + this.packageSlug;
         } else {
             window.location.href = "/catalog";
@@ -3103,18 +3109,12 @@ export default () => ({
             // 2. Capture Preview Image
             let finalPreviewDataUrl = "";
             const previewCanvas = await this.generateCompositeCanvas(
-                800,
-                800,
+                1200,
+                1200,
                 "jpeg",
             );
             if (previewCanvas) {
-                const scaledCanvas = document.createElement("canvas");
-                scaledCanvas.width = 400;
-                scaledCanvas.height = 400;
-                scaledCanvas
-                    .getContext("2d")
-                    .drawImage(previewCanvas, 0, 0, 400, 400);
-                finalPreviewDataUrl = scaledCanvas.toDataURL("image/jpeg", 0.7);
+                finalPreviewDataUrl = previewCanvas.toDataURL("image/jpeg", 0.95);
             }
 
             // 3. Send to Server
@@ -3218,6 +3218,10 @@ export default () => ({
                     this.updateDesignUrl = result.updateUrl;
                 }
 
+                // Reset undo stack so we don't warn about unsaved changes
+                this.undoStack = [];
+                this.saveHistory();
+
                 // Close save modal & open success modal
                 this.showSaveModal = false;
                 this.showSuccessSaveModal = true;
@@ -3260,9 +3264,23 @@ export default () => ({
                 }),
             });
 
-            const result = await response.json();
+            // Laravel auth typically redirects on success. 
+            // If it redirected or returned 200/204, we consider it a success.
+            let isSuccess = false;
+            let result = {};
 
-            if (response.ok || response.status === 200) {
+            if (response.redirected || response.ok) {
+                isSuccess = true;
+            } else {
+                // Parse errors
+                try {
+                    result = await response.json();
+                } catch(e) {
+                    console.warn("Could not parse JSON error response");
+                }
+            }
+
+            if (isSuccess) {
                 this.isAuthenticated = true;
                 const authInput = document.getElementById("is-authenticated");
                 if (authInput) authInput.value = "1";

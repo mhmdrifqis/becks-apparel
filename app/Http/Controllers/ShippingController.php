@@ -250,7 +250,7 @@ class ShippingController extends Controller
             ], 400);
         }
 
-        $courier = strtolower($order->shipping_service ?: 'jne');
+        $courier = strtolower($order->courier_name ?: $order->shipping_service ?: 'jne');
         if (str_contains($courier, 'jne')) $courier = 'jne';
         elseif (str_contains($courier, 'sicepat')) $courier = 'sicepat';
         elseif (str_contains($courier, 'jnt') || str_contains($courier, 'j&t')) $courier = 'jnt';

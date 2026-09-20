@@ -5,19 +5,19 @@
 @php $hideNavFooter = true; @endphp
 
 @section('content')
-<div class="h-screen overflow-hidden flex flex-col bg-slate-50" x-data="customizer()" x-cloak>
+<div class="h-screen overflow-hidden flex flex-col bg-gray-100 dark:bg-zinc-900" x-data="customizer()" x-cloak>
     <style>
         [x-cloak] { display: none !important; }
         .canvas-container { margin: 0 auto !important; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         /* Disesuaikan ke Vibrant Orange */
-        ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #ea580c; }
+        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #b48e2a; }
         
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
         
         @media (max-width: 768px) {
             #jersey-canvas { max-width: 100% !important; height: auto !important; }
@@ -44,9 +44,9 @@
         @font-face { font-family: 'Spain WC 2026'; src: url('/assets/fonts/Spain WC 2026_Nero Design.woff2') format('woff2'); }
         
         /* Cropper CSS disesuaikan dengan tema gelap */
-        .cropper-container { background-color: #04251a !important; }
+        .cropper-container { background-color: #18181b !important; }
         .cropper-modal { background-color: #000 !important; opacity: 0.8 !important; }
-        .cropper-view-box { outline: 2px solid #f97316 !important; }
+        .cropper-view-box { outline: 2px solid #d4af37 !important; }
         .cropper-face { background-color: transparent !important; }
     </style>
 
@@ -54,25 +54,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 
     <div x-show="isLoading" 
-         class="fixed inset-0 z-[100] bg-brand-950/80 backdrop-blur-md flex flex-col items-center justify-center transition-all duration-500">
+         class="fixed inset-0 z-[100] bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md flex flex-col items-center justify-center transition-all duration-500">
         <div class="relative w-24 h-24">
             <div class="absolute inset-0 border-4 border-brand-500/20 rounded-full"></div>
             <div class="absolute inset-0 border-4 border-t-brand-500 rounded-full animate-spin"></div>
         </div>
-        <p class="mt-6 text-brand-400 font-bold tracking-widest text-xs uppercase animate-pulse text-center">Menyiapkan Desain...</p>
+        <p class="mt-6 text-gray-900 dark:text-brand-400 font-bold tracking-widest text-xs uppercase animate-pulse text-center">Menyiapkan Desain...</p>
     </div>
 
     <div id="app-container" class="flex flex-col md:flex-row h-full w-full overflow-hidden relative">
         
-        <nav class="fixed bottom-0 md:relative w-full md:w-20 bg-brand-950/80 backdrop-blur-xl border-t md:border-t-0 md:border-r border-brand-800/30 flex flex-row md:flex-col items-center py-2 md:py-6 px-4 md:px-0 gap-2 md:gap-8 z-50 order-3 md:order-1 shrink-0 h-16 md:h-full">
+        <nav class="fixed bottom-0 md:relative w-full md:w-20 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-t md:border-t-0 md:border-r border-gray-200 dark:border-brand-800/30 flex flex-row md:flex-col items-center py-2 md:py-6 px-4 md:px-0 gap-2 md:gap-8 z-50 order-3 md:order-1 shrink-0 h-16 md:h-full">
             <div class="hidden md:flex p-3 rounded-xl bg-brand-900 shadow-lg mb-4 cursor-pointer hover:scale-110 transition-transform" @click="location.reload()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+                <img src="{{ asset('assets/images/logo-becks.png') }}" class="w-8 h-8 object-contain brightness-0 invert">
+
             </div>
             
             <div class="flex flex-row md:flex-col flex-1 justify-around md:justify-start gap-2 md:gap-6 w-full overflow-x-auto no-scrollbar">
                 <template x-for="menu in menus" :key="menu.id">
-                    <button @click="setActiveMenu(menu.id)" :class="activeMenu === menu.id ? 'bg-brand-900/20 text-brand-400 border-brand-900/50' : 'text-slate-400 border-transparent'" class="group flex flex-col items-center gap-1 p-2 rounded-lg border transition-all min-w-[60px]">
-                        <div class="p-2 rounded-lg group-hover:bg-brand-900/10"><span x-html="menu.icon"></span></div>
+                    <button @click="setActiveMenu(menu.id)" :class="activeMenu === menu.id ? 'bg-gray-100 dark:bg-brand-900/20 text-gray-900 dark:text-brand-400 border-brand-900/50' : 'text-gray-400 dark:text-slate-400 border-transparent'" class="group flex flex-col items-center gap-1 p-2 rounded-lg border transition-all min-w-[60px]">
+                        <div class="p-2 rounded-lg group-hover:bg-gray-50 dark:bg-brand-900/10"><span x-html="menu.icon"></span></div>
                         <span class="text-[9px] md:text-[10px] font-medium uppercase tracking-tighter" x-text="menu.label"></span>
                     </button>
                 </template>
@@ -81,32 +82,32 @@
 
         <aside 
             :class="isPanelOpen ? 'md:w-80 h-[45%] md:h-full opacity-100' : 'md:w-0 h-0 md:h-full opacity-0'"
-            class="relative w-full bg-brand-950/95 backdrop-blur-2xl border-t md:border-t-0 md:border-r border-brand-800/20 flex flex-col z-20 shadow-2xl order-2 md:order-2 transition-all duration-300 overflow-hidden shrink-0 mb-16 md:mb-0"
+            class="relative w-full bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-t md:border-t-0 md:border-r border-gray-100 dark:border-brand-800/20 flex flex-col z-20 shadow-2xl order-2 md:order-2 transition-all duration-300 overflow-hidden shrink-0 mb-16 md:mb-0"
         >
-            <header class="p-4 md:p-6 border-b border-brand-800/20 bg-brand-950/40 flex items-center justify-between">
+            <header class="p-4 md:p-6 border-b border-gray-100 dark:border-brand-800/20 bg-gray-100/80 dark:bg-zinc-900/40 flex items-center justify-between">
                 <div>
-                    <h2 class="text-base md:text-lg font-bold capitalize text-brand-50" x-text="activeMenuLabel"></h2>
-                    <p class="text-[10px] md:text-xs text-brand-400/60 mt-0.5 tracking-wider uppercase">Konfigurasi Elemen</p>
+                    <h2 class="text-base md:text-lg font-bold capitalize text-gray-900 dark:text-brand-50" x-text="activeMenuLabel"></h2>
+                    <p class="text-[10px] md:text-xs text-gray-400 dark:text-brand-400/60 mt-0.5 tracking-wider uppercase">Konfigurasi Elemen</p>
                 </div>
             </header>
             
             <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-8 pb-32 custom-scrollbar">
                 
                 <div x-show="activeMenu === 'mockup'" x-transition class="space-y-6">
-                    <label class="block text-[10px] font-bold text-brand-400/80 mb-4 uppercase tracking-[0.2em]">Pilih Model Mockup</label>
+                    <label class="block text-[10px] font-bold text-gray-500 dark:text-brand-400/80 mb-4 uppercase tracking-[0.2em]">Pilih Model Mockup</label>
                     <div class="grid grid-cols-1 gap-4">
                         <template x-for="mockup in availableMockups" :key="mockup.id">
                             <button 
                                 @click="setModel(mockup.id)"
-                                :class="currentModel === mockup.id ? 'border-brand-500 bg-brand-900/30 ring-1 ring-brand-500' : 'border-brand-800/30 hover:border-brand-700 bg-brand-950/20'"
+                                :class="currentModel === mockup.id ? 'border-brand-500 bg-gray-200/50 dark:bg-brand-900/30 ring-1 ring-brand-500' : 'border-gray-200 dark:border-brand-800/30 hover:border-brand-700 bg-gray-50 dark:bg-zinc-900/20'"
                                 class="w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left group"
                             >
-                                <div class="w-12 h-12 rounded-xl bg-brand-900/20 flex items-center justify-center group-hover:bg-brand-900/40 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+                                <div class="w-12 h-12 rounded-xl bg-gray-100 dark:bg-brand-900/20 flex items-center justify-center group-hover:bg-gray-200 dark:bg-brand-900/40 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-900 dark:text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
                                 </div>
                                 <div>
-                                    <h3 class="text-xs font-bold text-brand-50 uppercase tracking-wide" x-text="mockup.label"></h3>
-                                    <p class="text-[10px] text-brand-400/60 mt-1 uppercase font-mono" x-text="mockup.id"></p>
+                                    <h3 class="text-xs font-bold text-gray-900 dark:text-brand-50 uppercase tracking-wide" x-text="mockup.label"></h3>
+                                    <p class="text-[10px] text-gray-400 dark:text-brand-400/60 mt-1 uppercase font-mono" x-text="mockup.id"></p>
                                 </div>
                                 <div x-show="currentModel === mockup.id" class="ml-auto">
                                     <div class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></div>
@@ -118,13 +119,13 @@
 
                 <div x-show="activeMenu === 'color'" x-transition class="space-y-6">
                     <div>
-                        <label class="block text-[10px] font-bold text-brand-400/80 mb-3 uppercase tracking-[0.2em]">Pilih Bagian Jersey</label>
-                        <div class="space-y-1 bg-brand-950/40 rounded-xl border border-brand-800/20 overflow-hidden">
+                        <label class="block text-[10px] font-bold text-gray-500 dark:text-brand-400/80 mb-3 uppercase tracking-[0.2em]">Pilih Bagian Jersey</label>
+                        <div class="space-y-1 bg-gray-100/80 dark:bg-zinc-900/40 rounded-xl border border-gray-100 dark:border-brand-800/20 overflow-hidden">
                             <template x-for="part in parts" :key="'part-'+part.id">
                                 <button 
                                     @click="activePart = part.id"
-                                    class="w-full flex items-center justify-between p-3 hover:bg-brand-900/20 transition-colors border-b border-brand-800/10 last:border-0"
-                                    :class="activePart === part.id ? 'bg-brand-900/10 border-l-2 border-l-brand-500' : ''"
+                                    class="w-full flex items-center justify-between p-3 hover:bg-gray-100 dark:bg-brand-900/20 transition-colors border-b border-brand-800/10 last:border-0"
+                                    :class="activePart === part.id ? 'bg-gray-50 dark:bg-brand-900/10 border-l-2 border-l-brand-500' : ''"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div class="w-5 h-5 rounded-full border border-white/10 relative overflow-hidden flex-shrink-0">
@@ -135,9 +136,9 @@
                                                 <div class="absolute inset-0 rounded-full" :style="`background-color: ${partColors[part.id]}`"></div>
                                             </template>
                                         </div>
-                                        <span class="text-xs font-medium" :class="activePart === part.id ? 'text-brand-300' : 'text-brand-100/70'" x-text="part.label"></span>
+                                        <span class="text-xs font-medium" :class="activePart === part.id ? 'text-gray-700 dark:text-brand-300' : 'text-gray-500 dark:text-brand-100/70'" x-text="part.label"></span>
                                     </div>
-                                    <span x-show="partColorMode[part.id] === 'gradient'" class="text-[8px] bg-brand-500/20 text-brand-400 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">Gradasi</span>
+                                    <span x-show="partColorMode[part.id] === 'gradient'" class="text-[8px] bg-brand-500/20 text-gray-900 dark:text-brand-400 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">Gradasi</span>
                                 </button>
                             </template>
                         </div>
@@ -146,9 +147,9 @@
                     <div>
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-2">
-                                <label class="text-xs font-bold text-brand-200 uppercase tracking-widest">Warna solid</label>
+                                <label class="text-xs font-bold text-gray-800 dark:text-brand-200 uppercase tracking-widest">Warna solid</label>
                             </div>
-                            <button @click="showAllSolidColors = !showAllSolidColors" class="text-[10px] text-brand-400 hover:text-brand-300 transition-colors font-bold uppercase" x-text="showAllSolidColors ? 'Tutup' : 'Semua'"></button>
+                            <button @click="showAllSolidColors = !showAllSolidColors" class="text-[10px] text-gray-900 dark:text-brand-400 hover:text-gray-700 dark:text-brand-300 transition-colors font-bold uppercase" x-text="showAllSolidColors ? 'Tutup' : 'Semua'"></button>
                         </div>
                         <div class="grid grid-cols-7 gap-1.5">
                             <template x-for="(color, index) in solidColors" :key="'solid-'+color">
@@ -160,8 +161,8 @@
                                     class="w-7 h-7 rounded-full border border-white/5 transition-all shadow-lg"
                                 ></button>
                             </template>
-                            <button class="w-7 h-7 rounded-full border-2 border-dashed border-brand-800 hover:border-brand-500 bg-brand-950/40 flex items-center justify-center relative transition-all hover:scale-105">
-                                <span class="text-brand-400 text-sm leading-none pointer-events-none">+</span>
+                            <button class="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 dark:border-brand-800 hover:border-brand-500 bg-gray-100/80 dark:bg-zinc-900/40 flex items-center justify-center relative transition-all hover:scale-105">
+                                <span class="text-gray-900 dark:text-brand-400 text-sm leading-none pointer-events-none">+</span>
                                 <input type="color" x-ref="partPicker" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full rounded-full" @input="updatePartColor(activePart, $event.target.value)">
                             </button>
                         </div>
@@ -170,9 +171,9 @@
                     <div>
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-2">
-                                <label class="text-xs font-bold text-brand-200 uppercase tracking-widest">Warna gradasi</label>
+                                <label class="text-xs font-bold text-gray-800 dark:text-brand-200 uppercase tracking-widest">Warna gradasi</label>
                             </div>
-                            <button @click="showAllGradients = !showAllGradients" class="text-[10px] text-brand-400 hover:text-brand-300 transition-colors font-bold uppercase" x-text="showAllGradients ? 'Tutup' : 'Semua'"></button>
+                            <button @click="showAllGradients = !showAllGradients" class="text-[10px] text-gray-900 dark:text-brand-400 hover:text-gray-700 dark:text-brand-300 transition-colors font-bold uppercase" x-text="showAllGradients ? 'Tutup' : 'Semua'"></button>
                         </div>
                         <div class="grid grid-cols-7 gap-1.5">
                             <template x-for="(gp, index) in gradientPresets" :key="gp.id">
@@ -187,12 +188,12 @@
                         </div>
                     </div>
 
-                    <div x-show="partColorMode[activePart] === 'gradient'" x-transition class="pt-4 border-t border-brand-800/20 space-y-5">
-                        <label class="block text-[10px] font-bold text-brand-400 uppercase tracking-[0.2em]">Atur Gradasi</label>
+                    <div x-show="partColorMode[activePart] === 'gradient'" x-transition class="pt-4 border-t border-gray-100 dark:border-brand-800/20 space-y-5">
+                        <label class="block text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-[0.2em]">Atur Gradasi</label>
 
-                        <div class="flex gap-2 p-1 bg-brand-950/60 rounded-lg border border-brand-800/20">
-                            <button @click="updatePartGradient(activePart, 'partGradientType', 'linear')" :class="activeState.partGradientType[activePart] === 'linear' ? 'bg-brand-900 text-white shadow-lg' : 'text-brand-400'" class="flex-1 py-1.5 text-[10px] font-bold rounded-md transition-all uppercase">Linear</button>
-                            <button @click="updatePartGradient(activePart, 'partGradientType', 'radial')" :class="activeState.partGradientType[activePart] === 'radial' ? 'bg-brand-900 text-white shadow-lg' : 'text-brand-400'" class="flex-1 py-1.5 text-[10px] font-bold rounded-md transition-all uppercase">Radial</button>
+                        <div class="flex gap-2 p-1 bg-brand-950/60 rounded-lg border border-gray-100 dark:border-brand-800/20">
+                            <button @click="updatePartGradient(activePart, 'partGradientType', 'linear')" :class="activeState.partGradientType[activePart] === 'linear' ? 'bg-brand-900 text-white shadow-lg' : 'text-gray-900 dark:text-brand-400'" class="flex-1 py-1.5 text-[10px] font-bold rounded-md transition-all uppercase">Linear</button>
+                            <button @click="updatePartGradient(activePart, 'partGradientType', 'radial')" :class="activeState.partGradientType[activePart] === 'radial' ? 'bg-brand-900 text-white shadow-lg' : 'text-gray-900 dark:text-brand-400'" class="flex-1 py-1.5 text-[10px] font-bold rounded-md transition-all uppercase">Radial</button>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
@@ -200,7 +201,7 @@
                                 <label class="block text-[9px] text-brand-500/80 mb-2 uppercase font-bold tracking-widest">Warna 1</label>
                                 <label class="flex items-center gap-2 cursor-pointer group relative">
                                     <div class="w-9 h-9 rounded-lg border-2 border-white/5 group-hover:border-brand-500 transition-colors flex-shrink-0" :style="`background-color: ${activeState.partGradientColor1[activePart]}`"></div>
-                                    <span class="text-[9px] text-brand-400 font-mono" x-text="activeState.partGradientColor1[activePart]"></span>
+                                    <span class="text-[9px] text-gray-900 dark:text-brand-400 font-mono" x-text="activeState.partGradientColor1[activePart]"></span>
                                     <input type="color" :value="activeState.partGradientColor1[activePart]" @input="updatePartGradient(activePart, 'partGradientColor1', $event.target.value)" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer">
                                 </label>
                             </div>
@@ -208,16 +209,16 @@
                                 <label class="block text-[9px] text-brand-500/80 mb-2 uppercase font-bold tracking-widest">Warna 2</label>
                                 <label class="flex items-center gap-2 cursor-pointer group relative">
                                     <div class="w-9 h-9 rounded-lg border-2 border-white/5 group-hover:border-brand-500 transition-colors flex-shrink-0" :style="`background-color: ${activeState.partGradientColor2[activePart]}`"></div>
-                                    <span class="text-[9px] text-brand-400 font-mono" x-text="activeState.partGradientColor2[activePart]"></span>
+                                    <span class="text-[9px] text-gray-900 dark:text-brand-400 font-mono" x-text="activeState.partGradientColor2[activePart]"></span>
                                     <input type="color" :value="activeState.partGradientColor2[activePart]" @input="updatePartGradient(activePart, 'partGradientColor2', $event.target.value)" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer">
                                 </label>
                             </div>
                         </div>
 
                         <div x-show="activeState.partGradientType[activePart] === 'linear'" x-transition>
-                            <label class="flex justify-between text-[10px] font-bold text-brand-400/80 mb-2 uppercase tracking-widest">
+                            <label class="flex justify-between text-[10px] font-bold text-gray-500 dark:text-brand-400/80 mb-2 uppercase tracking-widest">
                                 <span>Sudut Gradasi</span>
-                                <span class="text-brand-400" x-text="activeState.partGradientAngle[activePart] + '�'"></span>
+                                <span class="text-gray-900 dark:text-brand-400" x-text="activeState.partGradientAngle[activePart] + '�'"></span>
                             </label>
                             <input type="range" min="0" max="360" :value="activeState.partGradientAngle[activePart]" @input="updatePartGradient(activePart, 'partGradientAngle', $event.target.value)" class="w-full h-1 bg-brand-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
                         </div>
@@ -226,17 +227,17 @@
 
                 <div x-show="activeMenu === 'pattern'" x-transition class="space-y-6">
                     <div>
-                        <label class="block text-[10px] font-bold text-brand-400/80 mb-4 uppercase tracking-[0.2em]">Atur Motif Per Bagian</label>
-                        <div class="space-y-1 bg-brand-950/40 rounded-xl border border-brand-800/20 overflow-hidden mb-6">
+                        <label class="block text-[10px] font-bold text-gray-500 dark:text-brand-400/80 mb-4 uppercase tracking-[0.2em]">Atur Motif Per Bagian</label>
+                        <div class="space-y-1 bg-gray-100/80 dark:bg-zinc-900/40 rounded-xl border border-gray-100 dark:border-brand-800/20 overflow-hidden mb-6">
                             <template x-for="part in parts.filter(p => !['belt'].includes(p.id))" :key="'pnode-'+part.id">
                                 <div 
-                                    class="w-full flex items-center justify-between p-3 hover:bg-brand-900/10 transition-colors border-b border-brand-800/10 last:border-0 cursor-pointer"
-                                    :class="activePatternPart === part.id ? 'bg-brand-900/10 border-l-2 border-l-brand-500' : ''"
+                                    class="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:bg-brand-900/10 transition-colors border-b border-brand-800/10 last:border-0 cursor-pointer"
+                                    :class="activePatternPart === part.id ? 'bg-gray-50 dark:bg-brand-900/10 border-l-2 border-l-brand-500' : ''"
                                     @click="activePatternPart = part.id"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div class="w-2 h-2 rounded-full" :class="partPatterns[part.id] ? 'bg-brand-500' : 'bg-brand-800'"></div>
-                                        <span class="text-xs font-medium" :class="activePatternPart === part.id ? 'text-brand-300' : 'text-brand-100/70'" x-text="part.label"></span>
+                                        <span class="text-xs font-medium" :class="activePatternPart === part.id ? 'text-gray-700 dark:text-brand-300' : 'text-gray-500 dark:text-brand-100/70'" x-text="part.label"></span>
                                     </div>
                                     <button 
                                         @click.stop="togglePartPattern(part.id)"
@@ -251,13 +252,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-[10px] font-bold text-brand-400/80 mb-3 uppercase tracking-[0.2em]">Pilih Motif <span class="text-brand-300" x-text="parts.find(p => p.id === activePatternPart)?.label"></span></label>
+                        <label class="block text-[10px] font-bold text-gray-500 dark:text-brand-400/80 mb-3 uppercase tracking-[0.2em]">Pilih Motif <span class="text-gray-700 dark:text-brand-300" x-text="parts.find(p => p.id === activePatternPart)?.label"></span></label>
                         <div class="grid grid-cols-2 gap-3 mb-6 max-h-52 md:max-h-72 overflow-y-auto pr-2 custom-scrollbar">
                             <template x-for="p in patterns" :key="p.id">
                                 <button 
                                     @click="partActivePatterns[activePatternPart] = p.id; updatePattern()" 
-                                    class="group relative aspect-[4/3] bg-brand-950/20 rounded-xl overflow-hidden border-2 transition-all" 
-                                    :class="partActivePatterns[activePatternPart] === p.id ? 'border-brand-500 ring-2 ring-brand-500/20' : 'border-brand-800/30'"
+                                    class="group relative aspect-[4/3] bg-gray-50 dark:bg-zinc-900/20 rounded-xl overflow-hidden border-2 transition-all" 
+                                    :class="partActivePatterns[activePatternPart] === p.id ? 'border-brand-500 ring-2 ring-brand-500/20' : 'border-gray-200 dark:border-brand-800/30'"
                                 >
                                     <img :src="p.url" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity">
                                     <div class="absolute inset-0 bg-gradient-to-t from-brand-950/80 to-transparent"></div>
@@ -268,15 +269,15 @@
                         
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
-                                <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Warna Motif</label>
-                                <button @click="showAllPatternColors = !showAllPatternColors" class="text-[10px] text-brand-400 hover:text-brand-300 font-bold uppercase transition-colors" x-text="showAllPatternColors ? 'Tutup' : 'Semua'"></button>
+                                <label class="text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest">Warna Motif</label>
+                                <button @click="showAllPatternColors = !showAllPatternColors" class="text-[10px] text-gray-900 dark:text-brand-400 hover:text-gray-700 dark:text-brand-300 font-bold uppercase transition-colors" x-text="showAllPatternColors ? 'Tutup' : 'Semua'"></button>
                             </div>
                             <div class="grid grid-cols-7 gap-1.5">
                                 <template x-for="(color, index) in solidColors" :key="'pat-'+color">
                                     <button x-show="showAllPatternColors || index < 14" @click="updatePatternColor(color)" :style="`background-color: ${color}`" :class="patternColor === color ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-brand-950 scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'" class="w-7 h-7 rounded-full border border-white/5 shadow-lg transition-all"></button>
                                 </template>
-                                <button class="w-7 h-7 rounded-full border-2 border-dashed border-brand-800 hover:border-brand-500 bg-brand-950/40 flex items-center justify-center relative transition-all hover:scale-105">
-                                    <span class="text-brand-400 text-sm leading-none">+</span>
+                                <button class="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 dark:border-brand-800 hover:border-brand-500 bg-gray-100/80 dark:bg-zinc-900/40 flex items-center justify-center relative transition-all hover:scale-105">
+                                    <span class="text-gray-900 dark:text-brand-400 text-sm leading-none">+</span>
                                     <input type="color" x-ref="patternPicker" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full rounded-full" @input="updatePatternColor($event.target.value)">
                                 </button>
                             </div>
@@ -284,8 +285,8 @@
 
                         <div class="space-y-4 pt-4">
                             <div class="flex items-center justify-between">
-                                <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Gradasi Motif</label>
-                                <button @click="showAllPatternGradients = !showAllPatternGradients" class="text-[10px] text-brand-400 hover:text-brand-300 font-bold uppercase transition-colors" x-text="showAllPatternGradients ? 'Tutup' : 'Semua'"></button>
+                                <label class="text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest">Gradasi Motif</label>
+                                <button @click="showAllPatternGradients = !showAllPatternGradients" class="text-[10px] text-gray-900 dark:text-brand-400 hover:text-gray-700 dark:text-brand-300 font-bold uppercase transition-colors" x-text="showAllPatternGradients ? 'Tutup' : 'Semua'"></button>
                             </div>
                             <div class="grid grid-cols-7 gap-1.5">
                                 <template x-for="(gp, index) in gradientPresets" :key="'pat-grad-'+gp.id">
@@ -300,20 +301,20 @@
                             </div>
 
                             <div x-show="activeState.partPatternGradientEnabled[activePatternPart]" x-transition class="pt-2 space-y-4">
-                                <div class="flex gap-2 p-1 bg-brand-950/60 rounded-lg border border-brand-800/20">
-                                    <button @click="updatePatternGradient('partPatternGradientType', 'linear')" :class="activeState.partPatternGradientType[activePatternPart] === 'linear' ? 'bg-brand-900 text-white shadow-lg' : 'text-brand-400'" class="flex-1 py-1.5 text-[9px] font-bold rounded-md transition-all uppercase">Linear</button>
-                                    <button @click="updatePatternGradient('partPatternGradientType', 'radial')" :class="activeState.partPatternGradientType[activePatternPart] === 'radial' ? 'bg-brand-900 text-white shadow-lg' : 'text-brand-400'" class="flex-1 py-1.5 text-[9px] font-bold rounded-md transition-all uppercase">Radial</button>
+                                <div class="flex gap-2 p-1 bg-brand-950/60 rounded-lg border border-gray-100 dark:border-brand-800/20">
+                                    <button @click="updatePatternGradient('partPatternGradientType', 'linear')" :class="activeState.partPatternGradientType[activePatternPart] === 'linear' ? 'bg-brand-900 text-white shadow-lg' : 'text-gray-900 dark:text-brand-400'" class="flex-1 py-1.5 text-[9px] font-bold rounded-md transition-all uppercase">Linear</button>
+                                    <button @click="updatePatternGradient('partPatternGradientType', 'radial')" :class="activeState.partPatternGradientType[activePatternPart] === 'radial' ? 'bg-brand-900 text-white shadow-lg' : 'text-gray-900 dark:text-brand-400'" class="flex-1 py-1.5 text-[9px] font-bold rounded-md transition-all uppercase">Radial</button>
                                 </div>
                                 <div class="grid grid-cols-2 gap-3">
                                     <label class="flex items-center gap-2 cursor-pointer group relative">
                                         <div class="w-8 h-8 rounded-lg border border-white/10 group-hover:border-brand-500 transition-colors" :style="`background-color: ${activeState.partPatternGradientColor1[activePatternPart]}`"></div>
                                         <input type="color" :value="activeState.partPatternGradientColor1[activePatternPart]" @input="updatePatternGradient('partPatternGradientColor1', $event.target.value)" class="absolute inset-0 opacity-0 cursor-pointer">
-                                        <span class="text-[9px] font-mono text-brand-400 uppercase">Warna 1</span>
+                                        <span class="text-[9px] font-mono text-gray-900 dark:text-brand-400 uppercase">Warna 1</span>
                                     </label>
                                     <label class="flex items-center gap-2 cursor-pointer group relative">
                                         <div class="w-8 h-8 rounded-lg border border-white/10 group-hover:border-brand-500 transition-colors" :style="`background-color: ${activeState.partPatternGradientColor2[activePatternPart]}`"></div>
                                         <input type="color" :value="activeState.partPatternGradientColor2[activePatternPart]" @input="updatePatternGradient('partPatternGradientColor2', $event.target.value)" class="absolute inset-0 opacity-0 cursor-pointer">
-                                        <span class="text-[9px] font-mono text-brand-400 uppercase">Warna 2</span>
+                                        <span class="text-[9px] font-mono text-gray-900 dark:text-brand-400 uppercase">Warna 2</span>
                                     </label>
                                 </div>
                                 <div x-show="activeState.partPatternGradientType[activePatternPart] === 'linear'" x-transition>
@@ -322,12 +323,12 @@
                             </div>
                         </div>
 
-                        <div class="space-y-6 pt-6 mt-6 border-t border-brand-800/20">
+                        <div class="space-y-6 pt-6 mt-6 border-t border-gray-100 dark:border-brand-800/20">
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="space-y-3">
                                     <div class="flex justify-between items-center">
-                                        <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Scale: <span class="text-brand-300" x-text="Number(partPatternScales[activePatternPart] || 0.3).toFixed(1)"></span></label>
-                                        <button @click="resetPatternProperty('scale')" class="p-1 hover:text-brand-300 text-brand-500/70 transition-colors" title="Reset Scale">
+                                        <label class="text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest">Scale: <span class="text-gray-700 dark:text-brand-300" x-text="Number(partPatternScales[activePatternPart] || 0.3).toFixed(1)"></span></label>
+                                        <button @click="resetPatternProperty('scale')" class="p-1 hover:text-gray-700 dark:text-brand-300 text-brand-500/70 transition-colors" title="Reset Scale">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                                         </button>
                                     </div>
@@ -335,8 +336,8 @@
                                 </div>
                                 <div class="space-y-3">
                                     <div class="flex justify-between items-center">
-                                        <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Angle: <span class="text-brand-300" x-text="partPatternAngles[activePatternPart]"></span>�</label>
-                                        <button @click="resetPatternProperty('angle')" class="p-1 hover:text-brand-300 text-brand-500/70 transition-colors" title="Reset Angle">
+                                        <label class="text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest">Angle: <span class="text-gray-700 dark:text-brand-300" x-text="partPatternAngles[activePatternPart]"></span>�</label>
+                                        <button @click="resetPatternProperty('angle')" class="p-1 hover:text-gray-700 dark:text-brand-300 text-brand-500/70 transition-colors" title="Reset Angle">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                                         </button>
                                     </div>
@@ -347,8 +348,8 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="space-y-3">
                                     <div class="flex justify-between items-center">
-                                        <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Posisi X: <span class="text-brand-300" x-text="partPatternX[activePatternPart]"></span></label>
-                                        <button @click="resetPatternProperty('X')" class="p-1 hover:text-brand-300 text-brand-500/70 transition-colors" title="Reset Posisi X">
+                                        <label class="text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest">Posisi X: <span class="text-gray-700 dark:text-brand-300" x-text="partPatternX[activePatternPart]"></span></label>
+                                        <button @click="resetPatternProperty('X')" class="p-1 hover:text-gray-700 dark:text-brand-300 text-brand-500/70 transition-colors" title="Reset Posisi X">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                                         </button>
                                     </div>
@@ -356,8 +357,8 @@
                                 </div>
                                 <div class="space-y-3">
                                     <div class="flex justify-between items-center">
-                                        <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Posisi Y: <span class="text-brand-300" x-text="partPatternY[activePatternPart]"></span></label>
-                                        <button @click="resetPatternProperty('Y')" class="p-1 hover:text-brand-300 text-brand-500/70 transition-colors" title="Reset Posisi Y">
+                                        <label class="text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest">Posisi Y: <span class="text-gray-700 dark:text-brand-300" x-text="partPatternY[activePatternPart]"></span></label>
+                                        <button @click="resetPatternProperty('Y')" class="p-1 hover:text-gray-700 dark:text-brand-300 text-brand-500/70 transition-colors" title="Reset Posisi Y">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                                         </button>
                                     </div>
@@ -367,19 +368,19 @@
 
                             <div class="flex gap-2">
                                 <button 
-                                    @click="updatePatternFlip('X')"
-                                    :class="partPatternFlipX[activePatternPart] ? 'bg-brand-900 border-brand-500' : 'bg-brand-950/40 border-brand-800/30'"
-                                    class="flex-1 py-2 rounded-xl border flex items-center justify-center gap-2 text-[10px] font-bold uppercase transition-all text-brand-100"
+                                    @click="partPatternFlipX[activePatternPart] = !partPatternFlipX[activePatternPart]; applyPattern(activePatternPart, partPatterns[activePatternPart])"
+                                    :class="partPatternFlipX[activePatternPart] ? 'bg-brand-900 border-brand-500 text-white' : 'bg-gray-100/80 dark:bg-zinc-900/40 border-gray-200 dark:border-brand-800/30 text-gray-700 dark:text-brand-100'"
+                                    class="flex-1 py-2 rounded-xl border flex items-center justify-center gap-2 text-[10px] font-bold uppercase transition-all"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="m15 15 3-3-3-3"/><path d="m9 9-3 3 3 3"/></svg>
-                                    Flip H
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12H3"/><path d="M12 3v18"/><path d="M16 8l4 4-4 4"/><path d="M8 8l-4 4 4 4"/></svg>
+                                    Flip X
                                 </button>
                                 <button 
-                                    @click="updatePatternFlip('Y')"
-                                    :class="partPatternFlipY[activePatternPart] ? 'bg-brand-900 border-brand-500' : 'bg-brand-950/40 border-brand-800/30'"
-                                    class="flex-1 py-2 rounded-xl border flex items-center justify-center gap-2 text-[10px] font-bold uppercase transition-all text-brand-100"
+                                    @click="partPatternFlipY[activePatternPart] = !partPatternFlipY[activePatternPart]; applyPattern(activePatternPart, partPatterns[activePatternPart])"
+                                    :class="partPatternFlipY[activePatternPart] ? 'bg-brand-900 border-brand-500 text-white' : 'bg-gray-100/80 dark:bg-zinc-900/40 border-gray-200 dark:border-brand-800/30 text-gray-700 dark:text-brand-100'"
+                                    class="flex-1 py-2 rounded-xl border flex items-center justify-center gap-2 text-[10px] font-bold uppercase transition-all"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="m9 15 3 3 3-3"/><path d="m15 9-3-3-3 3"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="m9 15 3 3 3-3"/><path d="m15 9-3-3-3 3"/></svg>
                                     Flip V
                                 </button>
                             </div>
@@ -390,9 +391,9 @@
 
                 <div x-show="activeMenu === 'text'" x-transition class="space-y-6">
                     <div>
-                        <label class="block text-[10px] font-bold text-brand-400/80 mb-3 uppercase tracking-[0.2em]">Input Teks</label>
+                        <label class="block text-[10px] font-bold text-gray-500 dark:text-brand-400/80 mb-3 uppercase tracking-[0.2em]">Input Teks</label>
                         <div class="flex gap-2">
-                            <input type="text" x-model="textInput" @input="updateTextProperty('textInput', $event.target.value)" class="flex-1 bg-brand-950/40 border border-brand-800/30 rounded-xl px-4 py-3 text-brand-50 text-sm focus:border-brand-500 focus:outline-none transition-all" placeholder="Ketik teks...">
+                            <input type="text" x-model="textInput" @input="updateTextProperty('textInput', $event.target.value)" class="flex-1 bg-gray-100/80 dark:bg-zinc-900/40 border border-gray-200 dark:border-brand-800/30 rounded-xl px-4 py-3 text-gray-900 dark:text-brand-50 text-sm focus:border-brand-500 focus:outline-none transition-all" placeholder="Ketik teks...">
                             <button @click="addText()" class="bg-brand-900 hover:bg-brand-800 text-white p-3 rounded-xl transition-all shadow-xl shadow-black/20">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                             </button>
@@ -400,16 +401,16 @@
                     </div>
 
                     <div>
-                        <label class="block text-[10px] font-bold text-brand-400/80 mb-3 uppercase tracking-[0.2em]">Pilihan Font</label>
+                        <label class="block text-[10px] font-bold text-gray-500 dark:text-brand-400/80 mb-3 uppercase tracking-[0.2em]">Pilihan Font</label>
                         <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
                             <template x-for="f in availableFonts" :key="f.id">
                                 <button 
                                     @click="updateFont('activeFont', f.id)"
-                                    :class="activeFont === f.id ? 'border-brand-500 bg-brand-900/30 ring-1 ring-brand-500' : 'border-brand-800/30 hover:border-brand-700 bg-brand-950/20'"
+                                    :class="activeFont === f.id ? 'border-brand-500 bg-gray-200/50 dark:bg-brand-900/30 ring-1 ring-brand-500' : 'border-gray-200 dark:border-brand-800/30 hover:border-brand-700 bg-gray-50 dark:bg-zinc-900/20'"
                                     class="p-3 border rounded-xl transition-all text-center group"
                                 >
-                                    <div class="text-sm text-brand-50 truncate" :style="`font-family: ${f.family}`" x-text="'Abc 123'"></div>
-                                    <div class="text-[8px] text-brand-400/60 mt-1 uppercase font-bold tracking-widest" x-text="f.name"></div>
+                                    <div class="text-sm text-gray-900 dark:text-brand-50 truncate" :style="`font-family: ${f.family}`" x-text="'Abc 123'"></div>
+                                    <div class="text-[8px] text-gray-400 dark:text-brand-400/60 mt-1 uppercase font-bold tracking-widest" x-text="f.name"></div>
                                 </button>
                             </template>
                         </div>
@@ -417,15 +418,15 @@
 
                     <div>
                         <div class="flex items-center justify-between mb-3">
-                            <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Warna Teks</label>
-                            <button @click="showAllTextColors = !showAllTextColors" class="text-[10px] text-brand-400 hover:text-brand-300 font-bold uppercase" x-text="showAllTextColors ? 'Tutup' : 'Semua'"></button>
+                            <label class="text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest">Warna Teks</label>
+                            <button @click="showAllTextColors = !showAllTextColors" class="text-[10px] text-gray-900 dark:text-brand-400 hover:text-gray-700 dark:text-brand-300 font-bold uppercase" x-text="showAllTextColors ? 'Tutup' : 'Semua'"></button>
                         </div>
                         <div class="grid grid-cols-7 gap-1.5">
                             <template x-for="(color, index) in solidColors" :key="'txt-'+color">
                                 <button x-show="showAllTextColors || index < 14" @click="updateTextProperty('activeColor', color)" :style="`background-color: ${color}`" :class="activeColor === color && !textGradientEnabled ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-brand-950 scale-110' : 'opacity-90 hover:opacity-100 hover:scale-105'" class="w-7 h-7 rounded-full border border-white/5 shadow-lg transition-all"></button>
                             </template>
-                            <button class="w-7 h-7 rounded-full border-2 border-dashed border-brand-800 hover:border-brand-500 bg-brand-950/40 flex items-center justify-center relative transition-all hover:scale-105">
-                                <span class="text-brand-400 text-sm leading-none pointer-events-none">+</span>
+                            <button class="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 dark:border-brand-800 hover:border-brand-500 bg-gray-100/80 dark:bg-zinc-900/40 flex items-center justify-center relative transition-all hover:scale-105">
+                                <span class="text-gray-900 dark:text-brand-400 text-sm leading-none pointer-events-none">+</span>
                                 <input type="color" x-ref="textPicker" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full rounded-full" @input="updateTextProperty('activeColor', $event.target.value)">
                             </button>
                         </div>
@@ -433,8 +434,8 @@
 
                     <div class="space-y-4 pt-2">
                         <div class="flex items-center justify-between">
-                            <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Gradasi Teks</label>
-                            <button @click="showAllTextGradients = !showAllTextGradients" class="text-[10px] text-brand-400 hover:text-brand-300 font-bold uppercase transition-colors" x-text="showAllTextGradients ? 'Tutup' : 'Semua'"></button>
+                            <label class="text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest">Gradasi Teks</label>
+                            <button @click="showAllTextGradients = !showAllTextGradients" class="text-[10px] text-gray-900 dark:text-brand-400 hover:text-gray-700 dark:text-brand-300 font-bold uppercase transition-colors" x-text="showAllTextGradients ? 'Tutup' : 'Semua'"></button>
                         </div>
                         <div class="grid grid-cols-7 gap-1.5">
                             <template x-for="(gp, index) in gradientPresets" :key="'txt-grad-'+gp.id">
@@ -449,20 +450,20 @@
                         </div>
 
                         <div x-show="textGradientEnabled" x-transition class="pt-2 space-y-4">
-                            <div class="flex gap-2 p-1 bg-brand-950/60 rounded-lg border border-brand-800/20">
-                                <button @click="updateTextProperty('textGradientType', 'linear')" :class="textGradientType === 'linear' ? 'bg-brand-900 text-white shadow-lg' : 'text-brand-400'" class="flex-1 py-1.5 text-[9px] font-bold rounded-md transition-all uppercase">Linear</button>
-                                <button @click="updateTextProperty('textGradientType', 'radial')" :class="textGradientType === 'radial' ? 'bg-brand-900 text-white shadow-lg' : 'text-brand-400'" class="flex-1 py-1.5 text-[9px] font-bold rounded-md transition-all uppercase">Radial</button>
+                            <div class="flex gap-2 p-1 bg-brand-950/60 rounded-lg border border-gray-100 dark:border-brand-800/20">
+                                <button @click="updateTextProperty('textGradientType', 'linear')" :class="textGradientType === 'linear' ? 'bg-brand-900 text-white shadow-lg' : 'text-gray-900 dark:text-brand-400'" class="flex-1 py-1.5 text-[9px] font-bold rounded-md transition-all uppercase">Linear</button>
+                                <button @click="updateTextProperty('textGradientType', 'radial')" :class="textGradientType === 'radial' ? 'bg-brand-900 text-white shadow-lg' : 'text-gray-900 dark:text-brand-400'" class="flex-1 py-1.5 text-[9px] font-bold rounded-md transition-all uppercase">Radial</button>
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <label class="flex items-center gap-2 cursor-pointer group relative">
                                     <div class="w-8 h-8 rounded-lg border border-white/10 group-hover:border-brand-500 transition-colors" :style="`background-color: ${textGradientColor1}`"></div>
                                     <input type="color" :value="textGradientColor1" @input="updateTextProperty('textGradientColor1', $event.target.value)" class="absolute inset-0 opacity-0 cursor-pointer">
-                                    <span class="text-[9px] font-mono text-brand-400 uppercase">Warna 1</span>
+                                    <span class="text-[9px] font-mono text-gray-900 dark:text-brand-400 uppercase">Warna 1</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer group relative">
                                     <div class="w-8 h-8 rounded-lg border border-white/10 group-hover:border-brand-500 transition-colors" :style="`background-color: ${textGradientColor2}`"></div>
                                     <input type="color" :value="textGradientColor2" @input="updateTextProperty('textGradientColor2', $event.target.value)" class="absolute inset-0 opacity-0 cursor-pointer">
-                                    <span class="text-[9px] font-mono text-brand-400 uppercase">Warna 2</span>
+                                    <span class="text-[9px] font-mono text-gray-900 dark:text-brand-400 uppercase">Warna 2</span>
                                 </label>
                             </div>
                             <div x-show="textGradientType === 'linear'" x-transition>
@@ -471,24 +472,24 @@
                         </div>
                     </div>
 
-                    <div class="space-y-5 pt-6 mt-4 border-t border-brand-800/20">
+                    <div class="space-y-5 pt-6 mt-4 border-t border-gray-100 dark:border-brand-800/20">
                         <div class="space-y-3">
                             <div class="flex justify-between">
-                                <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Ukuran: <span class="text-brand-300" x-text="textFontSize"></span>px</label>
+                                <label class="text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest">Ukuran: <span class="text-gray-700 dark:text-brand-300" x-text="textFontSize"></span>px</label>
                             </div>
                             <input type="range" min="10" max="250" step="1" x-model.number="textFontSize" @input="updateTextProperty('textFontSize', $event.target.value)" class="w-full h-1 bg-brand-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
                         </div>
                         
                         <div class="space-y-3">
                             <div class="flex justify-between">
-                                <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Jarak Huruf: <span class="text-brand-300" x-text="textCharSpacing"></span></label>
+                                <label class="text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest">Jarak Huruf: <span class="text-gray-700 dark:text-brand-300" x-text="textCharSpacing"></span></label>
                             </div>
                             <input type="range" min="-100" max="1000" step="10" x-model.number="textCharSpacing" @input="updateTextProperty('textCharSpacing', $event.target.value)" class="w-full h-1 bg-brand-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
                         </div>
 
                         <div class="space-y-3">
                             <div class="flex justify-between">
-                                <label class="text-[10px] font-bold text-brand-400 uppercase tracking-widest">Lengkungan: <span class="text-brand-300" x-text="textArc"></span></label>
+                                <label class="text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest">Lengkungan: <span class="text-gray-700 dark:text-brand-300" x-text="textArc"></span></label>
                             </div>
                             <input type="range" min="-300" max="300" step="1" x-model.number="textArc" @input="updateTextProperty('textArc', $event.target.value)" class="w-full h-1 bg-brand-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
                         </div>
@@ -497,21 +498,21 @@
                 </div>
 
                 <div x-show="activeMenu === 'logo'" x-transition class="space-y-6">
-                    <div @click="triggerLogoUpload()" class="group border-2 border-dashed border-brand-800/40 rounded-3xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-brand-500/50 hover:bg-brand-900/5 transition-all bg-brand-950/20">
-                        <div class="w-16 h-16 rounded-2xl bg-brand-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-brand-400"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <div @click="triggerLogoUpload()" class="group border-2 border-dashed border-gray-200 dark:border-brand-800/40 rounded-3xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-brand-500/50 hover:bg-gray-50/50 dark:bg-brand-900/5 transition-all bg-gray-50 dark:bg-zinc-900/20">
+                        <div class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-brand-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-900 dark:text-brand-400"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                         </div>
-                        <span class="text-xs font-bold text-brand-50 uppercase tracking-[0.2em]">Upload Logo / Foto</span>
-                        <p class="text-[10px] text-brand-400/60 mt-2 uppercase max-w-[200px] leading-relaxed">Format JPG/PNG dengan latar belakang transparan disarankan.</p>
+                        <span class="text-xs font-bold text-gray-900 dark:text-brand-50 uppercase tracking-[0.2em]">Upload Logo / Foto</span>
+                        <p class="text-[10px] text-gray-400 dark:text-brand-400/60 mt-2 uppercase max-w-[200px] leading-relaxed">Format JPG/PNG dengan latar belakang transparan disarankan.</p>
                     </div>
 
                     <!-- PENGATURAN WARNA LOGO -->
-                    <div x-show="activeObjectType === 'image'" x-transition class="mt-6 pt-6 border-t border-brand-800/20 space-y-4">
-                        <label class="block text-[10px] font-bold text-brand-400/80 mb-3 uppercase tracking-[0.2em]">Ubah Warna Logo</label>
+                    <div x-show="activeObjectType === 'image'" x-transition class="mt-6 pt-6 border-t border-gray-100 dark:border-brand-800/20 space-y-4">
+                        <label class="block text-[10px] font-bold text-gray-500 dark:text-brand-400/80 mb-3 uppercase tracking-[0.2em]">Ubah Warna Logo</label>
                         
-                        <div class="flex items-center gap-3 mb-4 bg-brand-950/40 p-3 rounded-xl border border-brand-800/30">
+                        <div class="flex items-center gap-3 mb-4 bg-gray-100/80 dark:bg-zinc-900/40 p-3 rounded-xl border border-gray-200 dark:border-brand-800/30">
                             <label class="relative inline-flex items-center cursor-pointer w-full justify-between">
-                                <span class="text-[10px] font-bold text-brand-100 uppercase">Aktifkan Warna Solid</span>
+                                <span class="text-[10px] font-bold text-gray-700 dark:text-brand-100 uppercase">Aktifkan Warna Solid</span>
                                 <input type="checkbox" class="sr-only peer" @change="updateLogoProperty('isSolidColor', $event.target.checked)" :checked="canvas && canvas.getActiveObject() && canvas.getActiveObject().isSolidColor">
                                 <div class="w-9 h-5 bg-brand-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[18px] after:bg-brand-400 after:border-brand-400 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-500"></div>
                             </label>
@@ -521,8 +522,8 @@
                             <template x-for="(color, index) in solidColors" :key="'logo-'+color">
                                 <button @click="updateLogoProperty('solidColor', color)" :style="`background-color: ${color}`" class="w-7 h-7 rounded-full border border-white/5 shadow-lg transition-all hover:scale-110 opacity-90 hover:opacity-100"></button>
                             </template>
-                            <button class="w-7 h-7 rounded-full border-2 border-dashed border-brand-800 hover:border-brand-500 bg-brand-950/40 flex items-center justify-center relative transition-all hover:scale-105">
-                                <span class="text-brand-400 text-sm leading-none pointer-events-none">+</span>
+                            <button class="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 dark:border-brand-800 hover:border-brand-500 bg-gray-100/80 dark:bg-zinc-900/40 flex items-center justify-center relative transition-all hover:scale-105">
+                                <span class="text-gray-900 dark:text-brand-400 text-sm leading-none pointer-events-none">+</span>
                                 <input type="color" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full rounded-full" @input="updateLogoProperty('solidColor', $event.target.value)">
                             </button>
                         </div>
@@ -543,7 +544,7 @@
                     ]" :key="v.id">
                         <button 
                             @click="setView(v.id)"
-                            :class="currentView === v.id ? 'bg-brand-900 text-white shadow-lg' : 'text-brand-300 hover:bg-brand-900/20'"
+                            :class="currentView === v.id ? 'bg-brand-900 text-white shadow-lg' : 'text-gray-700 dark:text-brand-300 hover:bg-gray-100 dark:bg-brand-900/20'"
                             class="flex-1 md:flex-none px-2 md:px-6 py-2 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold transition-all uppercase tracking-widest text-center"
                             x-text="v.label"
                         ></button>
@@ -573,7 +574,7 @@
             
             <!-- Zoom & Save Floating Tools -->
             <div class="absolute bottom-4 md:bottom-8 right-4 md:right-8 z-40 flex flex-col gap-2 md:gap-3 items-end">
-                <button @click="openPreview()" class="bg-brand-950 hover:bg-brand-900 text-brand-400 w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-brand-800 group" title="Preview Keseluruhan">
+                <button @click="openPreview()" class="bg-white dark:bg-zinc-950 hover:bg-brand-900 text-gray-900 dark:text-brand-400 w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-gray-300 dark:border-brand-800 group" title="Preview Keseluruhan">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
                 <button @click="triggerSave()" class="bg-brand-900 hover:bg-brand-800 text-white w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-white/10 group" title="Simpan Desain">
@@ -610,19 +611,19 @@
                     :style="`top: ${toolbarPos.top}px; left: ${toolbarPos.left}px; transform: translateX(-50%);`"
                     @mousedown.stop
                 >
-                    <button @click="duplicateSelected()" class="p-2.5 text-brand-300 hover:text-white hover:bg-brand-800 rounded-xl transition-all group relative">
+                    <button @click="duplicateSelected()" class="p-2.5 text-gray-700 dark:text-brand-300 hover:text-white hover:bg-brand-800 rounded-xl transition-all group relative">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                         <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-brand-900 text-[9px] px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-bold uppercase tracking-widest border border-brand-700 shadow-xl">Duplikat</span>
                     </button>
                     
                     <div class="w-[1px] h-6 bg-brand-800/50 mx-1"></div>
                     
-                    <button @click="flipObject('X')" class="p-2.5 text-brand-300 hover:text-white hover:bg-brand-800 rounded-xl transition-colors group relative">
+                    <button @click="flipObject('X')" class="p-2.5 text-gray-700 dark:text-brand-300 hover:text-white hover:bg-brand-800 rounded-xl transition-colors group relative">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="m15 15 3-3-3-3"/><path d="m9 9-3 3 3 3"/></svg>
                         <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-brand-900 text-[9px] px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-bold uppercase tracking-widest border border-brand-700 shadow-xl">Flip H</span>
                     </button>
 
-                    <button @click="flipObject('Y')" class="p-2.5 text-brand-300 hover:text-white hover:bg-brand-800 rounded-xl transition-colors group relative">
+                    <button @click="flipObject('Y')" class="p-2.5 text-gray-700 dark:text-brand-300 hover:text-white hover:bg-brand-800 rounded-xl transition-colors group relative">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="m9 15 3 3 3-3"/><path d="m15 9-3-3-3 3"/></svg>
                         <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-brand-900 text-[9px] px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-bold uppercase tracking-widest border border-brand-700 shadow-xl">Flip V</span>
                     </button>
@@ -630,7 +631,7 @@
                     <div class="w-[1px] h-6 bg-brand-800/50 mx-1"></div>
                     
                     <div x-show="activeObjectType === 'image' || activeObjectElement" class="contents">
-                        <button @click="openCropper()" class="p-2.5 text-brand-300 hover:text-white hover:bg-brand-800 rounded-xl transition-all group relative">
+                        <button @click="openCropper()" class="p-2.5 text-gray-700 dark:text-brand-300 hover:text-white hover:bg-brand-800 rounded-xl transition-all group relative">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2h-5"/><polyline points="14 3 14 8 20 8"/><path d="M3 14.28a5 5 0 0 1 5.42-3.72c2.47.3 4.58 2.21 4.58 4.72 0 2.5-1.5 4-3.5 4.5"/><path d="M3 14.28C3 17 5 19 8 19s5-2 5-4.72c0-2.5-2.1-4.42-4.58-4.72a5 5 0 0 0-5.42 3.72z"/></svg>
                             <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-brand-900 text-[9px] px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-bold uppercase tracking-widest border border-brand-700 shadow-xl">Pangkas</span>
                         </button>
@@ -647,37 +648,37 @@
     </div>
 
     <div x-show="showCopyConfirmModal" x-cloak class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" x-transition>
-        <div class="bg-brand-950 border border-brand-800/50 rounded-3xl w-full max-w-sm overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-            <div class="p-6 border-b border-brand-800/30 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-brand-900/40 flex items-center justify-center shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-brand-400"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        <div class="bg-white dark:bg-zinc-950 border border-gray-200 dark:border-brand-800/50 rounded-3xl w-full max-w-sm overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <div class="p-6 border-b border-gray-200 dark:border-brand-800/30 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gray-200 dark:bg-brand-900/40 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-900 dark:text-brand-400"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                 </div>
                 <div>
-                    <h3 class="font-bold text-brand-50 uppercase tracking-widest text-sm">Salin Desain</h3>
-                    <p class="text-[10px] text-brand-400 mt-0.5 font-bold tracking-widest uppercase">Mirroring Depan</p>
+                    <h3 class="font-bold text-gray-900 dark:text-brand-50 uppercase tracking-widest text-sm">Salin Desain</h3>
+                    <p class="text-[10px] text-gray-900 dark:text-brand-400 mt-0.5 font-bold tracking-widest uppercase">Mirroring Depan</p>
                 </div>
             </div>
             <div class="p-6">
-                <p class="text-sm text-brand-100/80 leading-relaxed font-medium">Salin setelan <span class="text-brand-300 font-bold underline decoration-brand-500 underline-offset-4">Warna dan Motif</span> dari bagian Depan ke tampilan ini?</p>
+                <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">Salin setelan <span class="text-gray-900 dark:text-brand-300 font-bold underline decoration-brand-500 underline-offset-4">Warna dan Motif</span> dari bagian Depan ke tampilan ini?</p>
             </div>
             <div class="px-6 pb-6 flex gap-3">
-                <button @click="showCopyConfirmModal = false" class="flex-1 py-3 rounded-2xl border border-brand-800 text-brand-400 hover:bg-brand-900/10 transition-all text-xs font-bold uppercase tracking-widest">Batal</button>
+                <button @click="showCopyConfirmModal = false" class="flex-1 py-3 rounded-2xl border border-gray-300 dark:border-brand-800 text-gray-900 dark:text-brand-400 hover:bg-gray-50 dark:bg-brand-900/10 transition-all text-xs font-bold uppercase tracking-widest">Batal</button>
                 <button @click="copyDesignFromFront()" class="flex-1 py-3 rounded-2xl bg-brand-900 hover:bg-brand-800 text-white shadow-xl transition-all text-xs font-bold uppercase tracking-widest">Ya, Salin</button>
             </div>
         </div>
     </div>
 
     <div x-show="showCropper" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
-        <div class="bg-brand-950 border border-brand-800/50 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-            <div class="p-4 border-b border-brand-800/30 flex justify-between items-center">
-                <h3 class="font-bold text-brand-50 uppercase tracking-widest text-sm">Pangkas Gambar</h3>
-                <button @click="cancelCrop()" class="p-2 text-brand-400 hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <div class="bg-white dark:bg-zinc-950 border border-gray-200 dark:border-brand-800/50 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-gray-200 dark:border-brand-800/30 flex justify-between items-center">
+                <h3 class="font-bold text-gray-900 dark:text-brand-50 uppercase tracking-widest text-sm">Pangkas Gambar</h3>
+                <button @click="cancelCrop()" class="p-2 text-gray-900 dark:text-brand-400 hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             </div>
-            <div class="flex-1 bg-brand-950/95 backdrop-blur-2xl relative overflow-hidden flex items-center justify-center min-h-[300px]">
+            <div class="flex-1 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl relative overflow-hidden flex items-center justify-center min-h-[300px]">
                 <img id="cropper-image" class="max-w-full max-h-full block">
             </div>
-            <div class="p-6 border-t border-brand-800/30 flex justify-end gap-3 bg-brand-950/40">
-                <button @click="cancelCrop()" class="px-6 py-2.5 rounded-2xl border border-brand-800 text-brand-400 hover:bg-brand-900/10 transition-all font-bold text-xs uppercase tracking-widest">Batal</button>
+            <div class="p-6 border-t border-gray-200 dark:border-brand-800/30 flex justify-end gap-3 bg-gray-100/80 dark:bg-zinc-900/40">
+                <button @click="cancelCrop()" class="px-6 py-2.5 rounded-2xl border border-gray-300 dark:border-brand-800 text-gray-900 dark:text-brand-400 hover:bg-gray-50 dark:bg-brand-900/10 transition-all font-bold text-xs uppercase tracking-widest">Batal</button>
                 <button @click="applyCrop()" class="px-8 py-2.5 rounded-2xl bg-brand-900 text-white hover:bg-brand-800 shadow-xl transition-all font-bold text-xs uppercase tracking-widest">Terapkan Pangkasan</button>
             </div>
         </div>
@@ -685,25 +686,25 @@
 
     <!-- Modal Simpan Desain -->
     <div x-show="showSaveModal" x-cloak class="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" x-transition>
-        <div class="bg-brand-950 border border-brand-800/50 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-            <div class="p-6 border-b border-brand-800/30 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-brand-900/40 flex items-center justify-center shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-brand-400"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <div class="bg-white dark:bg-zinc-950 border border-gray-200 dark:border-brand-800/50 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <div class="p-6 border-b border-gray-200 dark:border-brand-800/30 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gray-200 dark:bg-brand-900/40 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-900 dark:text-brand-400"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                 </div>
                 <div>
-                    <h3 class="font-bold text-brand-50 uppercase tracking-widest text-sm">Simpan Desain</h3>
-                    <p class="text-[10px] text-brand-400 mt-0.5 font-bold tracking-widest uppercase">Koleksi Desain Saya</p>
+                    <h3 class="font-bold text-gray-900 dark:text-brand-50 uppercase tracking-widest text-sm">Simpan Desain</h3>
+                    <p class="text-[10px] text-gray-900 dark:text-brand-400 mt-0.5 font-bold tracking-widest uppercase">Koleksi Desain Saya</p>
                 </div>
             </div>
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="block text-[10px] font-bold text-brand-400 uppercase tracking-widest mb-2">Nama Desain</label>
-                    <input type="text" x-model="designName" class="w-full bg-brand-900/30 border border-brand-800 text-white rounded-2xl px-4 py-3 focus:border-brand-500 focus:outline-none transition-all" placeholder="Contoh: Jersey Home 2024">
+                    <label class="block text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest mb-2">Nama Desain</label>
+                    <input type="text" x-model="designName" class="w-full bg-gray-100 dark:bg-brand-900/30 border border-gray-300 dark:border-brand-800 text-gray-900 dark:text-white rounded-2xl px-4 py-3 focus:border-brand-500 focus:outline-none transition-all" placeholder="Contoh: Jersey Home 2024">
                 </div>
-                <p class="text-[11px] text-brand-400/60 leading-relaxed uppercase font-bold tracking-widest">Desain Anda akan disimpan ke dalam daftar "Desain Saya" dan dapat diedit kembali kapan saja.</p>
+                <p class="text-[11px] text-gray-400 dark:text-brand-400/60 leading-relaxed uppercase font-bold tracking-widest">Desain Anda akan disimpan ke dalam daftar "Desain Saya" dan dapat diedit kembali kapan saja.</p>
             </div>
             <div class="px-6 pb-6 flex gap-3">
-                <button @click="showSaveModal = false" class="flex-1 py-3 rounded-2xl border border-brand-800 text-brand-400 hover:bg-brand-900/10 transition-all text-xs font-bold uppercase tracking-widest">Batal</button>
+                <button @click="showSaveModal = false" class="flex-1 py-3 rounded-2xl border border-gray-300 dark:border-brand-800 text-gray-900 dark:text-brand-400 hover:bg-gray-50 dark:bg-brand-900/10 transition-all text-xs font-bold uppercase tracking-widest">Batal</button>
                 <button @click="saveDesign()" :disabled="!designName" class="flex-1 py-3 rounded-2xl bg-brand-900 hover:bg-brand-800 text-white shadow-xl transition-all text-xs font-bold uppercase tracking-widest disabled:opacity-50">Simpan Sekarang</button>
             </div>
         </div>
@@ -711,44 +712,49 @@
 
     <!-- Modal Login Diperlukan -->
     <div x-show="showRequireLoginModal" x-cloak class="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" x-transition>
-        <div class="bg-brand-950 border border-brand-800/50 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+        <div class="bg-white dark:bg-zinc-950 border border-gray-200 dark:border-brand-800/50 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
             <!-- Header Modal -->
-            <div class="p-6 border-b border-brand-800/30 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30 shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <div class="p-6 border-b border-gray-200 dark:border-brand-800/30 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-900/20 text-brand-500 flex items-center justify-center shrink-0 border border-brand-900/30 shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 dark:text-brand-50 uppercase tracking-widest text-sm">Login Diperlukan</h3>
+                        <p class="text-[10px] text-brand-500 mt-0.5 font-bold tracking-widest uppercase">Simpan Desain Jersey</p>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="font-bold text-brand-50 uppercase tracking-widest text-sm">Login Diperlukan</h3>
-                    <p class="text-[10px] text-amber-400 mt-0.5 font-bold tracking-widest uppercase">Simpan Desain Jersey</p>
-                </div>
+                <button @click="showRequireLoginModal = false" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-brand-800/30 text-gray-400 hover:text-gray-900 dark:text-brand-400 dark:hover:text-brand-300 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
 
             <!-- Content Area -->
             <div class="p-6 space-y-4">
-                <div class="p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-400 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    <p class="text-xs text-amber-200/90 leading-relaxed font-medium">
+                <div class="p-3.5 bg-brand-900/10 border border-brand-900/20 rounded-2xl flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-500 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <p class="text-xs text-brand-700 dark:text-brand-300 leading-relaxed font-medium">
                         Anda perlu masuk ke akun Anda terlebih dahulu untuk menyimpan desain jersey kustomisasi ini ke dalam koleksi Anda.
                     </p>
                 </div>
 
                 <!-- Form Login Langsung (Quick Login) -->
                 <form @submit.prevent="performInlineLogin()" class="space-y-3 pt-1">
-                    <div x-show="loginError" x-cloak class="p-3 bg-rose-500/20 border border-rose-500/40 rounded-xl text-rose-300 text-xs font-semibold">
+                    <div x-show="loginError" x-cloak class="p-3 bg-rose-50 border border-rose-200 dark:bg-rose-500/20 dark:border-rose-500/40 rounded-xl text-rose-600 dark:text-rose-300 text-xs font-semibold">
                         <span x-text="loginError"></span>
                     </div>
 
                     <div>
-                        <label class="block text-[10px] font-bold text-brand-400 uppercase tracking-widest mb-1.5">Email / No. WhatsApp</label>
-                        <input type="text" x-model="loginInput" class="w-full bg-brand-900/40 border border-brand-800 text-white rounded-xl px-4 py-2.5 text-xs focus:border-amber-500 focus:outline-none transition-all placeholder:text-brand-500" placeholder="contoh@email.com / 08123456789" required>
+                        <label class="block text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest mb-1.5">Email / No. WhatsApp</label>
+                        <input type="text" x-model="loginInput" class="w-full bg-gray-200 dark:bg-brand-900/40 border border-gray-300 dark:border-brand-800 text-white rounded-xl px-4 py-2.5 text-xs focus:border-brand-500 focus:outline-none transition-all placeholder:text-brand-600 dark:text-brand-500" placeholder="contoh@email.com / 08123456789" required>
                     </div>
 
                     <div>
-                        <label class="block text-[10px] font-bold text-brand-400 uppercase tracking-widest mb-1.5">Password</label>
-                        <input type="password" x-model="passwordInput" class="w-full bg-brand-900/40 border border-brand-800 text-white rounded-xl px-4 py-2.5 text-xs focus:border-amber-500 focus:outline-none transition-all placeholder:text-brand-500" placeholder="••••••••" required>
+                        <label class="block text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest mb-1.5">Password</label>
+                        <input type="password" x-model="passwordInput" class="w-full bg-gray-200 dark:bg-brand-900/40 border border-gray-300 dark:border-brand-800 text-white rounded-xl px-4 py-2.5 text-xs focus:border-brand-500 focus:outline-none transition-all placeholder:text-brand-600 dark:text-brand-500" placeholder="••••••••" required>
                     </div>
 
-                    <button type="submit" :disabled="isLoggingIn" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black tracking-widest text-xs uppercase shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                    <button type="submit" :disabled="isLoggingIn" class="w-full py-3 rounded-xl bg-brand-900 hover:bg-brand-500 text-white font-black tracking-widest text-xs uppercase shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                         <template x-if="!isLoggingIn">
                             <span class="flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
@@ -757,7 +763,7 @@
                         </template>
                         <template x-if="isLoggingIn">
                             <span class="flex items-center gap-2">
-                                <svg class="animate-spin h-4 w-4 text-slate-950" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 Memproses Login...
                             </span>
                         </template>
@@ -766,42 +772,40 @@
 
                 <div class="relative flex py-1 items-center">
                     <div class="flex-grow border-t border-brand-800/60"></div>
-                    <span class="flex-shrink mx-3 text-[10px] text-brand-400/60 uppercase font-bold tracking-widest">Atau Halaman Auth</span>
+                    <span class="flex-shrink mx-3 text-[10px] text-gray-400 dark:text-brand-400/60 uppercase font-bold tracking-widest">Atau Halaman Auth</span>
                     <div class="flex-grow border-t border-brand-800/60"></div>
                 </div>
 
                 <div class="flex gap-2">
-                    <a :href="'/login?redirect_to=' + encodeURIComponent(window.location.href)" class="flex-1 py-2.5 rounded-xl border border-brand-800 text-brand-300 hover:bg-brand-900/40 transition-all text-[11px] font-bold uppercase tracking-widest text-center">
+                    <button type="button" 
+                            @click="window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: { mode: 'login' }})); showRequireLoginModal = false;" 
+                            class="flex-1 py-2.5 rounded-xl border border-gray-300 dark:border-brand-800 text-gray-700 dark:text-brand-300 hover:bg-gray-200 dark:bg-brand-900/40 transition-all text-[11px] font-bold uppercase tracking-widest text-center">
                         Ke Halaman Login
-                    </a>
-                    <a :href="'/register?redirect_to=' + encodeURIComponent(window.location.href)" class="flex-1 py-2.5 rounded-xl border border-brand-800 text-brand-300 hover:bg-brand-900/40 transition-all text-[11px] font-bold uppercase tracking-widest text-center">
+                    </button>
+                    <button type="button" 
+                            @click="window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: { mode: 'register' }})); showRequireLoginModal = false;" 
+                            class="flex-1 py-2.5 rounded-xl border border-gray-300 dark:border-brand-800 text-gray-700 dark:text-brand-300 hover:bg-gray-200 dark:bg-brand-900/40 transition-all text-[11px] font-bold uppercase tracking-widest text-center">
                         Daftar Akun Baru
-                    </a>
+                    </button>
                 </div>
             </div>
 
-            <!-- Footer Modal -->
-            <div class="px-6 pb-6 pt-2">
-                <button @click="showRequireLoginModal = false" class="w-full py-2 rounded-xl text-brand-400 hover:text-white font-bold text-xs uppercase tracking-widest transition-all">
-                    Nanti Saja (Batal)
-                </button>
-            </div>
         </div>
     </div>
     <div x-show="showSuccessSaveModal" x-cloak class="fixed inset-0 z-[135] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" x-transition>
-        <div class="bg-brand-950 border border-brand-800/50 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-            <div class="p-6 border-b border-brand-800/30 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+        <div class="bg-white dark:bg-zinc-950 border border-gray-200 dark:border-brand-800/50 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <div class="p-6 border-b border-gray-200 dark:border-brand-800/30 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20 dark:border-emerald-500/30">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 </div>
                 <div>
-                    <h3 class="font-bold text-brand-50 uppercase tracking-widest text-sm">Desain Berhasil Disimpan!</h3>
-                    <p class="text-[10px] text-emerald-400 mt-0.5 font-bold tracking-widest uppercase">Koleksi Desain Saya</p>
+                    <h3 class="font-bold text-gray-900 dark:text-brand-50 uppercase tracking-widest text-sm">Desain Berhasil Disimpan!</h3>
+                    <p class="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-bold tracking-widest uppercase">Koleksi Desain Saya</p>
                 </div>
             </div>
             <div class="p-6 space-y-3">
-                <p class="text-xs text-brand-100/90 leading-relaxed font-medium">
-                    Desain <span class="font-bold text-emerald-400" x-text="'&quot;' + designName + '&quot;'"></span> telah berhasil tersimpan. Silakan pilih langkah selanjutnya:
+                <p class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                    Desain <span class="font-bold text-emerald-600 dark:text-emerald-400" x-text="'&quot;' + designName + '&quot;'"></span> telah berhasil tersimpan. Silakan pilih langkah selanjutnya:
                 </p>
             </div>
             <div class="px-6 pb-6 flex flex-col gap-3">
@@ -809,7 +813,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                     Teruskan ke Order
                 </button>
-                <button @click="showSuccessSaveModal = false" class="w-full py-3 rounded-2xl border border-brand-800 text-brand-300 hover:bg-brand-900/40 transition-all text-xs font-bold uppercase tracking-widest">
+                <button @click="showSuccessSaveModal = false" class="w-full py-3 rounded-2xl border border-gray-300 dark:border-brand-800 text-gray-700 dark:text-brand-300 hover:bg-gray-200 dark:bg-brand-900/40 transition-all text-xs font-bold uppercase tracking-widest">
                     Tetap Mengedit
                 </button>
             </div>
@@ -818,24 +822,24 @@
 
     <!-- Modal Konfirmasi Kembali -->
     <div x-show="showBackModal" x-cloak class="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" x-transition>
-        <div class="bg-brand-950 border border-brand-800/50 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-            <div class="p-6 border-b border-brand-800/30 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-brand-900/40 flex items-center justify-center shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-brand-400"><path d="m15 18-6-6 6-6"/></svg>
+        <div class="bg-white dark:bg-zinc-950 border border-gray-200 dark:border-brand-800/50 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <div class="p-6 border-b border-gray-200 dark:border-brand-800/30 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-brand-900/40 border border-gray-200 dark:border-brand-800/30 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-900 dark:text-brand-400"><path d="m15 18-6-6 6-6"/></svg>
                 </div>
                 <div>
-                    <h3 class="font-bold text-brand-50 uppercase tracking-widest text-sm">Keluar Customizer</h3>
-                    <p class="text-[10px] text-brand-400 mt-0.5 font-bold tracking-widest uppercase">Konfirmasi Penyimpanan</p>
+                    <h3 class="font-bold text-gray-900 dark:text-brand-50 uppercase tracking-widest text-sm">Keluar Customizer</h3>
+                    <p class="text-[10px] text-gray-900 dark:text-brand-400 mt-0.5 font-bold tracking-widest uppercase">Konfirmasi Penyimpanan</p>
                 </div>
             </div>
             <div class="p-6">
-                <p class="text-sm text-brand-100/80 leading-relaxed font-medium">Apakah Anda ingin menyimpan perubahan desain sebelum keluar?</p>
+                <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">Apakah Anda ingin menyimpan perubahan desain sebelum keluar?</p>
             </div>
             <div class="px-6 pb-6 flex flex-col gap-2">
                 <button @click="triggerSave()" class="w-full py-3 rounded-2xl bg-brand-900 hover:bg-brand-800 text-white shadow-xl transition-all text-xs font-bold uppercase tracking-widest">Ya, Simpan Desain</button>
                 <div class="flex gap-2">
-                    <button @click="redirectToCatalog()" class="flex-1 py-3 rounded-2xl border border-rose-900/30 text-rose-400 hover:bg-rose-950/30 transition-all text-xs font-bold uppercase tracking-widest">Tidak, Buang Perubahan</button>
-                    <button @click="showBackModal = false" class="flex-1 py-3 rounded-2xl border border-brand-800 text-brand-400 hover:bg-brand-900/10 transition-all text-xs font-bold uppercase tracking-widest">Batal</button>
+                    <button @click="redirectToCatalog()" class="flex-1 py-3 rounded-2xl border border-rose-200 dark:border-rose-900/30 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all text-xs font-bold uppercase tracking-widest">Tidak, Buang Perubahan</button>
+                    <button @click="showBackModal = false" class="flex-1 py-3 rounded-2xl border border-gray-300 dark:border-brand-800 text-gray-900 dark:text-brand-400 hover:bg-gray-50 dark:bg-brand-900/10 transition-all text-xs font-bold uppercase tracking-widest">Batal</button>
                 </div>
             </div>
         </div>

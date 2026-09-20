@@ -5,7 +5,7 @@
 @section('content')
 <div x-data="{ 
     qty: 1, 
-    selectedMaterialId: '{{ $materials->first()?->id ?? 0 }}',
+    selectedMaterialId: '{{ $materials->where('stock', '>', 0)->first()?->id ?? ($materials->first()?->id ?? 0) }}',
     materials: @js($materials),
     openDetail: false,
     get selectedMaterial() {
@@ -202,12 +202,19 @@
                             <div class="max-h-[220px] overflow-y-auto custom-scrollbar pr-2 pb-2 rounded-2xl mb-4">
                                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
                                     @foreach($materials as $material)
-                                    <button @click="selectedMaterialId = '{{ $material->id }}'" 
-                                            class="p-4 text-[10px] font-black uppercase tracking-widest border-2 rounded-2xl transition-all relative text-left group flex items-center justify-between"
-                                            :class="selectedMaterialId == '{{ $material->id }}' ? 'border-brand-900 bg-brand-50 text-brand-900 shadow-lg shadow-brand-900/5' : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'">
-                                        <span class="truncate pr-4">{{ $material->name }}</span>
-                                        <div x-show="selectedMaterialId == '{{ $material->id }}'" class="absolute bottom-2 right-2 text-brand-900">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                    @php
+                                        $isOutOfStock = $material->stock <= 0;
+                                    @endphp
+                                    <button @if(!$isOutOfStock) @click="selectedMaterialId = '{{ $material->id }}'" @endif
+                                            @disabled($isOutOfStock)
+                                            class="p-4 text-[10px] font-black uppercase tracking-widest border-2 rounded-2xl transition-all relative text-left group flex flex-col justify-between gap-2
+                                            {{ $isOutOfStock ? 'opacity-50 cursor-not-allowed bg-slate-50 border-slate-200' : 'hover:border-slate-300' }}"
+                                            :class="selectedMaterialId == '{{ $material->id }}' ? 'border-brand-900 bg-brand-50 text-brand-900 shadow-lg shadow-brand-900/5' : '{{ $isOutOfStock ? 'border-slate-200 text-slate-400' : 'border-slate-100 text-slate-500 bg-white' }}'">
+                                        <div class="flex items-center justify-between w-full">
+                                            <span class="truncate pr-4">{{ $material->name }}</span>
+                                            <div x-show="selectedMaterialId == '{{ $material->id }}'" class="text-brand-900">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                            </div>
                                         </div>
                                     </button>
                                     @endforeach

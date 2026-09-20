@@ -74,9 +74,32 @@ class PackageResource extends Resource
                             ->multiple()
                             ->reorderable()
                             ->appendFiles()
+                            ->directory('packages')
                             ->columnSpanFull()
                             ->disk('public')
-                            ->directory('packages'),
+                            ->hiddenOn('view'),
+
+                        Forms\Components\Placeholder::make('images_view')
+                            ->label('Gambar Produk')
+                            ->hiddenOn(['create', 'edit'])
+                            ->content(function ($record) {
+                                $files = array_values(array_filter($record?->images ?? []));
+                                if ($files === []) return new \Illuminate\Support\HtmlString('<span style="font-size:14px;color:#6b7280">Tidak ada gambar produk.</span>');
+                                
+                                $html = '<div style="display:flex;flex-wrap:wrap;gap:12px">';
+                                foreach ($files as $index => $file) {
+                                    $url = e(\Illuminate\Support\Facades\Storage::disk('public')->url($file));
+                                    $html .= '<div style="width:124px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;padding:8px">
+                                        <a href="' . $url . '" target="_blank" rel="noopener" title="Buka ukuran asli">
+                                            <img src="' . $url . '" alt="Gambar ' . ($index + 1) . '" style="display:block;width:100px;height:100px;object-fit:cover;border-radius:8px">
+                                        </a>
+                                        <a href="' . $url . '" download style="display:block;text-align:center;margin-top:6px;font-size:10px;font-weight:600;color:#4b5563">Unduh</a>
+                                    </div>';
+                                }
+                                $html .= '</div>';
+                                return new \Illuminate\Support\HtmlString($html);
+                            })
+                            ->columnSpanFull(),
 
                         Forms\Components\Toggle::make('is_active')
                             ->label('Aktif')
@@ -134,8 +157,18 @@ class PackageResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->tooltip('Lihat')
+                    ->iconButton()
+                    ->slideOver()
+                    ->modalCancelAction(false),
+                Tables\Actions\EditAction::make()
+                    ->tooltip('Ubah')
+                    ->iconButton()
+                    ->slideOver(),
+                Tables\Actions\DeleteAction::make()
+                    ->tooltip('Hapus')
+                    ->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -148,8 +181,6 @@ class PackageResource extends Resource
     {
         return [
             'index' => Pages\ListPackages::route('/'),
-            'create' => Pages\CreatePackage::route('/create'),
-            'edit' => Pages\EditPackage::route('/{record}/edit'),
         ];
     }
 }

@@ -12,9 +12,15 @@ class PaywuzService
 
     public function __construct()
     {
-        $this->apiKey = config('services.paywuz.api_key', '');
-        // Menggunakan v1 sesuai docs
-        $this->baseUrl = 'https://api.paywuz.id/v1'; 
+        $apiSetting = \App\Models\ApiSetting::first();
+        if ($apiSetting) {
+            $isSandbox = $apiSetting->paywuz_environment === 'sandbox';
+            $this->apiKey = $isSandbox ? $apiSetting->paywuz_sandbox_api_key : $apiSetting->paywuz_production_api_key;
+            $this->baseUrl = 'https://api.paywuz.id/v1'; // Paywuz uses the same endpoint, distinguished by API Key (e.g. pk_sand_)
+        } else {
+            $this->apiKey = config('services.paywuz.api_key', '');
+            $this->baseUrl = 'https://api.paywuz.id/v1'; 
+        }
     }
 
     /**
@@ -22,7 +28,7 @@ class PaywuzService
      */
     protected function client()
     {
-        return Http::withHeaders([
+        return Http::timeout(15)->withHeaders([
             'Authorization' => 'Bearer ' . $this->apiKey,
             'Accept'        => 'application/json',
             'Content-Type'  => 'application/json',

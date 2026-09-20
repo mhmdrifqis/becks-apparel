@@ -83,8 +83,27 @@ class MaterialResource extends Resource
                             ->label('Foto Bahan')
                             ->image()
                             ->directory('materials')
+                            ->columnSpanFull()
+                            ->hiddenOn('view'),
+
+                        Forms\Components\Placeholder::make('image_path_view')
+                            ->label('Foto Bahan')
+                            ->hiddenOn(['create', 'edit'])
+                            ->content(function ($record) {
+                                $file = $record?->image_path;
+                                if (!$file) return new \Illuminate\Support\HtmlString('<span style="font-size:14px;color:#6b7280">Tidak ada foto bahan.</span>');
+                                
+                                $url = e(\Illuminate\Support\Facades\Storage::disk('public')->url($file));
+                                return new \Illuminate\Support\HtmlString('
+                                <div style="display:inline-block;width:124px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;padding:8px">
+                                    <a href="' . $url . '" target="_blank" rel="noopener" title="Buka ukuran asli">
+                                        <img src="' . $url . '" alt="Foto Bahan" style="display:block;width:100px;height:100px;object-fit:cover;border-radius:8px">
+                                    </a>
+                                    <a href="' . $url . '" download style="display:block;text-align:center;margin-top:6px;font-size:10px;font-weight:600;color:#4b5563">Unduh</a>
+                                </div>');
+                            })
                             ->columnSpanFull(),
-                            
+
                         Forms\Components\Textarea::make('description')
                             ->label('Deskripsi Singkat')
                             ->rows(3)
@@ -150,8 +169,18 @@ class MaterialResource extends Resource
                     ->query(fn ($query, $data) => $data['value'] ? $query->whereJsonContains('product_types', $data['value']) : $query),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->tooltip('Lihat')
+                    ->iconButton()
+                    ->slideOver()
+                    ->modalCancelAction(false),
+                Tables\Actions\EditAction::make()
+                    ->tooltip('Ubah')
+                    ->iconButton()
+                    ->slideOver(),
+                Tables\Actions\DeleteAction::make()
+                    ->tooltip('Hapus')
+                    ->iconButton(),
             ]);
     }
 
@@ -159,8 +188,6 @@ class MaterialResource extends Resource
     {
         return [
             'index' => Pages\ListMaterials::route('/'),
-            'create' => Pages\CreateMaterial::route('/create'),
-            'edit' => Pages\EditMaterial::route('/{record}/edit'),
         ];
     }
 }

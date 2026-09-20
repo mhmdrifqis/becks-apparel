@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Widgets;
+namespace App\Filament\Owner\Widgets;
 
 use App\Models\Order;
 use Filament\Tables;
@@ -89,11 +89,35 @@ class LatestOrdersTable extends BaseWidget
                     ->sortable(),
             ])
             ->actions([
-                Tables\Actions\Action::make('view')
-                    ->label('Detail')
-                    ->icon('heroicon-m-eye')
-                    ->url(fn (Order $record): string => route('filament.admin.resources.orders.view', $record))
-                    ->openUrlInNewTab(),
+                Tables\Actions\ViewAction::make()
+                    ->label('Lihat')
+                    ->tooltip('Lihat Detail')
+                    ->iconButton()
+                    ->slideOver()
+                    ->modalCancelAction(false)
+                    ->infolist([
+                        \Filament\Infolists\Components\Section::make('Detail Pesanan')
+                            ->schema([
+                                \Filament\Infolists\Components\TextEntry::make('order_number')->label('No. Order'),
+                                \Filament\Infolists\Components\TextEntry::make('user.name')->label('Pemesan'),
+                                \Filament\Infolists\Components\TextEntry::make('created_at')->label('Tanggal')->dateTime('d M Y H:i'),
+                                \Filament\Infolists\Components\TextEntry::make('total_amount')->label('Total Harga')->money('IDR'),
+                                \Filament\Infolists\Components\TextEntry::make('payment_status')->label('Status Pembayaran')
+                                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                                        'unpaid'  => 'Belum Bayar',
+                                        'partial' => 'DP',
+                                        'paid'    => 'Lunas',
+                                        default   => ucfirst($state),
+                                    })
+                                    ->badge()
+                                    ->color(fn (string $state): string => match ($state) {
+                                        'unpaid' => 'danger',
+                                        'partial' => 'warning',
+                                        'paid' => 'success',
+                                        default => 'gray',
+                                    }),
+                            ])->columns(2),
+                    ]),
             ])
             ->paginated(false);
     }

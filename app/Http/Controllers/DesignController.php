@@ -12,7 +12,13 @@ class DesignController extends Controller
 {
     public function index()
     {
-        $designs = Auth::user()->designs()->latest()->get();
+        $designs = Auth::user()->designs()
+            ->where(function ($q) {
+                $q->whereNull('design_json->type')
+                  ->orWhere('design_json->type', '!=', 'upload');
+            })
+            ->latest()
+            ->get();
         return view('customer.designs.index', compact('designs'));
     }
 

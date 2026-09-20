@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\ReturnRequestResource\Pages;
 
 use App\Filament\Resources\ReturnRequestResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListReturnRequests extends ListRecords
@@ -12,8 +11,6 @@ class ListReturnRequests extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\CreateAction::make(),
-        ];
+        return [];
     }
 }

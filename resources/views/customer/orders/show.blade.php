@@ -20,8 +20,15 @@
                     <p class="text-xs font-bold text-slate-300 uppercase tracking-widest mt-2">#{{ $order->order_number }}</p>
                     <p class="mt-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Dibuat pada {{ $order->created_at->format('d F Y, H:i') }}
+                        Dibuat pada {{ $order->created_at->format('d M Y H:i') }}
                     </p>
+                    
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <a href="{{ route('download.invoice', $order) }}" target="_blank" class="inline-flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                            Unduh Invoice
+                        </a>
+                    </div>
                 </div>
                 
                 <div class="flex flex-col items-end gap-3">
@@ -41,7 +48,21 @@
                             {{ $order->payment_status === 'paid' ? 'LUNAS' : ($order->payment_status === 'partial' ? 'DP DIBAYAR' : 'BELUM DIBAYAR') }}
                         </div>
                         <div class="px-4 py-2 rounded-xl border-2 border-slate-100 bg-white text-slate-600 text-[10px] font-black uppercase tracking-widest shadow-sm">
-                            {{ strtoupper($order->status) }}
+                            @php
+                                $statusProduksi = match($order->status) {
+                                    'pending'   => 'MENUNGGU',
+                                    'paid'      => 'ANTRIAN MASUK',
+                                    'printing'  => 'CETAK',
+                                    'sewing'    => 'JAHIT',
+                                    'qc'        => 'QC',
+                                    'ready'     => 'SIAP KIRIM',
+                                    'shipped'   => 'DIKIRIM',
+                                    'completed' => 'SELESAI',
+                                    'cancelled' => 'DIBATALKAN',
+                                    default     => strtoupper($order->status)
+                                };
+                            @endphp
+                            {{ $statusProduksi }}
                         </div>
                     </div>
                 </div>
@@ -155,7 +176,7 @@
                 <!-- Timeline Produksi Berpindah Ke Sini -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <div class="px-6 py-4 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
-                        <h2 class="text-xs font-black text-slate-900 uppercase tracking-widest">Timeline Produksi</h2>
+                        <h2 class="text-xs font-black text-slate-900 uppercase tracking-widest">Lini Masa Produksi</h2>
                         <span class="text-[10px] font-bold text-slate-400 uppercase">Histori Pengerjaan</span>
                     </div>
                     <div class="p-6 md:p-8">
@@ -172,7 +193,7 @@
                                         </span>
                                         <div class="flex flex-col gap-1">
                                             <time class="inline-block w-fit bg-slate-100 border border-slate-200 text-slate-500 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full mb-1">
-                                                {{ $log->created_at->format('d M Y, H:i') }} WIB
+                                                {{ $log->created_at->format('d M Y H:i') }} WIB
                                             </time>
                                             <h3 class="text-sm font-black text-slate-900 uppercase tracking-tight">
                                                 {{ $log->description }}
@@ -189,7 +210,7 @@
                             </ol>
                         @else
                             <div class="text-center py-4">
-                                <p class="text-xs font-bold text-slate-400 italic">Pesanan Anda akan masuk ke antrean produksi setelah pembayaran dikonfirmasi.</p>
+                                <p class="text-xs font-bold text-slate-400 italic">Pesanan Anda akan masuk ke antrian produksi setelah pembayaran dikonfirmasi.</p>
                             </div>
                         @endif
                     </div>
@@ -246,6 +267,9 @@
                                              @endif
 
                                              @foreach($files as $file)
+                                                 @if($file === $design->preview_path)
+                                                     @continue
+                                                 @endif
                                                  <a href="{{ Storage::disk('public')->url($file) }}" target="_blank" class="w-24 h-24 bg-slate-50 rounded-xl border-2 border-brand-100 overflow-hidden hover:border-brand-900 transition-all group relative">
                                                      <img src="{{ Storage::disk('public')->url($file) }}" class="w-full h-full object-cover">
                                                      <div class="absolute inset-0 bg-brand-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
@@ -343,6 +367,16 @@
                     
                     <div class="space-y-4 mb-6">
                         <div class="flex justify-between items-center text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                            <span>Total Produk</span>
+                            <span class="text-slate-900">Rp {{ number_format($order->total_amount - ($order->shipping_cost ?? 0), 0, ',', '.') }}</span>
+                        </div>
+                        @if($order->shipping_cost > 0)
+                        <div class="flex justify-between items-center text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                            <span>Biaya Kirim</span>
+                            <span class="text-slate-900">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
+                        </div>
+                        @endif
+                        <div class="flex justify-between items-center text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                             <span>Total Pesanan</span>
                             <span class="text-slate-900">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
                         </div>
@@ -350,11 +384,12 @@
                             <span>Sdh Dibayar</span>
                             <span class="text-green-600">- Rp {{ number_format($order->deposit_amount, 0, ',', '.') }}</span>
                         </div>
-                        <div class="h-px bg-slate-100 w-full"></div>
-                        <div class="flex flex-col gap-1">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tagihan Tersisa</span>
-                            <p class="text-3xl lg:text-4xl font-black text-brand-900 tracking-tighter leading-none mt-1">Rp {{ number_format($order->total_amount - $order->deposit_amount, 0, ',', '.') }}</p>
-                        </div>
+                    </div>
+                    <div class="h-px bg-slate-100 w-full"></div>
+                    <div class="flex flex-col gap-1 mt-4">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tagihan Tersisa</span>
+                        <p class="text-3xl lg:text-4xl font-black text-brand-900 tracking-tighter leading-none mt-1">Rp {{ number_format($order->total_amount - $order->deposit_amount, 0, ',', '.') }}</p>
+                    </div>
 
                         @if($order->payment_status === 'unpaid' && $order->status === 'unpaid')
                             <div class="mt-6 pt-6 border-t border-slate-50">
@@ -412,7 +447,7 @@
                                  </div>
                              </div>
                              @if($order->tracking_number)
-                             <button @click="fetchTracking()" class="w-full py-3 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-lg shadow-brand-900/20 active:scale-95 flex items-center justify-center gap-2">
+                             <button type="button" @click="fetchTracking()" class="w-full py-3 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-lg shadow-brand-900/20 active:scale-95 flex items-center justify-center gap-2">
                                  <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                                  Lacak Resi Pengiriman
                              </button>
@@ -461,7 +496,7 @@
                                      @endif
                                  </div>
                              @else
-                                 <button @click="showReturnModal = true" class="w-full py-3 bg-white border-2 border-red-100 text-red-500 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-red-50 hover:border-red-200 transition-all active:scale-95 flex items-center justify-center gap-2">
+                                 <button type="button" @click="showReturnModal = true" class="w-full py-3 bg-white border-2 border-red-100 text-red-500 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-red-50 hover:border-red-200 transition-all active:scale-95 flex items-center justify-center gap-2">
                                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
                                      Ajukan Pengembalian
                                  </button>
@@ -471,8 +506,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
     <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] pb-safe">
         <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
             <div class="flex flex-col">
@@ -500,7 +533,6 @@
             </div>
         </div>
     </div>
-</div>
 
     <!-- Return Request Modal -->
     <div x-show="showReturnModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
@@ -666,8 +698,9 @@
 
 </div>
 
+@push('scripts')
 <script>
-    document.addEventListener('alpine:init', () => {
+    const registerOrderDetail = () => {
         Alpine.data('orderDetail', () => ({
             showReturnModal: false,
             showPaymentModal: false,
@@ -737,7 +770,14 @@
                 }
             }
         }));
-    });
+    };
+
+    if (window.Alpine) {
+        registerOrderDetail();
+    } else {
+        document.addEventListener('alpine:init', registerOrderDetail);
+    }
 </script>
+@endpush
 
 @endsection

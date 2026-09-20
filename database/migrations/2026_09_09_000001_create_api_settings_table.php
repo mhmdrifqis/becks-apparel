@@ -35,7 +35,7 @@ return new class extends Migration
 
                 // 4. FastAPI Chatbot Integration
                 $table->boolean('chatbot_is_active')->default(true);
-                $table->text('chatbot_url')->default('http://127.0.0.1:8000/chatbot');
+                $table->string('chatbot_url')->default('http://127.0.0.1:8000/chatbot');
                 $table->integer('chatbot_timeout')->default(10);
 
                 // 5. Google Gemini AI
@@ -47,7 +47,7 @@ return new class extends Migration
                 $table->boolean('google_is_active')->default(true);
                 $table->text('google_client_id')->nullable();
                 $table->text('google_client_secret')->nullable();
-                $table->text('google_redirect_uri')->default('https://becksapparel.com/auth/google/callback');
+                $table->string('google_redirect_uri')->default('https://becksapparel.com/auth/google/callback');
 
                 $table->timestamps();
             });

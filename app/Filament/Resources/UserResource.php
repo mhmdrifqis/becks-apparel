@@ -19,11 +19,11 @@ class UserResource extends Resource
 
     protected static ?string $navigationGroup = 'Sistem';
 
-    protected static ?string $navigationLabel = 'Manajemen User';
+    protected static ?string $navigationLabel = 'Manajemen Pengguna';
 
-    protected static ?string $modelLabel = 'User';
+    protected static ?string $modelLabel = 'Pengguna';
 
-    protected static ?string $pluralModelLabel = 'User';
+    protected static ?string $pluralModelLabel = 'Pengguna';
 
     protected static ?int $navigationSort = 4;
 

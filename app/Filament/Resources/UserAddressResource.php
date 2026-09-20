@@ -18,11 +18,11 @@ class UserAddressResource extends Resource
 
     protected static ?string $navigationGroup = 'Sistem';
 
-    protected static ?string $navigationLabel = 'Alamat User';
+    protected static ?string $navigationLabel = 'Alamat Pengguna';
 
-    protected static ?string $modelLabel = 'Alamat User';
+    protected static ?string $modelLabel = 'Alamat Pengguna';
 
-    protected static ?string $pluralModelLabel = 'Alamat User';
+    protected static ?string $pluralModelLabel = 'Alamat Pengguna';
 
     protected static ?int $navigationSort = 5;
 

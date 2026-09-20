@@ -15,7 +15,19 @@ class ListOrderProduksi extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [];
+        return [
+            \Filament\Actions\Action::make('unduh_rekap_produksi_pdf')
+                ->label('Unduh Rekap Produksi (PDF)')
+                ->color('primary')
+                ->icon('heroicon-o-document-arrow-down')
+                ->action(function (\Livewire\Component $livewire) {
+                    $records = $livewire->getFilteredTableQuery()->get();
+                    $token = \Illuminate\Support\Str::random(10);
+                    \Illuminate\Support\Facades\Cache::put('pdf_export_' . $token, $records, now()->addMinutes(5));
+                    $url = route('pdf.preview_bulk', ['type' => 'produksi', 'token' => $token]);
+                    $livewire->js("window.open('{$url}', '_blank');");
+                }),
+        ];
     }
 
     public function getTabs(): array

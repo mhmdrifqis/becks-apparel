@@ -6,6 +6,8 @@ use App\Models\Order;
 use App\Models\ReturnRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class ReturnRequestController extends Controller
 {
@@ -36,8 +38,23 @@ class ReturnRequestController extends Controller
         if ($request->hasFile('proof_files')) {
             foreach ($request->file('proof_files') as $file) {
                 $path = $file->store('returns', 'public');
+
+                if (!$path) {
+                    Storage::disk('public')->delete($filePaths);
+
+                    throw ValidationException::withMessages([
+                        'proof_files' => 'Bukti gagal disimpan. Silakan coba unggah kembali.',
+                    ]);
+                }
+
                 $filePaths[] = $path;
             }
+        }
+
+        if ($filePaths === []) {
+            throw ValidationException::withMessages([
+                'proof_files' => 'Minimal satu bukti foto atau video wajib diunggah.',
+            ]);
         }
 
         ReturnRequest::create([
