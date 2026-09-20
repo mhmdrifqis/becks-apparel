@@ -18,6 +18,21 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-4 py-12 md:py-16">
+        @if(session('success'))
+            <div class="bg-green-50 text-green-700 p-4 rounded-xl mb-6 font-bold text-xs">{{ session('success') }}</div>
+        @endif
+        @if(session('error'))
+            <div class="bg-red-50 text-red-700 p-4 rounded-xl mb-6 font-bold text-xs">{{ session('error') }}</div>
+        @endif
+        @if($errors->any())
+            <div class="bg-red-50 text-red-700 p-4 rounded-xl mb-6 font-bold text-xs">
+                <ul class="list-disc pl-4">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         @if($orders->isEmpty())
             <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-12 text-center">
@@ -181,7 +196,7 @@
                                 <div class="mt-6 flex flex-wrap justify-end gap-3">
                                     @if($order->tracking_number)
                                         <button @click="fetchTracking({{ $order->id }})" class="px-6 py-3 bg-brand-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-800 transition-all shadow-md flex items-center gap-1.5">
-                                            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                            
                                             Lacak Resi
                                         </button>
                                     @endif
@@ -190,7 +205,61 @@
                                     @endif
                                     <a href="{{ route('customer.orders.show', $order->order_number) }}" class="px-8 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Detail Pesanan</a>
                                     @if($order->status === 'completed')
-                                        <button class="px-8 py-3 bg-brand-50 text-brand-900 border border-brand-100 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-100 transition-all">Beli Lagi</button>
+                                        @if(!$order->review)
+                                            <div x-data="{ showLocalReviewModal: false, localRating: 0 }" class="inline-block">
+                                                <button @click="showLocalReviewModal = true" class="px-8 py-3 bg-white border border-brand-900 text-brand-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-50 transition-all">Beri Ulasan</button>
+                                                
+                                                <!-- Local Review Modal -->
+                                                <div x-show="showLocalReviewModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm text-left" x-cloak style="display: none;">
+                                                    <div class="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-hidden shadow-2xl flex flex-col" @click.away="showLocalReviewModal = false">
+                                                        <div class="p-6 md:p-8 border-b border-slate-100 flex justify-between items-center bg-brand-900 text-white">
+                                                            <div>
+                                                                <h2 class="text-lg md:text-xl font-black uppercase tracking-tight">Beri Ulasan Produk</h2>
+                                                                <p class="text-[10px] text-brand-100 font-bold tracking-widest mt-1">Pesanan #{{ $order->order_number }}</p>
+                                                            </div>
+                                                            <button @click="showLocalReviewModal = false" class="p-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-white transition-colors">
+                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                            </button>
+                                                        </div>
+                                                        <form action="{{ route('customer.orders.review', $order->id) }}" method="POST" enctype="multipart/form-data" class="flex-1 overflow-y-auto p-6 md:p-8">
+                                                            @csrf
+                                                            
+                                                            <div class="mb-6">
+                                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Penilaian Anda (Bintang)</label>
+                                                                <div class="flex items-center gap-2">
+                                                                    <template x-for="i in 5">
+                                                                        <button type="button" @click="localRating = i" class="focus:outline-none transition-transform hover:scale-110">
+                                                                            <svg class="w-10 h-10" :class="localRating >= i ? 'text-amber-400' : 'text-slate-200'" fill="currentColor" viewBox="0 0 20 20">
+                                                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                                            </svg>
+                                                                        </button>
+                                                                    </template>
+                                                                </div>
+                                                                <!-- Use x-model to ensure the hidden input stays in sync -->
+                                                                <input type="hidden" name="rating" x-model="localRating" required>
+                                                                <p x-show="localRating === 0" class="text-[10px] text-red-500 font-bold mt-2">Pilih bintang untuk melanjutkan.</p>
+                                                            </div>
+
+                                                            <div class="mb-6">
+                                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Tuliskan Pengalaman Anda</label>
+                                                                <textarea name="comment" rows="4" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-brand-900 focus:border-transparent placeholder:text-slate-400" placeholder="Bagaimana kualitas produk, hasil jahitan, dan pelayanan kami?"></textarea>
+                                                            </div>
+
+                                                            <div class="mb-8">
+                                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Unggah Foto (Opsional)</label>
+                                                                <input type="file" name="images[]" multiple accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:tracking-widest file:bg-brand-50 file:text-brand-900 hover:file:bg-brand-100 transition-colors">
+                                                                <p class="text-[10px] text-slate-400 font-bold mt-2">Format: JPG, PNG. Maksimal 2MB per foto.</p>
+                                                            </div>
+
+                                                            <button type="submit" :disabled="localRating === 0" class="w-full py-4 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-brand-800 transition-all shadow-xl shadow-brand-900/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                                Kirim Ulasan
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        <a href="{{ route('catalog.show', $order->orderItems->first()->package->slug) }}" class="px-8 py-3 bg-brand-50 text-brand-900 border border-brand-100 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-100 transition-all text-center">Beli Lagi</a>
                                     @endif
                                 </div>
                             </div>

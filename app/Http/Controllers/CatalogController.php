@@ -11,6 +11,14 @@ class CatalogController extends Controller
     public function index()
     {
         $packages = Package::where('is_active', true)
+            ->withAvg(['reviews' => function ($query) {
+                $query->where('is_visible', true);
+            }], 'rating')
+            ->withSum(['orderItems' => function ($query) {
+                $query->whereHas('order', function ($q) {
+                    $q->whereIn('status', ['paid', 'printing', 'sewing', 'qc', 'ready', 'shipped', 'completed']);
+                });
+            }], 'quantity')
             ->get()
             ->groupBy('category');
 
@@ -21,6 +29,11 @@ class CatalogController extends Controller
     {
         $package = Package::where('slug', $slug)
             ->where('is_active', true)
+            ->withSum(['orderItems' => function ($query) {
+                $query->whereHas('order', function ($q) {
+                    $q->whereIn('status', ['paid', 'printing', 'sewing', 'qc', 'ready', 'shipped', 'completed']);
+                });
+            }], 'quantity')
             ->firstOrFail();
 
         // Filter bahan sesuai kategori produk (jersey, jaket, kaos, kemeja)

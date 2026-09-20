@@ -44,6 +44,9 @@ Route::middleware('auth')->group(function () {
     // Return Request Route
     Route::post('/pesanan/{order}/return', [App\Http\Controllers\ReturnRequestController::class, 'store'])->name('customer.orders.return');
     
+    // Review Route
+    Route::post('/pesanan/{order}/review', [App\Http\Controllers\ReviewController::class, 'store'])->name('customer.orders.review');
+    
     Route::post('/payment/{order}/create', [App\Http\Controllers\PaymentController::class, 'createPayment'])->name('payment.create');
     Route::post('/payment/{order}/sync', [App\Http\Controllers\PaymentController::class, 'syncStatus'])->name('payment.sync');
 

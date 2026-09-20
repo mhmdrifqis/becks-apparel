@@ -51,6 +51,11 @@ class Order extends Model
         return $this->hasMany(OrderStatusLog::class);
     }
 
+    public function review(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Review::class);
+    }
+
     /**
      * Route notifications for the WhatsApp channel.
      *
