@@ -45,13 +45,7 @@
 
     <div class="max-w-7xl mx-auto px-4 py-20">
         @php
-            $portfolios = [
-                ['img' => 'portofolio1.png', 'title' => 'Jakarta United', 'desc' => 'Menjadi official apparel partner untuk klub Liga 3 DKI Jakarta musim 2019: Jakarta United'],
-                ['img' => 'portofolio2.png', 'title' => 'PSJS Jakarta Selatan', 'desc' => 'Menjadi official apparel partner untuk klub Liga 3 DKI Jakarta musim 2019: PSJS Jakarta Selatan'],
-                ['img' => 'portofolio3.png', 'title' => 'Persikota Tangerang', 'desc' => 'Menjadi official sponsor apparel untuk klub Liga 3 Banten musim 2019: Persikota Tangerang'],
-                ['img' => 'portofolio4.png', 'title' => 'ACN Muara Badak', 'desc' => 'Menjadi official apparel partner untuk klub Liga 3 Kalimantan Timur musim 2019: ACN Muara Badak'],
-                ['img' => 'portofolio5.png', 'title' => 'PS Belitung Timur', 'desc' => 'Menjadi official apparel partner untuk klub Liga 3 Bangka Belitung musim 2021: PS Belitung Timur'],
-            ];
+            $portfolios = config('portfolio');
         @endphp
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -60,14 +54,14 @@
                     <!-- Image Container -->
                     <div class="aspect-[4/5] overflow-hidden bg-slate-100">
                         <img src="{{ asset('assets/images/portofolio/' . $item['img']) }}" 
-                             alt="Becks Apparel Portfolio {{ $item['title'] }}" 
+                             alt="Becks Apparel Portfolio {{ $item['name'] }}" 
                              class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 group-hover:rotate-2">
                     </div>
                     
                     <!-- Overlay Info -->
                     <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-10 text-white">
                         <span class="text-brand-400 font-bold text-xs uppercase tracking-[0.3em] mb-3 font-sans italic">Becks Project #00{{ $index + 1 }}</span>
-                        <h3 class="text-2xl font-black uppercase tracking-tight mb-3 leading-none">{{ $item['title'] }}</h3>
+                        <h3 class="text-2xl font-black uppercase tracking-tight mb-3 leading-none">{{ $item['name'] }}</h3>
                         <p class="text-brand-50/70 text-sm italic font-medium leading-relaxed mb-6">{{ $item['desc'] }}</p>
                         
                         <div class="flex gap-2">

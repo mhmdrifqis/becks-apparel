@@ -65,6 +65,38 @@
         </div>
     </section>
 
+    <!-- SECTION MARQUEE (TRUSTED BY) -->
+    <section class="py-12 md:py-16 bg-[#06402B] text-[#fdfbf7] overflow-hidden shadow-2xl relative">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-overlay"></div>
+        
+        <div class="mb-8 md:mb-12 text-center relative z-10">
+            <p class="text-xs md:text-sm font-bold uppercase tracking-[0.3em] text-[#fdfbf7]/70">Dipercaya Oleh Klub & Komunitas Terbaik</p>
+        </div>
+        
+        <div class="relative flex overflow-x-hidden group z-10">
+            @php
+                $teams = config('portfolio');
+                // Duplicate multiple times for seamless infinite scroll on wide screens
+                $marqueeItems = array_merge($teams, $teams, $teams, $teams);
+            @endphp
+            
+            <div class="animate-marquee flex items-center gap-16 md:gap-32 px-8 md:px-16">
+                @foreach($marqueeItems as $team)
+                    <div class="flex items-center gap-4 md:gap-6">
+                        <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/10 p-1 md:p-1.5 shadow-2xl border border-white/20 hover:scale-110 transition-transform duration-500">
+                            <img src="{{ asset('assets/images/portofolio/' . $team['img']) }}" alt="{{ $team['name'] }}" class="w-full h-full object-cover rounded-full mix-blend-luminosity opacity-70 hover:mix-blend-normal hover:opacity-100 transition-all duration-500">
+                        </div>
+                        <span class="text-xl md:text-3xl font-black uppercase tracking-widest text-white whitespace-nowrap">{{ $team['name'] }}</span>
+                    </div>
+                @endforeach
+            </div>
+            
+            <!-- Gradient Overlays for smooth edges -->
+            <div class="absolute inset-y-0 left-0 w-24 md:w-48 bg-gradient-to-r from-[#06402B] to-transparent pointer-events-none"></div>
+            <div class="absolute inset-y-0 right-0 w-24 md:w-48 bg-gradient-to-l from-[#06402B] to-transparent pointer-events-none"></div>
+        </div>
+    </section>
+
     <!-- SECTION 3: PRODUK -->
     <section class="min-h-screen py-20 md:py-24 bg-[#fdfbf7] relative">
         <div class="absolute top-12 right-12 hidden md:block">
@@ -214,6 +246,18 @@
     ::selection {
         background: #06402B;
         color: #fdfbf7;
+    }
+
+    @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+        animation: marquee 40s linear infinite;
+        width: max-content;
+    }
+    .group:hover .animate-marquee {
+        animation-play-state: paused;
     }
 </style>
 @endsection
