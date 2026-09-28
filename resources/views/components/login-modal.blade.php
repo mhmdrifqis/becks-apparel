@@ -65,10 +65,10 @@
 
                         <div>
                             <div class="flex items-center justify-between mb-1">
-                                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">Password</label>
+                                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">Kata Sandi</label>
                                 @if (Route::has('password.request'))
                                     <a href="{{ route('password.request') }}" class="text-[10px] font-bold text-brand-600 hover:text-brand-500 transition-colors">
-                                        Lupa Password via WhatsApp?
+                                        Lupa Kata Sandi via WhatsApp?
                                     </a>
                                 @endif
                             </div>

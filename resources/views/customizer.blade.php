@@ -54,10 +54,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 
     <div x-show="isLoading" 
-         class="fixed inset-0 z-[100] bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md flex flex-col items-center justify-center transition-all duration-500">
-        <div class="relative w-24 h-24">
-            <div class="absolute inset-0 border-4 border-brand-500/20 rounded-full"></div>
-            <div class="absolute inset-0 border-4 border-t-brand-500 rounded-full animate-spin"></div>
+         class="fixed inset-0 z-[100] bg-white/80 dark:bg-zinc-950/90 backdrop-blur-md flex flex-col items-center justify-center transition-all duration-500">
+        <div class="relative flex flex-col items-center">
+            <div class="absolute inset-0 bg-brand-900/30 rounded-full blur-2xl animate-pulse scale-150"></div>
+            <div class="relative animate-[bounce_3s_ease-in-out_infinite]">
+                <img src="{{ asset('assets/images/logo-becks.png') }}" class="h-20 w-auto object-contain brightness-0 invert drop-shadow-[0_0_15px_rgba(6,64,43,0.5)]">
+            </div>
+            <div class="mt-8 w-40 h-1 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden relative">
+                <div class="absolute inset-y-0 left-0 bg-brand-500 w-full animate-[loader-progress_2s_ease-in-out_infinite]" style="animation: loader-progress 2s ease-in-out infinite;"></div>
+            </div>
+            <style>
+                @keyframes loader-progress {
+                    0% { transform: translateX(-100%); }
+                    50% { transform: translateX(0); }
+                    100% { transform: translateX(100%); }
+                }
+            </style>
         </div>
         <p class="mt-6 text-gray-900 dark:text-brand-400 font-bold tracking-widest text-xs uppercase animate-pulse text-center">Menyiapkan Desain...</p>
     </div>
@@ -95,22 +107,22 @@
                 
                 <div x-show="activeMenu === 'mockup'" x-transition class="space-y-6">
                     <label class="block text-[10px] font-bold text-gray-500 dark:text-brand-400/80 mb-4 uppercase tracking-[0.2em]">Pilih Model Mockup</label>
-                    <div class="grid grid-cols-1 gap-4">
+                    <div class="grid grid-cols-2 gap-3">
                         <template x-for="mockup in availableMockups" :key="mockup.id">
                             <button 
                                 @click="setModel(mockup.id)"
-                                :class="currentModel === mockup.id ? 'border-brand-500 bg-gray-200/50 dark:bg-brand-900/30 ring-1 ring-brand-500' : 'border-gray-200 dark:border-brand-800/30 hover:border-brand-700 bg-gray-50 dark:bg-zinc-900/20'"
-                                class="w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left group"
+                                :class="currentModel === mockup.id ? 'border-brand-500 bg-gray-50 dark:bg-brand-900/30 ring-2 ring-brand-500/50' : 'border-gray-200 dark:border-brand-800/30 hover:border-brand-700 bg-white dark:bg-zinc-900/20'"
+                                class="flex flex-col items-center p-3 rounded-2xl border transition-all text-center group relative overflow-hidden"
                             >
-                                <div class="w-12 h-12 rounded-xl bg-gray-100 dark:bg-brand-900/20 flex items-center justify-center group-hover:bg-gray-200 dark:bg-brand-900/40 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-900 dark:text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+                                <div class="w-full aspect-square bg-gray-100 dark:bg-zinc-800/50 rounded-xl p-2 mb-3 relative group-hover:bg-gray-200 dark:group-hover:bg-zinc-800 transition-colors">
+                                    <img :src="'/assets/mockups/' + mockup.id + '/front/shadows.png'" class="absolute inset-0 m-auto w-[90%] h-[90%] object-contain mix-blend-multiply dark:mix-blend-normal opacity-70 group-hover:opacity-100 transition-opacity">
+                                    <img :src="'/assets/mockups/' + mockup.id + '/front/highlights.png'" class="absolute inset-0 m-auto w-[90%] h-[90%] object-contain mix-blend-screen opacity-60 group-hover:opacity-90 transition-opacity">
                                 </div>
                                 <div>
-                                    <h3 class="text-xs font-bold text-gray-900 dark:text-brand-50 uppercase tracking-wide" x-text="mockup.label"></h3>
-                                    <p class="text-[10px] text-gray-400 dark:text-brand-400/60 mt-1 uppercase font-mono" x-text="mockup.id"></p>
+                                    <h3 class="text-[10px] font-bold text-gray-900 dark:text-brand-50 uppercase tracking-wide leading-tight" x-text="mockup.label"></h3>
                                 </div>
-                                <div x-show="currentModel === mockup.id" class="ml-auto">
-                                    <div class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></div>
+                                <div x-show="currentModel === mockup.id" class="absolute top-2 right-2">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-brand-500 ring-2 ring-white dark:ring-zinc-900 animate-pulse"></div>
                                 </div>
                             </button>
                         </template>
@@ -536,7 +548,7 @@
         <main class="flex-1 bg-white relative flex flex-col items-center justify-center p-2 md:p-4 min-h-[400px] order-1 md:order-3 mb-16 md:mb-0">
             <!-- View Switcher -->
             <div class="relative md:absolute md:top-6 md:left-1/2 md:-translate-x-1/2 z-40 flex items-center gap-1 md:gap-3 w-[95%] md:w-auto justify-center mt-16 md:mt-0 mb-4 md:mb-0 shrink-0">
-                <div class="bg-white/80 backdrop-blur-xl p-1 md:p-1.5 rounded-xl md:rounded-2xl border border-slate-200 shadow-xl flex gap-1 w-full md:w-auto">
+                <div class="bg-white/90 dark:bg-zinc-800/90 backdrop-blur-xl p-1 md:p-1.5 rounded-xl md:rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xl flex gap-1 w-full md:w-auto">
                     <template x-for="v in [
                         {id: 'front', label: 'Depan'},
                         {id: 'back', label: 'Belakang'},
@@ -544,7 +556,7 @@
                     ]" :key="v.id">
                         <button 
                             @click="setView(v.id)"
-                            :class="currentView === v.id ? 'bg-brand-900 text-white shadow-lg' : 'text-gray-700 dark:text-brand-300 hover:bg-gray-100 dark:bg-brand-900/20'"
+                            :class="currentView === v.id ? 'bg-brand-900 text-white shadow-lg' : 'text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-700/50'"
                             class="flex-1 md:flex-none px-2 md:px-6 py-2 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold transition-all uppercase tracking-widest text-center"
                             x-text="v.label"
                         ></button>
@@ -567,14 +579,14 @@
                 <button @click="handleBack()" class="bg-white/80 backdrop-blur-xl text-slate-700 p-2 md:p-3 rounded-xl md:rounded-2xl border border-slate-200 hover:bg-slate-100 transition-all shadow-xl group" title="Kembali">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
-                <a href="{{ url('/') }}" class="bg-white/80 backdrop-blur-xl text-slate-700 p-2 md:p-3 rounded-xl md:rounded-2xl border border-slate-200 hover:bg-slate-100 transition-all shadow-xl group" title="Ke Beranda">
+                <button @click="handleBack('{{ url('/') }}')" class="bg-white/80 backdrop-blur-xl text-slate-700 p-2 md:p-3 rounded-xl md:rounded-2xl border border-slate-200 hover:bg-slate-100 transition-all shadow-xl group" title="Ke Beranda">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                </a>
+                </button>
             </div>
             
             <!-- Zoom & Save Floating Tools -->
             <div class="absolute bottom-4 md:bottom-8 right-4 md:right-8 z-40 flex flex-col gap-2 md:gap-3 items-end">
-                <button @click="openPreview()" class="bg-white dark:bg-zinc-950 hover:bg-brand-900 text-gray-900 dark:text-brand-400 w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-gray-300 dark:border-brand-800 group" title="Preview Keseluruhan">
+                <button @click="openPreview()" class="bg-white dark:bg-zinc-950 hover:bg-brand-900 text-gray-900 dark:text-brand-400 w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-gray-300 dark:border-brand-800 group" title="Pratinjau Desain">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
                 <button @click="triggerSave()" class="bg-brand-900 hover:bg-brand-800 text-white w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-white/10 group" title="Simpan Desain">
@@ -582,16 +594,16 @@
                 </button>
 
                 <div class="flex flex-col gap-1 md:gap-2 bg-white/80 p-1.5 md:p-2 rounded-xl md:rounded-2xl backdrop-blur-md border border-slate-200 shadow-xl">
-                    <button @click="undo()" :disabled="undoStack.length <= 1" class="w-8 h-8 md:w-10 md:h-10 bg-slate-100 text-slate-700 rounded-lg md:rounded-xl flex items-center justify-center hover:bg-slate-200 disabled:opacity-30 transition-all border border-slate-200" title="Undo (Ctrl+Z)">
+                    <button @click="undo()" :disabled="undoStack.length <= 1" class="w-8 h-8 md:w-10 md:h-10 bg-slate-100 text-slate-700 rounded-lg md:rounded-xl flex items-center justify-center hover:bg-slate-200 disabled:opacity-30 transition-all border border-slate-200" title="Urungkan (Ctrl+Z)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 md:w-[18px] md:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
                     </button>
-                    <button @click="redo()" :disabled="redoStack.length === 0" class="w-8 h-8 md:w-10 md:h-10 bg-slate-100 text-slate-700 rounded-lg md:rounded-xl flex items-center justify-center hover:bg-slate-200 disabled:opacity-30 transition-all border border-slate-200" title="Redo (Ctrl+Shift+Z)">
+                    <button @click="redo()" :disabled="redoStack.length === 0" class="w-8 h-8 md:w-10 md:h-10 bg-slate-100 text-slate-700 rounded-lg md:rounded-xl flex items-center justify-center hover:bg-slate-200 disabled:opacity-30 transition-all border border-slate-200" title="Ulangi (Ctrl+Shift+Z)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 md:w-[18px] md:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg>
                     </button>
                     <div class="h-[1px] bg-slate-200 mx-1 my-0.5"></div>
-                    <button @click="zoom(0.2)" class="w-8 h-8 md:w-10 md:h-10 text-slate-600 hover:bg-slate-100 rounded-lg md:rounded-xl transition-colors text-base md:text-lg font-bold flex items-center justify-center" title="Zoom In">+</button>
-                    <button @click="zoom(-0.2)" class="w-8 h-8 md:w-10 md:h-10 text-slate-600 hover:bg-slate-100 rounded-lg md:rounded-xl transition-colors text-lg md:text-xl font-bold flex items-center justify-center" title="Zoom Out">-</button>
-                    <button @click="resetZoom()" class="w-8 h-8 md:w-10 md:h-10 text-slate-600 hover:bg-slate-100 rounded-lg md:rounded-xl transition-all flex items-center justify-center group" title="Reset Zoom">
+                    <button @click="zoom(0.2)" class="w-8 h-8 md:w-10 md:h-10 text-slate-600 hover:bg-slate-100 rounded-lg md:rounded-xl transition-colors text-base md:text-lg font-bold flex items-center justify-center" title="Persbesar">+</button>
+                    <button @click="zoom(-0.2)" class="w-8 h-8 md:w-10 md:h-10 text-slate-600 hover:bg-slate-100 rounded-lg md:rounded-xl transition-colors text-lg md:text-xl font-bold flex items-center justify-center" title="Perkecil">-</button>
+                    <button @click="resetZoom()" class="w-8 h-8 md:w-10 md:h-10 text-slate-600 hover:bg-slate-100 rounded-lg md:rounded-xl transition-all flex items-center justify-center group" title="Atur Ulang Zoom">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 md:w-4 md:h-4 group-hover:rotate-180 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     </button>
                 </div>
@@ -607,7 +619,7 @@
                     x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 scale-95 translate-y-2"
                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                    class="absolute z-[60] bg-brand-950/90 backdrop-blur-2xl border border-brand-700/50 rounded-2xl flex items-center gap-1 p-2 floating-toolbar-shadow pointer-events-auto"
+                    class="absolute z-[60] bg-brand-white backdrop-blur-2xl border border-brand-white rounded-2xl flex items-center gap-1 p-2 floating-toolbar-shadow pointer-events-auto"
                     :style="`top: ${toolbarPos.top}px; left: ${toolbarPos.left}px; transform: translateX(-50%);`"
                     @mousedown.stop
                 >
@@ -848,7 +860,7 @@
     <!-- Modal Preview Keseluruhan -->
     <div x-show="showPreviewModal" x-cloak class="fixed inset-0 z-[140] flex items-center justify-center p-4 md:p-8 bg-black/40 backdrop-blur-md" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
         
-        <div class="relative w-full max-w-6xl h-full max-h-[95vh] flex flex-col rounded-[32px] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-200 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)]">
+        <div class="relative w-full max-w-4xl h-full max-h-[95vh] flex flex-col rounded-[32px] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-200 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)]">
             
             <!-- Subtle Pattern / Texture -->
             <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: radial-gradient(circle at 2px 2px, black 1px, transparent 0); background-size: 24px 24px;"></div>
@@ -856,8 +868,7 @@
             <!-- Header -->
             <div class="relative z-10 p-6 md:px-10 md:py-8 flex items-start justify-between border-b border-gray-200/50 bg-white/40 backdrop-blur-xl">
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter leading-none mb-1">DESIGN PREVIEW</h2>
-                    <p class="text-xs font-bold text-brand-600 uppercase tracking-[0.2em]">Custom Jersey</p>
+                    <h2 class="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter leading-none mb-1">Pratinjau Desain</h2>
                 </div>
                 
                 <button @click="showPreviewModal = false" class="p-2.5 bg-white/60 hover:bg-white text-gray-600 hover:text-gray-900 rounded-full shadow-sm hover:shadow-md transition-all duration-300 group">
@@ -865,11 +876,11 @@
                 </button>
             </div>
 
-                        <!-- Dynamic Composite Preview Layout -->
-            <div class="relative z-10 flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-                <div class="w-full h-full min-h-[500px] flex items-center justify-center bg-white/85 backdrop-blur-[10px] border border-white/60 rounded-[24px] shadow-[0_10px_30px_rgba(0,0,0,0.05)] overflow-hidden relative group">
+            <!-- Dynamic Composite Preview Layout -->
+            <div class="relative z-10 flex-1 overflow-hidden p-4 md:p-8">
+                <div class="w-full h-full flex items-center justify-center bg-white border border-white/60 rounded-[24px] shadow-sm overflow-hidden relative group">
                     <template x-if="previewModalImage">
-                        <img :src="previewModalImage" alt="Studio Preview" class="w-full h-full object-contain rounded-[24px]">
+                        <img :src="previewModalImage" alt="Studio Preview" class="w-full h-full object-contain rounded-[24px] max-h-[60vh]">
                     </template>
                     <template x-if="!previewModalImage">
                         <div class="text-gray-400 text-sm text-center flex flex-col items-center gap-3">
@@ -882,9 +893,25 @@
 
             <!-- Footer Actions -->
             <div class="relative z-10 px-6 md:px-10 py-6 border-t border-gray-200/50 bg-white/40 backdrop-blur-xl flex flex-col sm:flex-row gap-4 justify-between items-center">
-                <button @click="showPreviewModal = false" class="w-full sm:w-auto py-3.5 px-8 rounded-full border border-gray-300 bg-white/50 text-gray-600 hover:bg-white hover:text-gray-900 transition-all font-bold text-xs uppercase tracking-widest text-center shadow-sm">
-                    Tutup Preview
-                </button>
+                
+                <div class="flex gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
+                    <button @click="togglePreviewLayer('jersey_front')" :class="previewVisibility.jersey_front ? 'bg-brand-50 border-brand-500 text-brand-700' : 'bg-gray-50 border-gray-200 text-gray-400'" class="px-3 md:px-4 py-2 rounded-xl border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0">
+                        <svg x-show="previewVisibility.jersey_front" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg x-show="!previewVisibility.jersey_front" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                        Depan
+                    </button>
+                    <button @click="togglePreviewLayer('jersey_back')" :class="previewVisibility.jersey_back ? 'bg-brand-50 border-brand-500 text-brand-700' : 'bg-gray-50 border-gray-200 text-gray-400'" class="px-3 md:px-4 py-2 rounded-xl border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0">
+                        <svg x-show="previewVisibility.jersey_back" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg x-show="!previewVisibility.jersey_back" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                        Belakang
+                    </button>
+                    <button @click="togglePreviewLayer('pants')" :class="previewVisibility.pants ? 'bg-brand-50 border-brand-500 text-brand-700' : 'bg-gray-50 border-gray-200 text-gray-400'" class="px-3 md:px-4 py-2 rounded-xl border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0">
+                        <svg x-show="previewVisibility.pants" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg x-show="!previewVisibility.pants" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                        Celana
+                    </button>
+                </div>
+
                 <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-3">
                     <button @click="exportDesignHD('jpeg')" class="flex-1 sm:flex-none py-3.5 px-8 rounded-full bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 shadow-sm hover:shadow-md transition-all font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

@@ -94,7 +94,7 @@
                 <div class="flex items-center gap-8">
                     <a href="{{ url('/') }}" :class="isTransparent ? 'text-white/90 hover:text-white' : 'text-slate-600 dark:text-zinc-400 hover:text-brand-900'" class="text-xs font-black uppercase tracking-widest transition-all {{ request()->is('/') ? 'border-b-2 border-brand-500 pb-1 text-brand-900 dark:text-brand-400' : '' }}">Beranda</a>
                     <a href="{{ route('catalog.index') }}" :class="isTransparent ? 'text-white/90 hover:text-white' : 'text-slate-600 dark:text-zinc-400 hover:text-brand-900'" class="text-xs font-black uppercase tracking-widest transition-all {{ request()->routeIs('catalog.*') ? 'border-b-2 border-brand-500 pb-1 text-brand-900 dark:text-brand-400' : '' }}">Katalog</a>
-                    <a href="{{ route('customizer') }}" :class="isTransparent ? 'text-white/90 hover:text-white' : 'text-slate-600 dark:text-zinc-400 hover:text-brand-900'" class="text-xs font-black uppercase tracking-widest transition-all {{ request()->routeIs('customizer') ? 'border-b-2 border-brand-500 pb-1 text-brand-900 dark:text-brand-400' : '' }}">Customizer</a>
+                    <a href="{{ route('customizer') }}" :class="isTransparent ? 'text-white/90 hover:text-white' : 'text-slate-600 dark:text-zinc-400 hover:text-brand-900'" class="text-xs font-black uppercase tracking-widest transition-all {{ request()->routeIs('customizer') ? 'border-b-2 border-brand-500 pb-1 text-brand-900 dark:text-brand-400' : '' }}">Kustomisasi</a>
                 </div>
 
                 <div class="h-6 w-px bg-slate-200 dark:bg-zinc-800 transition-opacity" :class="isTransparent ? 'opacity-20' : 'opacity-100'"></div>
@@ -240,11 +240,11 @@
                             </a>
                             
                             <div class="mt-2 pt-2 border-t border-gray-100 dark:border-zinc-800">
-                                <form method="POST" action="{{ route('logout') }}">
+                                <form method="POST" action="{{ route('logout') }}"> 
                                     @csrf
                                     <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors font-bold text-left">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                                        <span>Log Out</span>
+                                        <span>Keluar</span>
                                     </button>
                                 </form>
                             </div>
@@ -253,7 +253,7 @@
                 </div>    
                 @else
                     <div class="flex g  ap-4 items-center">
-                        <button @click="showAuthModal = true; authMode = 'login'" class="bg-brand-900 hover:bg-brand-800 text-white px-5 py-2 rounded-full text-sm font-bold transition-all shadow-md active:scale-95">Login</button>
+                        <button @click="showAuthModal = true; authMode = 'login'" class="bg-brand-900 hover:bg-brand-800 text-white px-5 py-2 rounded-full text-sm font-bold transition-all shadow-md active:scale-95">Masuk</button>
                     </div>
                 @endauth
 
@@ -340,7 +340,7 @@
         <div class="px-4 pt-4 pb-6 space-y-1">
             <a href="{{ url('/') }}" class="block px-3 py-2 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 {{ request()->is('/') ? 'bg-brand-50 dark:bg-brand-950/30 text-brand-900 dark:text-brand-400 font-black' : '' }}">Beranda</a>
             <a href="{{ route('catalog.index') }}" class="block px-3 py-2 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 {{ request()->routeIs('catalog.*') ? 'bg-brand-50 dark:bg-brand-950/30 text-brand-900 dark:text-brand-400 font-black' : '' }}">Katalog</a>
-            <a href="{{ route('customizer') }}" class="block px-3 py-2 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 {{ request()->routeIs('customizer') ? 'bg-brand-50 dark:bg-brand-950/30 text-brand-900 dark:text-brand-400 font-black' : '' }}">Customizer</a>
+            <a href="{{ route('customizer') }}" class="block px-3 py-2 text-base font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 {{ request()->routeIs('customizer') ? 'bg-brand-50 dark:bg-brand-950/30 text-brand-900 dark:text-brand-400 font-black' : '' }}">Kustomisasi</a>
             
             <div class="pt-4 flex flex-col gap-2">
                  @auth
@@ -419,7 +419,7 @@
                     </div>
                  @else
                     <div class="grid grid-cols-2 gap-3 mt-2">
-                        <button @click="showAuthModal = true; authMode = 'login'; isOpen = false" class="w-full text-center border border-gray-300 dark:border-zinc-700 py-3 rounded-xl font-bold text-sm transition-colors text-gray-700 dark:text-gray-300">Login</button>
+                        <button @click="showAuthModal = true; authMode = 'login'; isOpen = false" class="w-full text-center border border-gray-300 dark:border-zinc-700 py-3 rounded-xl font-bold text-sm transition-colors text-gray-700 dark:text-gray-300">Masuk</button>
                         <button @click="showAuthModal = true; authMode = 'register'; isOpen = false" class="w-full text-center bg-brand-900 text-white py-3 rounded-xl font-bold text-sm transition-transform active:scale-95 shadow-md">Daftar</button>
                     </div>
                  @endauth

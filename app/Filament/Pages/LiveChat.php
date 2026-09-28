@@ -10,10 +10,21 @@ use Illuminate\Support\Facades\Http;
 class LiveChat extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
-    protected static ?string $navigationGroup = 'Customer Support';
-    protected static ?string $navigationLabel = 'Chat Pelanggan';
-    protected static ?string $title = 'Live Chat dengan Pelanggan';
+    protected static ?string $navigationGroup = 'Layanan Pelanggan';
+    protected static ?string $navigationLabel = 'Obrolan Pelanggan';
+    protected static ?string $title = 'Obrolan Pelanggan (Live Chat)';
     protected static string $view = 'filament.pages.live-chat';
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = ChatSession::where('status', 'active')->count();
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'danger';
+    }
 
     public $activeChats = [];
     public $selectedChatId = null;
@@ -27,7 +38,18 @@ class LiveChat extends Page
 
     public function loadActiveChats()
     {
-        $this->activeChats = ChatSession::where('status', 'active')->latest()->get();
+        $this->activeChats = ChatSession::where('status', 'active')
+            ->with(['messages' => function ($q) {
+                $q->orderBy('created_at', 'desc');
+            }])
+            ->latest()
+            ->get()
+            ->map(function ($chat) {
+                $chat->unread_count = $chat->messages->where('sender', 'user')->where('is_read', false)->count();
+                $chat->latest_message = $chat->messages->first()?->message ?? '';
+                return $chat;
+            });
+            
         if ($this->selectedChatId) {
             $this->loadMessages($this->selectedChatId);
         }
@@ -41,6 +63,12 @@ class LiveChat extends Page
 
     public function loadMessages($chatId)
     {
+        // Tandai pesan dari pelanggan sudah dibaca oleh admin
+        LiveChatMessage::where('live_chat_id', $chatId)
+            ->where('sender', 'user')
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
         $this->messages = LiveChatMessage::where('live_chat_id', $chatId)
             ->orderBy('created_at', 'asc')
             ->get();

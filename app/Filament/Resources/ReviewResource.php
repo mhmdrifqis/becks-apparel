@@ -16,7 +16,7 @@ class ReviewResource extends Resource
     protected static ?string $model = Review::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-star';
-    protected static ?string $navigationGroup = 'Manajemen Produk';
+    protected static ?string $navigationGroup = 'Layanan Pelanggan';
     protected static ?string $navigationLabel = 'Ulasan Pelanggan';
     protected static ?string $modelLabel = 'Ulasan';
     protected static ?string $pluralModelLabel = 'Ulasan Pelanggan';
@@ -96,8 +96,15 @@ class ReviewResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->tooltip('Lihat')
+                    ->iconButton()
+                    ->slideOver()
+                    ->modalCancelAction(false),
+                Tables\Actions\EditAction::make()
+                    ->tooltip('Ubah')
+                    ->iconButton()
+                    ->slideOver(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -110,8 +117,6 @@ class ReviewResource extends Resource
     {
         return [
             'index' => Pages\ListReviews::route('/'),
-            // 'create' => Pages\CreateReview::route('/create'), // Disable create since users make them
-            'edit' => Pages\EditReview::route('/{record}/edit'),
         ];
     }
     

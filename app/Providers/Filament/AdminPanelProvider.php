@@ -54,7 +54,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label('Data Master')
                     ->icon('heroicon-o-cube'),
                 \Filament\Navigation\NavigationGroup::make()
-                    ->label('Customer Support')
+                    ->label('Layanan Pelanggan')
                     ->icon('heroicon-o-chat-bubble-left-right'),
                 \Filament\Navigation\NavigationGroup::make()
                     ->label('Sistem')

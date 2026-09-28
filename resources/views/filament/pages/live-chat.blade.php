@@ -18,8 +18,13 @@
                         class="w-full text-left p-3 mb-2 rounded-lg transition-colors border {{ $selectedChatId == $chat->id ? 'bg-primary-50 border-primary-500 dark:bg-primary-900/20 dark:border-primary-500' : 'bg-transparent border-transparent hover:bg-gray-50 dark:hover:bg-gray-800' }}"
                     >
                         <div class="flex justify-between items-center">
-                            <span class="font-semibold text-gray-900 dark:text-white">
+                            <span class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                                 {{ $chat->user_name ?? 'Guest User' }}
+                                @if($chat->unread_count > 0)
+                                    <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                        {{ $chat->unread_count }}
+                                    </span>
+                                @endif
                             </span>
 
                             <span class="text-xs text-gray-500">
@@ -28,7 +33,7 @@
                         </div>
 
                         <div class="text-xs text-gray-500 mt-1 truncate">
-                            ID: {{ substr($chat->user_id, 0, 15) }}...
+                            {{ $chat->latest_message ? \Illuminate\Support\Str::limit($chat->latest_message, 40) : 'ID: ' . substr($chat->user_id, 0, 15) }}
                         </div>
                     </button>
                 @empty
@@ -48,7 +53,7 @@
                 <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 flex justify-between items-center">
 
                     <h3 class="text-lg font-bold text-black dark:text-white">
-                        Chat dengan Pelanggan
+                        Obrolan dengan Pelanggan
                     </h3>
 
                     <x-filament::button
@@ -73,8 +78,25 @@
                                     CS
                                 </div>
 
-                                <div class="bg-primary-600 text-white px-4 py-2 rounded-2xl rounded-tr-none shadow-sm text-sm max-w-[80%]">
-                                    {{ $msg->message }}
+                                <div class="bg-primary-600 text-white px-4 py-2 rounded-2xl rounded-tr-none shadow-sm text-sm max-w-[80%] relative group">
+                                    <div class="pr-6">
+                                        {{ $msg->message }}
+                                    </div>
+                                    <div class="absolute bottom-1 right-2 text-[10px] flex items-center">
+                                        @if($msg->is_read)
+                                            <!-- Double Blue Ticks (Since bg is colored, we can use a light blue or just white for contrast, but let's use a distinct color like #38bdf8 (sky-400) or just plain white/gray depending on design. Since it's WhatsApp style, blue on green/primary bg. -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                <path d="M20 12l-11 11-1-1"></path>
+                                            </svg>
+                                        @else
+                                            <!-- Double Gray Ticks -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                <path d="M20 12l-11 11-1-1"></path>
+                                            </svg>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
 
@@ -134,4 +156,23 @@
         </div>
 
     </div>
+
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            const scrollToBottom = () => {
+                const chatBox = document.getElementById('chat-box');
+                if (chatBox) {
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            };
+            
+            // Scroll on load
+            scrollToBottom();
+
+            // Scroll after Livewire updates
+            Livewire.hook('morph.updated', () => {
+                scrollToBottom();
+            });
+        });
+    </script>
 </x-filament-panels::page>

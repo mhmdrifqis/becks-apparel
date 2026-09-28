@@ -29,9 +29,13 @@
                 BECKS
             </h1>
             
-            <div class="mt-8 md:mt-12">
-                <div class="inline-block px-6 py-3 md:px-12 md:py-4 bg-[#fdfbf7] text-[#06402B] rounded-full font-bold text-xs md:text-sm tracking-widest shadow-2xl animate-fade-in-up uppercase">
-                    PT BOLA MEDIA SPORTAINMENT
+            <div class="mt-8 md:mt-12 flex justify-center animate-fade-in-up">
+                <div class="flex items-center gap-4">
+                    <div class="h-px w-8 md:w-12 bg-white/40"></div>
+                    <p class="text-white/80 font-semibold text-xs md:text-sm tracking-[0.2em] uppercase">
+                        PT BOLA MEDIA SPORTAINMENT
+                    </p>
+                    <div class="h-px w-8 md:w-12 bg-white/40"></div>
                 </div>
             </div>
         </div>

@@ -202,6 +202,14 @@ class ChatbotController extends Controller
 
         $messages = $query->orderBy('id', 'asc')->get();
 
+        // Tandai pesan admin yang baru diambil ini sebagai 'read' (sudah dibaca pelanggan)
+        if ($messages->count() > 0) {
+            $chat->messages()
+                 ->whereIn('id', $messages->pluck('id'))
+                 ->where('sender', 'admin')
+                 ->update(['is_read' => true]);
+        }
+
         return response()->json([
             'messages' => $messages,
             'status' => $chat->status, // 'active' atau 'closed'

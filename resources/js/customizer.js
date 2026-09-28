@@ -6,7 +6,7 @@ export default () => ({
     availableMockups: [
         {
             id: "v-neck-short",
-            label: "V-Neck Short Sleeve",
+            label: "V-Neck Lengan Pendek",
             parts: {
                 front: [
                     "body",
@@ -29,7 +29,7 @@ export default () => ({
         },
         {
             id: "v-neck combination-short",
-            label: "V-Neck Combination",
+            label: "Kombinasi V-Neck",
             parts: {
                 front: [
                     "body",
@@ -53,7 +53,7 @@ export default () => ({
         },
         {
             id: "o-neck-short",
-            label: "O-Neck Short Sleeve",
+            label: "O-Neck Lengan Pendek",
             parts: {
                 front: [
                     "body",
@@ -77,7 +77,7 @@ export default () => ({
 
         {
             id: "v-neck-long",
-            label: "V-Neck Long Sleeve",
+            label: "V-Neck Lengan Panjang",
             parts: {
                 front: [
                     "body",
@@ -100,7 +100,7 @@ export default () => ({
         },
         {
             id: "v-neck combination-long",
-            label: "V-Neck Combination Long Sleeve",
+            label: "Kombinasi V-Neck Lengan Panjang",
             parts: {
                 front: [
                     "body",
@@ -125,7 +125,7 @@ export default () => ({
 
         {
             id: "o-neck-long",
-            label: "O-Neck Long Sleeve",
+            label: "O-Neck Lengan Panjang",
             parts: {
                 front: [
                     "body",
@@ -934,7 +934,7 @@ export default () => ({
         {
             id: "mockup",
             label: "Mockup",
-            icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/></svg>',
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>',
         },
         {
             id: "color",
@@ -1338,8 +1338,19 @@ export default () => ({
         });
     },
 
+    clearSnapshots() {
+        if (this.applyToAll) {
+            this.viewSnapshots = { jersey_front: null, jersey_back: null, pants: null };
+        } else {
+            const viewMap = { front: "jersey_front", back: "jersey_back", pants: "pants" };
+            const key = viewMap[this.currentView];
+            if (key) this.viewSnapshots[key] = null;
+        }
+    },
+
     saveHistory() {
         if (this.isHistoryAction) return;
+        this.clearSnapshots();
         const state = {
             viewStates: JSON.parse(JSON.stringify(this.viewStates)),
             textState: {
@@ -1544,9 +1555,9 @@ export default () => ({
     },
 
     async generateCompositeCanvas(baseW, baseH, format = "jpeg") {
-        const hasFront = !!this.viewSnapshots.jersey_front;
-        const hasBack = !!this.viewSnapshots.jersey_back;
-        const hasPants = !!this.viewSnapshots.pants;
+        const hasFront = !!this.viewSnapshots.jersey_front && this.previewVisibility.jersey_front;
+        const hasBack = !!this.viewSnapshots.jersey_back && this.previewVisibility.jersey_back;
+        const hasPants = !!this.viewSnapshots.pants && this.previewVisibility.pants;
 
         if (!hasFront && !hasBack && !hasPants) return null;
 
@@ -1577,37 +1588,76 @@ export default () => ({
                 i.src = src;
             });
 
-        if (hasBack) {
-            const img = await loadImg(this.viewSnapshots.jersey_back);
-            let s = hasFront ? 0.8 : 1.0;
-            let x = hasFront ? w * 0.25 : 0;
-            let y = hasFront ? h * -0.05 : 0;
-            ctx.drawImage(img, x, y, w * s, h * s);
-        }
+        // Compute layout dynamically based on visible items
+        const visibleCount = [hasFront, hasBack, hasPants].filter(Boolean).length;
 
-        if (hasPants) {
-            const img = await loadImg(this.viewSnapshots.pants);
-            let s = hasFront ? 0.6 : 0.8;
-            let x = hasFront ? w * 0.45 : w * 0.1;
-            let y = hasFront ? h * 0.45 : h * 0.2;
-            ctx.drawImage(img, x, y, w * s, h * s);
-        }
+        if (visibleCount === 1) {
+            // Center the single item
+            if (hasFront) {
+                const img = await loadImg(this.viewSnapshots.jersey_front);
+                ctx.drawImage(img, w * 0.1, h * 0.1, w * 0.8, h * 0.8);
+            } else if (hasBack) {
+                const img = await loadImg(this.viewSnapshots.jersey_back);
+                ctx.drawImage(img, w * 0.1, h * 0.1, w * 0.8, h * 0.8);
+            } else if (hasPants) {
+                const img = await loadImg(this.viewSnapshots.pants);
+                ctx.drawImage(img, w * 0.1, h * 0.1, w * 0.8, h * 0.8);
+            }
+        } else if (visibleCount === 2) {
+            // Side by side layout
+            let leftImg, rightImg;
+            if (hasFront && hasBack) {
+                leftImg = await loadImg(this.viewSnapshots.jersey_front);
+                rightImg = await loadImg(this.viewSnapshots.jersey_back);
+            } else if (hasFront && hasPants) {
+                leftImg = await loadImg(this.viewSnapshots.jersey_front);
+                rightImg = await loadImg(this.viewSnapshots.pants);
+            } else if (hasBack && hasPants) {
+                leftImg = await loadImg(this.viewSnapshots.jersey_back);
+                rightImg = await loadImg(this.viewSnapshots.pants);
+            }
+            
+            // Draw as squares to preserve aspect ratio
+            const size = w * 0.45;
+            const yOffset = (h - size) / 2;
+            ctx.drawImage(leftImg, w * 0.025, yOffset, size, size);
+            ctx.drawImage(rightImg, w * 0.525, yOffset, size, size);
+        } else {
+            // All 3 items (default complex layout)
+            if (hasBack) {
+                const img = await loadImg(this.viewSnapshots.jersey_back);
+                let s = 0.8;
+                let x = w * 0.25;
+                let y = h * -0.05;
+                ctx.drawImage(img, x, y, w * s, h * s);
+            }
 
-        if (hasFront) {
-            const img = await loadImg(this.viewSnapshots.jersey_front);
-            let s = hasBack || hasPants ? 0.8 : 1.0;
-            let x = hasBack || hasPants ? w * -0.1 : 0;
-            let y = hasBack || hasPants ? h * 0.2 : 0;
-            ctx.drawImage(img, x, y, w * s, h * s);
+            if (hasPants) {
+                const img = await loadImg(this.viewSnapshots.pants);
+                let s = 0.6;
+                let x = w * 0.45;
+                let y = h * 0.45;
+                ctx.drawImage(img, x, y, w * s, h * s);
+            }
+
+            if (hasFront) {
+                const img = await loadImg(this.viewSnapshots.jersey_front);
+                let s = 0.8;
+                let x = w * -0.1;
+                let y = h * 0.2;
+                ctx.drawImage(img, x, y, w * s, h * s);
+            }
         }
 
         return offscreen;
     },
     async openPreview() {
         await this.ensureAllSnapshots();
-        const canvas = await this.generateCompositeCanvas(1200, 1200, "jpeg");
+        // Default to showing all
+        this.previewVisibility = { jersey_front: true, jersey_back: true, pants: true };
+        const canvas = await this.generateCompositeCanvas(1200, 1200, "png");
         if (canvas) {
-            this.previewModalImage = canvas.toDataURL("image/jpeg", 0.8);
+            this.previewModalImage = canvas.toDataURL("image/png");
         } else {
             this.previewModalImage = null;
         }
@@ -1621,8 +1671,14 @@ export default () => ({
         });
     },
 
-    togglePreviewLayer(view) {
+    async togglePreviewLayer(view) {
         this.previewVisibility[view] = !this.previewVisibility[view];
+        const canvas = await this.generateCompositeCanvas(1200, 1200, "png");
+        if (canvas) {
+            this.previewModalImage = canvas.toDataURL("image/png");
+        } else {
+            this.previewModalImage = null;
+        }
     },
 
     async exportDesignHD(format) {
@@ -2237,27 +2293,21 @@ export default () => ({
         };
         const viewToCapture = viewMap[this.currentView] || this.currentView;
 
-        requestAnimationFrame(() => {
-            if (
-                this.canvas &&
-                this.viewSnapshots.hasOwnProperty(viewToCapture)
-            ) {
-                try {
-                    const originalZoom = this.canvas.getZoom();
-                    const originalVpt = [...this.canvas.viewportTransform];
+        if (this.canvas && this.viewSnapshots.hasOwnProperty(viewToCapture)) {
+            try {
+                const originalVpt = [...this.canvas.viewportTransform];
 
-                    this.canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
-                    // Gunakan multiplier: 4 agar tangkapan gambar asli beresolusi HD (2400x2400)
-                    this.viewSnapshots[viewToCapture] = this.canvas.toDataURL({
-                        format: "png",
-                        multiplier: 4,
-                    });
-                    this.canvas.setViewportTransform(originalVpt);
-                } catch (e) {
-                    /* ignore */
-                }
+                this.canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+                // Gunakan multiplier: 4 agar tangkapan gambar asli beresolusi HD (2400x2400)
+                this.viewSnapshots[viewToCapture] = this.canvas.toDataURL({
+                    format: "png",
+                    multiplier: 4,
+                });
+                this.canvas.setViewportTransform(originalVpt);
+            } catch (e) {
+                /* ignore */
             }
-        });
+        }
     },
 
     _waitForRender() {
@@ -3022,8 +3072,9 @@ export default () => ({
     },
 
     redirectToCatalog() {
-        // If there's a referrer from our own site (and not the customizer itself), go back
-        if (document.referrer && document.referrer.includes(window.location.host) && !document.referrer.includes('/customizer')) {
+        if (this.redirectUrl) {
+            window.location.href = this.redirectUrl;
+        } else if (document.referrer && document.referrer.includes(window.location.host) && !document.referrer.includes('/customizer')) {
             window.history.back();
         } else if (this.packageSlug) {
             window.location.href = "/catalog/" + this.packageSlug;
@@ -3032,7 +3083,13 @@ export default () => ({
         }
     },
 
-    handleBack() {
+    handleBack(url = null) {
+        if (url) {
+            this.redirectUrl = url;
+        } else {
+            this.redirectUrl = null;
+        }
+
         // If there are changes (undoStack > 1), ask to save
         if (this.undoStack.length > 1) {
             this.showBackModal = true;

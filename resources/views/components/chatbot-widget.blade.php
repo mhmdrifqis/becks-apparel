@@ -1,7 +1,18 @@
 <div 
     x-data="{ 
         isOpen: false,
+        showProactive: false,
+        hasInteracted: false,
         x: 0, y: 0, dragging: false, hasDragged: false, startX: 0, startY: 0, initialX: 0, initialY: 0,
+        init() {
+            @if(request()->is('/'))
+            setTimeout(() => {
+                if (!this.isOpen && !this.hasInteracted) {
+                    this.showProactive = true;
+                }
+            }, 5000);
+            @endif
+        },
         dragStart(e) {
             this.dragging = true;
             this.hasDragged = false;
@@ -22,6 +33,7 @@
             this.dragging = false;
         }
     }" 
+    x-init="init()"
     @mousemove.window="dragMove"
     @mouseup.window="dragEnd"
     @touchmove.window="if(dragging) { dragMove($event.touches[0]); $event.preventDefault(); }"
@@ -45,8 +57,8 @@
         <div class="bg-brand-900 text-white p-4 flex justify-between items-center shadow-md z-10">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm relative" id="header-avatar">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
                     </svg>
                     <!-- Pulse indicator -->
                     <span id="admin-pulse" class="absolute -top-1 -right-1 flex h-3 w-3 hidden">
@@ -73,8 +85,8 @@
             <!-- Welcome Message -->
             <div class="flex items-start gap-2 max-w-[85%]">
                 <div class="w-8 h-8 rounded-full bg-brand-900 flex-shrink-0 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
                     </svg>
                 </div>
                 <div class="bg-white dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 dark:border-zinc-700/50 text-sm">
@@ -87,8 +99,8 @@
         <div id="chat-typing" class="hidden px-4 pb-4 bg-gray-50 dark:bg-zinc-950/50">
             <div class="flex items-start gap-2">
                 <div class="w-8 h-8 rounded-full bg-brand-900 flex-shrink-0 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
                     </svg>
                 </div>
                 <div class="bg-white dark:bg-zinc-800 px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 dark:border-zinc-700/50 flex gap-1.5 items-center">
@@ -122,15 +134,42 @@
         </div>
     </div>
 
+    <!-- Proactive Bubble -->
+    <div 
+        x-show="showProactive && !isOpen"
+        x-transition:enter="transition ease-out duration-300 transform"
+        x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+        x-transition:leave="transition ease-in duration-200 transform"
+        x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+        x-transition:leave-end="opacity-0 translate-y-4 scale-95"
+        class="absolute bottom-20 right-0 w-64 bg-white dark:bg-zinc-800 p-4 rounded-2xl rounded-br-sm shadow-xl border border-gray-100 dark:border-zinc-700 cursor-pointer z-50"
+        @click="isOpen = true; showProactive = false; hasInteracted = true"
+    >
+        <button @click.stop="showProactive = false; hasInteracted = true" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-brand-900 flex-shrink-0 flex items-center justify-center text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" /></svg>
+            </div>
+            <div>
+                <p class="text-sm text-gray-800 dark:text-zinc-200 pr-4 font-medium leading-relaxed">Hai! Butuh bantuan cari jersey favoritmu? 👋</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Toggle Button -->
     <button 
         @mousedown="dragStart"
         @touchstart="dragStart($event.touches[0])"
-        @click.prevent="if(!hasDragged) isOpen = !isOpen"
+        @click.prevent="if(!hasDragged) { isOpen = !isOpen; hasInteracted = true; showProactive = false; }"
         class="w-14 h-14 rounded-full bg-brand-900 hover:bg-brand-800 text-white shadow-lg shadow-brand-900/30 flex items-center justify-center transition-all duration-300 hover:scale-105 focus:outline-none ring-4 ring-white dark:ring-zinc-950 group cursor-grab active:cursor-grabbing"
     >
-        <svg x-show="!isOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:animate-pulse pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        <svg x-show="!isOpen" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:animate-pulse pointer-events-none text-white">
+            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
         </svg>
         <svg x-show="isOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pointer-events-none" style="display: none;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -210,8 +249,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (sender === 'bot') {
             avatarHTML = `
                 <div class="w-8 h-8 rounded-full bg-brand-900 flex-shrink-0 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
                     </svg>
                 </div>
             `;
@@ -239,7 +278,13 @@ document.addEventListener('DOMContentLoaded', function() {
             bubbleClasses = 'bg-blue-600 text-white rounded-tl-sm shadow-md';
         }
 
-        const formattedMessage = message.replace(/\n/g, '<br>');
+        let formattedMessage = message
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n\* /g, '<br>• ')
+            .replace(/\n- /g, '<br>• ')
+            .replace(/^\* /, '• ')
+            .replace(/^- /, '• ')
+            .replace(/\n/g, '<br>');
 
         let optionsHTML = '';
         if (options && options.length > 0) {

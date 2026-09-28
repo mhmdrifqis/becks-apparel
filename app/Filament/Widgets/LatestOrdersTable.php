@@ -92,8 +92,7 @@ class LatestOrdersTable extends BaseWidget
                 Tables\Actions\Action::make('view')
                     ->label('Detail')
                     ->icon('heroicon-m-eye')
-                    ->url(fn (Order $record): string => route('filament.admin.resources.orders.view', $record))
-                    ->openUrlInNewTab(),
+                    ->url(fn (Order $record): string => \App\Filament\Resources\OrderResource::getUrl('index', ['tableAction' => 'view', 'tableActionRecord' => $record->getKey()])),
             ])
             ->paginated(false);
     }

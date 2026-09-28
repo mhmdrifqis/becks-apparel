@@ -20,10 +20,10 @@ class LiveChatResource extends Resource
     protected static ?string $model = LiveChat::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clock';
-    protected static ?string $navigationGroup = 'Customer Support';
-    protected static ?string $navigationLabel = 'Riwayat Chat';
-    protected static ?string $pluralLabel = 'Riwayat Chat';
-    protected static ?string $modelLabel = 'Riwayat Chat';
+    protected static ?string $navigationGroup = 'Layanan Pelanggan';
+    protected static ?string $navigationLabel = 'Riwayat Obrolan';
+    protected static ?string $pluralLabel = 'Riwayat Obrolan';
+    protected static ?string $modelLabel = 'Riwayat Obrolan';
 
     public static function canCreate(): bool
     {
@@ -83,12 +83,15 @@ class LiveChatResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->tooltip('Lihat')
+                    ->iconButton(),
                 Tables\Actions\DeleteAction::make()
+                    ->tooltip('Hapus')
+                    ->iconButton()
                     ->requiresConfirmation()
                     ->modalHeading('Hapus Riwayat Chat?')
-                    ->modalDescription('Apakah Anda yakin ingin menghapus seluruh riwayat percakapan ini? Tindakan ini tidak dapat dibatalkan.')
-                    ->label('Hapus'),
+                    ->modalDescription('Apakah Anda yakin ingin menghapus seluruh riwayat percakapan ini? Tindakan ini tidak dapat dibatalkan.'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

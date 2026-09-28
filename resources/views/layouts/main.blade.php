@@ -135,7 +135,9 @@
             }
         </script>
         <!-- Chatbot Widget -->
-        <x-chatbot-widget />
+        @if(!request()->is('customizer') && !request()->is('cart') && !request()->is('checkout') && !request()->is('checkout/*') && !request()->is('payment/*') && !request()->is('pesanan/*'))
+            <x-chatbot-widget />
+        @endif
 
         @stack('scripts')
     </body>
