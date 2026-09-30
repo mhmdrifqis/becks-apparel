@@ -46,8 +46,8 @@ class FinancialReportResource extends Resource
 
                 Tables\Columns\TextColumn::make('total_amount')
                     ->label('Total Harga')
-                    ->money('IDR')
-                    ->summarize(Tables\Columns\Summarizers\Sum::make()->money('IDR'))
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state ?? 0, 0, ',', '.'))
+                    ->summarize(Tables\Columns\Summarizers\Sum::make()->formatStateUsing(fn ($state) => 'Rp ' . number_format($state ?? 0, 0, ',', '.')))
                     ->sortable(),
 
                 Tables\Columns\BadgeColumn::make('payment_status')
@@ -179,13 +179,24 @@ class FinancialReportResource extends Resource
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Informasi Pesanan')
+                \Filament\Infolists\Components\Section::make('Informasi Pesanan & Pelanggan')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('order_number')->label('No. Order'),
-                        \Filament\Infolists\Components\TextEntry::make('user.name')->label('Pemesan'),
-                        \Filament\Infolists\Components\TextEntry::make('created_at')->label('Tanggal')->dateTime('d M Y H:i'),
-                        \Filament\Infolists\Components\TextEntry::make('total_amount')->label('Total Harga')->money('IDR'),
-                        \Filament\Infolists\Components\TextEntry::make('payment_status')->label('Status Pembayaran')
+                        \Filament\Infolists\Components\TextEntry::make('order_number')
+                            ->label('No. Order')
+                            ->weight(\Filament\Support\Enums\FontWeight::Bold),
+                        \Filament\Infolists\Components\TextEntry::make('created_at')
+                            ->label('Tanggal Masuk')
+                            ->dateTime('d M Y H:i'),
+                        \Filament\Infolists\Components\TextEntry::make('user.name')
+                            ->label('Nama Akun Pemesan'),
+                        \Filament\Infolists\Components\TextEntry::make('recipient_name')
+                            ->label('Nama Penerima')
+                            ->default(fn ($record) => $record->user->name ?? '-'),
+                        \Filament\Infolists\Components\TextEntry::make('recipient_phone')
+                            ->label('No. Telepon / WA')
+                            ->default(fn ($record) => $record->user->phone ?? '-'),
+                        \Filament\Infolists\Components\TextEntry::make('payment_status')
+                            ->label('Status Pembayaran')
                             ->formatStateUsing(fn (string $state): string => match ($state) {
                                 'unpaid'  => 'Belum Bayar',
                                 'partial' => 'DP',
@@ -199,7 +210,8 @@ class FinancialReportResource extends Resource
                                 'paid' => 'success',
                                 default => 'gray',
                             }),
-                        \Filament\Infolists\Components\TextEntry::make('status')->label('Status Produksi')
+                        \Filament\Infolists\Components\TextEntry::make('status')
+                            ->label('Status Produksi')
                             ->formatStateUsing(fn (string $state): string => match ($state) {
                                 'pending'   => 'Menunggu',
                                 'paid'      => 'Antrian Masuk',
@@ -214,6 +226,73 @@ class FinancialReportResource extends Resource
                             })
                             ->badge(),
                     ])->columns(2),
+
+                \Filament\Infolists\Components\Section::make('Ringkasan Finansial')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('total_amount')
+                            ->label('Total Transaksi')
+                            ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state ?? 0, 0, ',', '.'))
+                            ->weight(\Filament\Support\Enums\FontWeight::Bold),
+                        \Filament\Infolists\Components\TextEntry::make('deposit_amount')
+                            ->label('DP / Uang Muka')
+                            ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state ?? 0, 0, ',', '.')),
+                        \Filament\Infolists\Components\TextEntry::make('shipping_cost')
+                            ->label('Ongkos Kirim')
+                            ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state ?? 0, 0, ',', '.')),
+                        \Filament\Infolists\Components\TextEntry::make('sisa_tagihan')
+                            ->label('Sisa Tagihan Pelunasan')
+                            ->getStateUsing(fn ($record) => 'Rp ' . number_format(max(0, ($record->total_amount ?? 0) - ($record->deposit_amount ?? 0)), 0, ',', '.')),
+                    ])->columns(2),
+
+                \Filament\Infolists\Components\Section::make('Rincian Item Produk')
+                    ->schema([
+                        \Filament\Infolists\Components\RepeatableEntry::make('orderItems')
+                            ->label('')
+                            ->schema([
+                                \Filament\Infolists\Components\TextEntry::make('package.name')->label('Paket'),
+                                \Filament\Infolists\Components\TextEntry::make('material.name')->label('Bahan'),
+                                \Filament\Infolists\Components\TextEntry::make('quantity')->label('Jumlah (Pcs)'),
+                                \Filament\Infolists\Components\TextEntry::make('subtotal')
+                                    ->label('Subtotal Item')
+                                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state ?? 0, 0, ',', '.')),
+                                \Filament\Infolists\Components\TextEntry::make('roster_preview')
+                                    ->label('Rincian Roster & Ukuran')
+                                    ->columnSpanFull()
+                                    ->getStateUsing(function ($record) {
+                                        $roster = $record->roster;
+                                        if (empty($roster) || !is_array($roster)) return '-';
+                                        $list = [];
+                                        foreach ($roster as $r) {
+                                            $name = $r['name'] ?? '-';
+                                            $num = !empty($r['number']) ? '#' . $r['number'] : '';
+                                            $size = $r['size'] ?? '-';
+                                            $sleeve = (!empty($r['isLongSleeve']) && $r['isLongSleeve']) ? ' (Panjang)' : '';
+                                            $list[] = trim("{$name} {$num} [{$size}{$sleeve}]");
+                                        }
+                                        return implode(', ', $list);
+                                    }),
+                            ])
+                            ->columns(2),
+                    ]),
+
+                \Filament\Infolists\Components\Section::make('Pengiriman & Catatan')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('courier_name')
+                            ->label('Kurir / Ekspedisi')
+                            ->placeholder('Belum ditentukan'),
+                        \Filament\Infolists\Components\TextEntry::make('tracking_number')
+                            ->label('Nomor Resi')
+                            ->placeholder('Belum ada resi'),
+                        \Filament\Infolists\Components\TextEntry::make('shipping_address')
+                            ->label('Alamat Kirim')
+                            ->columnSpanFull()
+                            ->placeholder('Ambil di Tempat / Tidak ada data alamat'),
+                        \Filament\Infolists\Components\TextEntry::make('notes')
+                            ->label('Catatan')
+                            ->columnSpanFull()
+                            ->placeholder('Tidak ada catatan'),
+                    ])->columns(2)
+                    ->collapsed(),
             ]);
     }
 

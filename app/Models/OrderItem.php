@@ -48,4 +48,19 @@ class OrderItem extends Model
     {
         return $this->belongsToMany(Upgrade::class, 'order_item_upgrade');
     }
+
+    protected static function booted()
+    {
+        static::updating(function ($item) {
+            if ($item->isDirty('material_usage')) {
+                $oldUsage = (float) ($item->getOriginal('material_usage') ?? 0);
+                $newUsage = (float) ($item->material_usage ?? 0);
+                $diff = $newUsage - $oldUsage;
+
+                if ($item->material && $diff != 0) {
+                    $item->material->decrement('stock', $diff);
+                }
+            }
+        });
+    }
 }

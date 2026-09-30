@@ -28,7 +28,7 @@ class OrderProduksiResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $navigationGroup = 'Workshop';
+    protected static ?string $navigationGroup = 'Ruang Produksi';
 
     public static function infolist(Infolist $infolist): Infolist
     {
@@ -47,11 +47,16 @@ class OrderProduksiResource extends Resource
                         Infolists\Components\RepeatableEntry::make('orderItems')
                             ->label('Daftar Produk')
                             ->schema([
-                                Infolists\Components\Grid::make(3)
+                                Infolists\Components\Grid::make(4)
                                     ->schema([
                                         Infolists\Components\TextEntry::make('package.name')->label('Paket'),
                                         Infolists\Components\TextEntry::make('material.name')->label('Bahan'),
-                                        Infolists\Components\TextEntry::make('quantity')->label('Qty'),
+                                        Infolists\Components\TextEntry::make('quantity')->label('Qty (Pcs)'),
+                                        Infolists\Components\TextEntry::make('material_usage')
+                                            ->label('Pemakaian Bahan')
+                                            ->formatStateUsing(fn ($state, $record) => $state ? ($state . ' ' . ($record->material?->unit ?? 'Meter')) : 'Belum dicatat')
+                                            ->badge()
+                                            ->color(fn ($state) => $state ? 'success' : 'gray'),
                                     ]),
                                 Infolists\Components\TextEntry::make('design.preview_path')
                                     ->label('Preview & Link Desain')
@@ -120,6 +125,34 @@ class OrderProduksiResource extends Resource
                             ])
                             ->required(),
                     ])->columns(2),
+
+                Forms\Components\Section::make('Catat Pemakaian Bahan Baku')
+                    ->description('Isi jumlah bahan yang terpakai untuk setiap item. Stok bahan baku di gudang otomatis terpotong saat disimpan.')
+                    ->schema([
+                        Forms\Components\Repeater::make('orderItems')
+                            ->label('Daftar Item Pesanan')
+                            ->relationship('orderItems')
+                            ->schema([
+                                Forms\Components\Placeholder::make('product_info')
+                                    ->label('Item & Bahan')
+                                    ->content(fn ($record) => $record ? ($record->package?->name . ' - ' . ($record->material?->name ?? 'Tanpa Bahan')) : '-'),
+
+                                Forms\Components\Placeholder::make('qty_info')
+                                    ->label('Jumlah')
+                                    ->content(fn ($record) => $record ? ($record->quantity . ' pcs') : '-'),
+
+                                Forms\Components\TextInput::make('material_usage')
+                                    ->label('Pemakaian Bahan (Meter)')
+                                    ->numeric()
+                                    ->suffix(fn ($record) => $record?->material?->unit ?? 'Meter')
+                                    ->placeholder('Contoh: 15.5')
+                                    ->helperText('Otomatis memotong stok gudang'),
+                            ])
+                            ->addable(false)
+                            ->deletable(false)
+                            ->reorderable(false)
+                            ->columns(3),
+                    ]),
             ]);
     }
 
@@ -128,6 +161,7 @@ class OrderProduksiResource extends Resource
         return $table
             ->query(
                 Order::query()
+                    ->with(['user', 'orderItems.package', 'orderItems.material', 'orderItems.design'])
                     ->whereIn('payment_status', ['paid', 'partial'])
             )
             ->columns([
@@ -231,50 +265,9 @@ class OrderProduksiResource extends Resource
                     ->modalCancelAction(false),
                 Tables\Actions\EditAction::make()
                     ->label('Ubah')
-                    ->tooltip('Ubah Status Produksi')
+                    ->tooltip('Ubah Status & Catat Bahan')
                     ->iconButton()
                     ->slideOver(),
-                
-                // FITUR: Catat Pemakaian Bahan
-                Tables\Actions\Action::make('log_material_usage')
-                    ->label('Log Bahan')
-                    ->tooltip('Catat Pemakaian Bahan Baku')
-                    ->iconButton()
-                    ->icon('heroicon-m-beaker')
-                    ->color('info')
-                    ->form([
-                        Forms\Components\Select::make('order_item_id')
-                            ->label('Pilih Produk (Item)')
-                            ->options(fn ($record) => $record->orderItems->mapWithKeys(function ($item) {
-                                return [$item->id => $item->package->name . ' (' . $item->material->name . ')'];
-                            }))
-                            ->required(),
-                        Forms\Components\TextInput::make('material_used')
-                            ->label('Jumlah Bahan Dipakai')
-                            ->numeric()
-                            ->suffix('Satuan')
-                            ->required()
-                            ->helperText('Contoh: 2 (Jika memakai 2 kg bahan)'),
-                    ])
-                    ->action(function (array $data, \App\Models\Order $record) {
-                        $orderItem = \App\Models\OrderItem::find($data['order_item_id']);
-                        $material = $orderItem->material;
-                        
-                        if ($material) {
-                            $material->decrement('stock', $data['material_used']);
-                            
-                            $orderItem->update([
-                                'material_usage' => $data['material_used']
-                            ]);
-                            
-                            \Filament\Notifications\Notification::make()
-                                ->title('Bahan baku berhasil dipotong dari gudang')
-                                ->success()
-                                ->send();
-                        }
-                    })
-                    ->modalHeading('Input Pemakaian Bahan Baku')
-                    ->modalSubmitActionLabel('Potong Stok Sekarang'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -40,7 +40,7 @@ class LatestOrdersTable extends BaseWidget
 
                 Tables\Columns\TextColumn::make('total_amount')
                     ->label('Total')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state ?? 0, 0, ',', '.'))
                     ->sortable(),
 
                 Tables\Columns\BadgeColumn::make('payment_status')

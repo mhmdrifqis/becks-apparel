@@ -57,10 +57,11 @@
         <tbody>
             @foreach($records as $index => $material)
                 @php
-                    // Menghitung total pemakaian dari relasi orderItems (hanya order yang lunas/dp)
                     $totalUsed = $material->orderItems->filter(function($item) {
                         return in_array($item->order->payment_status ?? '', ['paid', 'partial']);
-                    })->sum('quantity');
+                    })->sum(function($item) {
+                        return $item->material_usage ?: $item->quantity;
+                    });
                     
                     $statusClass = 'bg-green';
                     $statusText = 'Aman';
@@ -71,13 +72,16 @@
                         $statusClass = 'bg-yellow';
                         $statusText = 'Menipis';
                     }
+
+                    $types = $material->product_types;
+                    $typesStr = (empty($types) || !is_array($types)) ? 'Semua' : implode(', ', array_map('ucfirst', $types));
                 @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $material->name }}</td>
-                    <td>{{ ucfirst($material->category) }}</td>
-                    <td class="text-center">{{ $material->stock }} {{ $material->unit }}</td>
-                    <td class="text-center">{{ $totalUsed }} {{ $material->unit }}</td>
+                    <td>{{ $typesStr }}</td>
+                    <td class="text-center">{{ number_format($material->stock, 0, ',', '.') }} {{ $material->unit }}</td>
+                    <td class="text-center">{{ number_format($totalUsed, 0, ',', '.') }} {{ $material->unit }}</td>
                     <td class="text-center">
                         <span class="badge {{ $statusClass }}">{{ $statusText }}</span>
                     </td>

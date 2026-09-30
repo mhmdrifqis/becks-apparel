@@ -40,7 +40,7 @@ class LatestOrdersTable extends BaseWidget
 
                 Tables\Columns\TextColumn::make('total_amount')
                     ->label('Total')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state ?? 0, 0, ',', '.'))
                     ->sortable(),
 
                 Tables\Columns\BadgeColumn::make('payment_status')
@@ -101,7 +101,7 @@ class LatestOrdersTable extends BaseWidget
                                 \Filament\Infolists\Components\TextEntry::make('order_number')->label('No. Order'),
                                 \Filament\Infolists\Components\TextEntry::make('user.name')->label('Pemesan'),
                                 \Filament\Infolists\Components\TextEntry::make('created_at')->label('Tanggal')->dateTime('d M Y H:i'),
-                                \Filament\Infolists\Components\TextEntry::make('total_amount')->label('Total Harga')->money('IDR'),
+                                \Filament\Infolists\Components\TextEntry::make('total_amount')->label('Total Harga')->formatStateUsing(fn ($state) => 'Rp ' . number_format($state ?? 0, 0, ',', '.')),
                                 \Filament\Infolists\Components\TextEntry::make('payment_status')->label('Status Pembayaran')
                                     ->formatStateUsing(fn (string $state): string => match ($state) {
                                         'unpaid'  => 'Belum Bayar',

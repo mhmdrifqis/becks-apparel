@@ -140,7 +140,7 @@ class PackageResource extends Resource
 
                 Tables\Columns\TextColumn::make('base_price')
                     ->label('Harga')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state ?? 0, 0, ',', '.'))
                     ->sortable(),
 
                 Tables\Columns\IconColumn::make('is_active')

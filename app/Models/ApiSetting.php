@@ -98,6 +98,16 @@ class ApiSetting extends Model
         }
     }
 
+    protected static function booted()
+    {
+        static::saved(function ($setting) {
+            \Illuminate\Support\Facades\Cache::forget('api_settings_global');
+        });
+        static::deleted(function ($setting) {
+            \Illuminate\Support\Facades\Cache::forget('api_settings_global');
+        });
+    }
+
     /**
      * Helper to safely encrypt secret values
      */

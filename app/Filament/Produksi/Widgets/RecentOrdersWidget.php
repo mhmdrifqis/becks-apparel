@@ -40,7 +40,7 @@ class RecentOrdersWidget extends BaseWidget
                 Tables\Actions\Action::make('kerjakan')
                     ->label('Mulai Proses')
                     ->button()
-                    ->url(fn (Order $record): string => \App\Filament\Produksi\Resources\OrderProduksiResource::getUrl('edit', ['record' => $record])),
+                    ->url(fn (Order $record): string => \App\Filament\Produksi\Resources\OrderProduksiResource::getUrl('index', ['tableAction' => 'edit', 'tableActionRecord' => $record->getKey()])),
             ])
             ->paginated(false);
     }

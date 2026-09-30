@@ -26,12 +26,12 @@ class OwnerKpiStats extends BaseWidget
         $onProgress = Order::whereIn('status', ['paid', 'printing', 'sewing', 'qc'])->count();
 
         return [
-            Stat::make('Total Omzet (Lunas)', $fmt->formatCurrency($totalRevenue, 'IDR'))
+            Stat::make('Total Omzet (Lunas)', 'Rp ' . number_format($totalRevenue, 0, ',', '.'))
                 ->description('Total pendapatan dari pesanan terbayar')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
 
-            Stat::make('Rata-rata Nilai Order', $fmt->formatCurrency($averageOrderValue, 'IDR'))
+            Stat::make('Rata-rata Nilai Order', 'Rp ' . number_format($averageOrderValue, 0, ',', '.'))
                 ->description('Nilai rata-rata per transaksi')
                 ->descriptionIcon('heroicon-m-presentation-chart-line')
                 ->color('info'),

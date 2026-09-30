@@ -47,7 +47,7 @@ class ProduksiPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
                 \Filament\Navigation\NavigationGroup::make()
-                    ->label('Workshop')
+                    ->label('Ruang Produksi')
                     ->icon('heroicon-o-scissors'),
             ])
             ->discoverWidgets(in: app_path('Filament/Produksi/Widgets'), for: 'App\\Filament\\Produksi\\Widgets')
