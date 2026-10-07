@@ -4,16 +4,21 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteController extends Controller
 {
+
     /**
      * Redirect the user to the Google authentication page.
      */
-    public function redirectToGoogle()
+    public function redirectToGoogle(Request $request)
     {
+        if ($request->has('redirect')) {
+            session(['auth_redirect_url' => $request->input('redirect')]);
+        }
         return Socialite::driver('google')->redirect();
     }
 
@@ -47,6 +52,11 @@ class SocialiteController extends Controller
                 $user->assignRole('Pelanggan');
 
                 Auth::login($user);
+            }
+
+            $redirectTo = session()->pull('auth_redirect_url');
+            if ($redirectTo && (!str_starts_with($redirectTo, 'http://') && !str_starts_with($redirectTo, 'https://') || str_starts_with($redirectTo, url('/')))) {
+                return redirect($redirectTo);
             }
 
             return redirect()->intended(route('dashboard', absolute: false));

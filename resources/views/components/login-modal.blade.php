@@ -57,6 +57,7 @@
 
                     <form method="POST" action="{{ route('login') }}" class="space-y-3">
                         @csrf
+                        <input type="hidden" name="redirect_to" :value="authRedirectUrl">
                         <div>
                             <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-1">Nomor WhatsApp / Email</label>
                             <input type="text" name="login" value="{{ old('login') }}" required autofocus class="w-full px-4 py-2.5 rounded-xl text-sm bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900" placeholder="08xxxxxxxxxx atau email">
@@ -97,7 +98,7 @@
                         </div>
 
                         <div class="mt-4">
-                            <a href="{{ route('auth.google') }}" class="w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-2xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all active:scale-95">
+                            <a href="{{ route('auth.google') }}" :href="'{{ route('auth.google') }}' + (authRedirectUrl ? '?redirect=' + encodeURIComponent(authRedirectUrl) : '')" class="w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-2xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all active:scale-95">
                                 <svg class="h-5 w-5 mr-3" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
                                     <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                                         <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"/>
@@ -133,6 +134,7 @@
 
                     <form method="POST" action="{{ route('register') }}" class="space-y-3">
                         @csrf
+                        <input type="hidden" name="redirect_to" :value="authRedirectUrl">
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2">Nama Lengkap</label>
                             <input type="text" name="name" value="{{ old('name') }}" required class="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand-500 focus:bg-white focus:ring-0 transition-all text-gray-900 text-sm" placeholder="Nama Lengkap Anda">
@@ -180,7 +182,7 @@
                         </div>
 
                         <div class="mt-4">
-                            <a href="{{ route('auth.google') }}" class="w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-2xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all active:scale-95">
+                            <a href="{{ route('auth.google') }}" :href="'{{ route('auth.google') }}' + (authRedirectUrl ? '?redirect=' + encodeURIComponent(authRedirectUrl) : '')" class="w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-2xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all active:scale-95">
                                 <svg class="h-5 w-5 mr-3" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
                                     <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                                         <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"/>

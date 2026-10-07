@@ -43,6 +43,14 @@ class AuthenticatedSessionController extends Controller
             return redirect(route('filament.owner.pages.dashboard'));
         }
 
+        // Custom redirect if user came from customizer or specific page
+        $redirectTo = $request->input('redirect_to') ?: session()->pull('auth_redirect_url');
+        if ($redirectTo && !str_starts_with($redirectTo, 'http://') && !str_starts_with($redirectTo, 'https://')) {
+            return redirect($redirectTo);
+        } elseif ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+            return redirect($redirectTo);
+        }
+
         // Default redirect for customers is Home
         return redirect()->intended(url('/'));
     }

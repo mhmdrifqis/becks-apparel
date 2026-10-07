@@ -71,6 +71,7 @@ class RegisteredUserController extends Controller
             'email' => $email,
             'password' => Hash::make($request->password),
             'otp' => $otp,
+            'redirect_to' => $request->input('redirect_to'),
         ], 600);
 
         session(['pending_reg_phone' => $phone]);
@@ -166,6 +167,11 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        $redirectTo = $regData['redirect_to'] ?? session()->pull('auth_redirect_url');
+        if ($redirectTo && (!str_starts_with($redirectTo, 'http://') && !str_starts_with($redirectTo, 'https://') || str_starts_with($redirectTo, url('/')))) {
+            return redirect($redirectTo)->with('success', 'Pendaftaran berhasil! Selamat datang di Becks Apparel.');
+        }
 
         return redirect(route('dashboard', absolute: false))
             ->with('success', 'Pendaftaran berhasil! Selamat datang di Becks Apparel.');

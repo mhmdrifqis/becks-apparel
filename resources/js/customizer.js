@@ -1218,7 +1218,7 @@ export default () => ({
                             console.error("Failed to load existing design:", e);
                         }
                     } else {
-                        // Check pending design in localStorage (from Unauthenticated redirect)
+                        // Check pending design in localStorage (from Unauthenticated redirect or draft)
                         const pendingDesignStr = localStorage.getItem(
                             "becks_pending_design",
                         );
@@ -1226,34 +1226,28 @@ export default () => ({
                             document.getElementById("is-authenticated")
                                 ?.value === "1";
 
-                        if (pendingDesignStr && isAuthenticated) {
+                        if (pendingDesignStr) {
                             try {
                                 const pendingDesign =
                                     JSON.parse(pendingDesignStr);
-                                if (
-                                    confirm(
-                                        "Lanjutkan menyimpan desain Anda sebelumnya (" +
-                                            pendingDesign.name +
-                                            ")?",
-                                    )
-                                ) {
+                                if (pendingDesign && pendingDesign.design_json) {
                                     await this.applyState(
                                         pendingDesign.design_json,
                                     );
-                                    this.designName = pendingDesign.name;
+                                    this.designName = pendingDesign.name || "";
                                     this.undoStack = [];
                                     this.saveHistory();
 
-                                    // Auto show save modal
-                                    this.showSaveModal = true;
+                                    // Auto show save modal if user is authenticated
+                                    if (isAuthenticated) {
+                                        this.showSaveModal = true;
+                                    }
                                 }
-                                localStorage.removeItem("becks_pending_design");
                             } catch (e) {
                                 console.error(
                                     "Failed to load pending design:",
                                     e,
                                 );
-                                localStorage.removeItem("becks_pending_design");
                             }
                         }
                     }
@@ -3059,12 +3053,44 @@ export default () => ({
         setTimeout(() => this.resizeCanvas(), 350);
     },
 
+    savePendingDesignToStorage() {
+        try {
+            const exportState = {
+                viewStates: JSON.parse(JSON.stringify(this.viewStates)),
+                textState: {
+                    input: this.textInput,
+                    font: this.activeFont,
+                    color: this.activeColor,
+                    size: this.textFontSize,
+                    spacing: this.textCharSpacing,
+                    arc: this.textArc,
+                },
+                designObjects: this.designObjects.map((obj) =>
+                    obj.toObject(["clipPath", "isSystemLayer", "view", "arc"]),
+                ),
+                currentModel: this.currentModel,
+                currentView: this.currentView,
+            };
+            localStorage.setItem(
+                "becks_pending_design",
+                JSON.stringify({
+                    name: this.designName || "",
+                    design_json: exportState,
+                    timestamp: Date.now(),
+                }),
+            );
+        } catch (err) {
+            console.error("Failed to store pending design state:", err);
+        }
+    },
+
     // SAVE LOGIC
     triggerSave() {
         this.showBackModal = false;
         this.isAuthenticated =
             document.getElementById("is-authenticated")?.value === "1";
         if (!this.isAuthenticated) {
+            this.savePendingDesignToStorage();
             this.showRequireLoginModal = true;
             return;
         }
@@ -3106,34 +3132,7 @@ export default () => ({
             document.getElementById("is-authenticated")?.value === "1";
         if (!this.isAuthenticated) {
             this.showSaveModal = false;
-            // Save draft state to localStorage so progress is preserved
-            try {
-                const exportState = {
-                    viewStates: JSON.parse(JSON.stringify(this.viewStates)),
-                    textState: {
-                        input: this.textInput,
-                        font: this.activeFont,
-                        color: this.activeColor,
-                        size: this.textFontSize,
-                        spacing: this.textCharSpacing,
-                        arc: this.textArc,
-                    },
-                    designObjects: this.designObjects.map((obj) =>
-                        obj.toObject(["clipPath", "isSystemLayer", "view", "arc"]),
-                    ),
-                    currentModel: this.currentModel,
-                    currentView: this.currentView,
-                };
-                localStorage.setItem(
-                    "becks_pending_design",
-                    JSON.stringify({
-                        name: this.designName,
-                        design_json: exportState,
-                    }),
-                );
-            } catch (err) {
-                console.error("Failed to store pending design state:", err);
-            }
+            this.savePendingDesignToStorage();
             this.showRequireLoginModal = true;
             return;
         }
@@ -3262,6 +3261,9 @@ export default () => ({
             }
 
             if (result.success) {
+                // Remove pending draft from storage since it is safely saved to server
+                localStorage.removeItem("becks_pending_design");
+
                 // Update URL to the new edit route without reloading the page
                 const targetUrl =
                     result.redirect +
@@ -3289,7 +3291,13 @@ export default () => ({
             }
         } catch (error) {
             console.error("Error saving design:", error);
-            if (!this.isAuthenticated) {
+            const isUnauthenticated =
+                !this.isAuthenticated ||
+                document.getElementById("is-authenticated")?.value !== "1" ||
+                (error.message && (error.message.includes("JSON") || error.message.includes("401") || error.message.includes("Unauthenticated")));
+            if (isUnauthenticated) {
+                this.savePendingDesignToStorage();
+                this.showSaveModal = false;
                 this.showRequireLoginModal = true;
             } else {
                 alert("Terjadi kesalahan saat menyimpan desain: " + (error.message || ""));

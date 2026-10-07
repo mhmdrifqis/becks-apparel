@@ -728,12 +728,12 @@
             <!-- Header Modal -->
             <div class="p-6 border-b border-gray-200 dark:border-brand-800/30 flex items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-brand-900/20 text-brand-500 flex items-center justify-center shrink-0 border border-brand-900/30 shadow-lg">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/20 shadow-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-900 dark:text-brand-50 uppercase tracking-widest text-sm">Login Diperlukan</h3>
-                        <p class="text-[10px] text-brand-500 mt-0.5 font-bold tracking-widest uppercase">Simpan Desain Jersey</p>
+                        <h3 class="font-bold text-gray-900 dark:text-brand-50 uppercase tracking-widest text-sm">Anda Belum Login</h3>
+                        <p class="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5 font-bold tracking-widest uppercase">Simpan Desain Jersey</p>
                     </div>
                 </div>
                 <button @click="showRequireLoginModal = false" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-brand-800/30 text-gray-400 hover:text-gray-900 dark:text-brand-400 dark:hover:text-brand-300 transition-colors">
@@ -743,65 +743,40 @@
 
             <!-- Content Area -->
             <div class="p-6 space-y-4">
-                <div class="p-3.5 bg-brand-900/10 border border-brand-900/20 rounded-2xl flex items-start gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-500 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    <p class="text-xs text-brand-700 dark:text-brand-300 leading-relaxed font-medium">
-                        Anda perlu masuk ke akun Anda terlebih dahulu untuk menyimpan desain jersey kustomisasi ini ke dalam koleksi Anda.
-                    </p>
+                <div class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <div>
+                        <p class="text-xs text-gray-800 dark:text-gray-200 leading-relaxed font-semibold">
+                            Anda belum login. Harap login / register sebelum menyimpan desain Anda.
+                        </p>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1 leading-normal">
+                            Desain Anda saat ini tersimpan aman di perangkat dan tidak akan hilang setelah login atau mendaftar.
+                        </p>
+                    </div>
                 </div>
 
-                <!-- Form Login Langsung (Quick Login) -->
-                <form @submit.prevent="performInlineLogin()" class="space-y-3 pt-1">
-                    <div x-show="loginError" x-cloak class="p-3 bg-rose-50 border border-rose-200 dark:bg-rose-500/20 dark:border-rose-500/40 rounded-xl text-rose-600 dark:text-rose-300 text-xs font-semibold">
-                        <span x-text="loginError"></span>
-                    </div>
-
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest mb-1.5">Email / No. WhatsApp</label>
-                        <input type="text" x-model="loginInput" class="w-full bg-gray-200 dark:bg-brand-900/40 border border-gray-300 dark:border-brand-800 text-white rounded-xl px-4 py-2.5 text-xs focus:border-brand-500 focus:outline-none transition-all placeholder:text-brand-600 dark:text-brand-500" placeholder="contoh@email.com / 08123456789" required>
-                    </div>
-
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-900 dark:text-brand-400 uppercase tracking-widest mb-1.5">Password</label>
-                        <input type="password" x-model="passwordInput" class="w-full bg-gray-200 dark:bg-brand-900/40 border border-gray-300 dark:border-brand-800 text-white rounded-xl px-4 py-2.5 text-xs focus:border-brand-500 focus:outline-none transition-all placeholder:text-brand-600 dark:text-brand-500" placeholder="••••••••" required>
-                    </div>
-
-                    <button type="submit" :disabled="isLoggingIn" class="w-full py-3 rounded-xl bg-brand-900 hover:bg-brand-500 text-white font-black tracking-widest text-xs uppercase shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50">
-                        <template x-if="!isLoggingIn">
-                            <span class="flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                                Masuk & Simpan Desain
-                            </span>
-                        </template>
-                        <template x-if="isLoggingIn">
-                            <span class="flex items-center gap-2">
-                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                Memproses Login...
-                            </span>
-                        </template>
-                    </button>
-                </form>
-
-                <div class="relative flex py-1 items-center">
-                    <div class="flex-grow border-t border-brand-800/60"></div>
-                    <span class="flex-shrink mx-3 text-[10px] text-gray-400 dark:text-brand-400/60 uppercase font-bold tracking-widest">Atau Halaman Auth</span>
-                    <div class="flex-grow border-t border-brand-800/60"></div>
-                </div>
-
-                <div class="flex gap-2">
+                <div class="space-y-2.5 pt-2">
                     <button type="button" 
-                            @click="window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: { mode: 'login' }})); showRequireLoginModal = false;" 
-                            class="flex-1 py-2.5 rounded-xl border border-gray-300 dark:border-brand-800 text-gray-700 dark:text-brand-300 hover:bg-gray-200 dark:bg-brand-900/40 transition-all text-[11px] font-bold uppercase tracking-widest text-center">
-                        Ke Halaman Login
+                            @click="window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: { mode: 'login', redirect: window.location.href } })); showRequireLoginModal = false;" 
+                            class="w-full py-3.5 rounded-2xl bg-brand-900 hover:bg-brand-800 text-white font-bold tracking-widest text-xs uppercase shadow-xl transition-all flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                        Masuk ke Akun (Login)
                     </button>
+
                     <button type="button" 
-                            @click="window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: { mode: 'register' }})); showRequireLoginModal = false;" 
-                            class="flex-1 py-2.5 rounded-xl border border-gray-300 dark:border-brand-800 text-gray-700 dark:text-brand-300 hover:bg-gray-200 dark:bg-brand-900/40 transition-all text-[11px] font-bold uppercase tracking-widest text-center">
-                        Daftar Akun Baru
+                            @click="window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: { mode: 'register', redirect: window.location.href } })); showRequireLoginModal = false;" 
+                            class="w-full py-3.5 rounded-2xl border-2 border-brand-900 dark:border-brand-500 text-brand-900 dark:text-brand-300 hover:bg-brand-900/10 font-bold tracking-widest text-xs uppercase transition-all flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                        Daftar Akun Baru (Register)
+                    </button>
+
+                    <button type="button" 
+                            @click="showRequireLoginModal = false" 
+                            class="w-full py-2.5 rounded-xl text-gray-500 hover:text-gray-800 dark:text-zinc-400 dark:hover:text-zinc-200 text-xs font-semibold uppercase tracking-wider text-center transition-colors">
+                        Batal, Lanjut Mengedit Desain
                     </button>
                 </div>
             </div>
-
         </div>
     </div>
     <div x-show="showSuccessSaveModal" x-cloak class="fixed inset-0 z-[135] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" x-transition>
