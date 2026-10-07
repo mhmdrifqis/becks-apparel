@@ -1,0 +1,31 @@
+{
+  "_vendor-CehjqktV.js": {
+    "file": "assets/vendor-CehjqktV.js",
+    "name": "vendor"
+  },
+  "_vendor-fabric-DY18Qe6W.js": {
+    "file": "assets/vendor-fabric-DY18Qe6W.js",
+    "name": "vendor-fabric"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-CdxNfzP4.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-Dju95Flo.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor-CehjqktV.js",
+      "_vendor-fabric-DY18Qe6W.js"
+    ]
+  },
+  "resources/js/customizer.js": {
+    "file": "assets/customizer-l0sNRNKZ.js",
+    "name": "customizer",
+    "src": "resources/js/customizer.js",
+    "isEntry": true
+  }
+}
