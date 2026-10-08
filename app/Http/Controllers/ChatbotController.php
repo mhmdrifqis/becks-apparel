@@ -123,8 +123,9 @@ class ChatbotController extends Controller
 
                           "=== ATURAN PENTING & HANDOVER ===\n" .
                           "1. Jawab pertanyaan dengan singkat, padat, ramah, dan solutif. Gunakan emoji secukupnya.\n" .
-                          "2. Jangan memberikan janji diskon di luar wewenangmu.\n" .
-                          "3. JIKA PENGGUNA MARAH, komplain, butuh negosiasi harga, atau secara eksplisit meminta berbicara dengan Admin / CS Manusia, BALAS DENGAN HANYA SATU KATA INI: [HANDOVER]\n" .
+                          "2. DILARANG menggunakan tanda bintang (*) atau (**) dan jangan membuat tulisan tebal (bold) ataupun miring. Tulis semua jawaban dengan teks biasa (plain text) yang bersih dan rapi tanpa simbol formatting.\n" .
+                          "3. Jangan memberikan janji diskon di luar wewenangmu.\n" .
+                          "4. JIKA PENGGUNA MARAH, komplain, butuh negosiasi harga, atau secara eksplisit meminta berbicara dengan Admin / CS Manusia, BALAS DENGAN HANYA SATU KATA INI: [HANDOVER]\n" .
                           "Jangan tambahkan kata lain atau kalimat apapun selain [HANDOVER] jika kondisi tersebut terpenuhi."
             ]]
         ];
@@ -144,6 +145,10 @@ class ChatbotController extends Controller
             }
 
             $replyText = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+
+            // Bersihkan format asterisk / bold agar menjadi teks biasa yang rapi
+            $replyText = preg_replace('/^\s*\*\s+/m', '• ', $replyText);
+            $replyText = str_replace(['**', '*'], '', $replyText);
 
             // Cek apakah ada trigger [HANDOVER]
             if (str_contains(strtoupper($replyText), '[HANDOVER]')) {

@@ -279,11 +279,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         let formattedMessage = message
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\n\* /g, '<br>• ')
-            .replace(/\n- /g, '<br>• ')
-            .replace(/^\* /, '• ')
-            .replace(/^- /, '• ')
+            .replace(/\n\*\s+/g, '<br>• ')
+            .replace(/^\*\s+/g, '• ')
+            .replace(/\n-\s+/g, '<br>• ')
+            .replace(/^-\s+/g, '• ')
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/\*(.*?)\*/g, '$1')
+            .replace(/\*/g, '')
             .replace(/\n/g, '<br>');
 
         let optionsHTML = '';
