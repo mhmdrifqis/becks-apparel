@@ -1587,15 +1587,18 @@ export default () => ({
 
         if (visibleCount === 1) {
             // Center the single item
+            const size = Math.min(w, h) * 0.85;
+            const x = (w - size) / 2;
+            const y = (h - size) / 2;
             if (hasFront) {
                 const img = await loadImg(this.viewSnapshots.jersey_front);
-                ctx.drawImage(img, w * 0.1, h * 0.1, w * 0.8, h * 0.8);
+                ctx.drawImage(img, x, y, size, size);
             } else if (hasBack) {
                 const img = await loadImg(this.viewSnapshots.jersey_back);
-                ctx.drawImage(img, w * 0.1, h * 0.1, w * 0.8, h * 0.8);
+                ctx.drawImage(img, x, y, size, size);
             } else if (hasPants) {
                 const img = await loadImg(this.viewSnapshots.pants);
-                ctx.drawImage(img, w * 0.1, h * 0.1, w * 0.8, h * 0.8);
+                ctx.drawImage(img, x, y, size, size);
             }
         } else if (visibleCount === 2) {
             // Side by side layout
@@ -1612,33 +1615,33 @@ export default () => ({
             }
             
             // Draw as squares to preserve aspect ratio
-            const size = w * 0.45;
+            const size = w * 0.46;
             const yOffset = (h - size) / 2;
-            ctx.drawImage(leftImg, w * 0.025, yOffset, size, size);
-            ctx.drawImage(rightImg, w * 0.525, yOffset, size, size);
+            ctx.drawImage(leftImg, w * 0.03, yOffset, size, size);
+            ctx.drawImage(rightImg, w * 0.51, yOffset, size, size);
         } else {
-            // All 3 items (default complex layout)
+            // All 3 items (balanced studio mockup composition, 100% inside canvas boundaries)
             if (hasBack) {
                 const img = await loadImg(this.viewSnapshots.jersey_back);
-                let s = 0.8;
-                let x = w * 0.25;
-                let y = h * -0.05;
+                let s = 0.58;
+                let x = w * 0.38;
+                let y = h * 0.05;
                 ctx.drawImage(img, x, y, w * s, h * s);
             }
 
             if (hasPants) {
                 const img = await loadImg(this.viewSnapshots.pants);
-                let s = 0.6;
-                let x = w * 0.45;
-                let y = h * 0.45;
+                let s = 0.48;
+                let x = w * 0.48;
+                let y = h * 0.47;
                 ctx.drawImage(img, x, y, w * s, h * s);
             }
 
             if (hasFront) {
                 const img = await loadImg(this.viewSnapshots.jersey_front);
-                let s = 0.8;
-                let x = w * -0.1;
-                let y = h * 0.2;
+                let s = 0.62;
+                let x = w * 0.04;
+                let y = h * 0.20;
                 ctx.drawImage(img, x, y, w * s, h * s);
             }
         }

@@ -8,12 +8,12 @@
     "name": "vendor-fabric"
   },
   "resources/css/app.css": {
-    "file": "assets/app-CdxNfzP4.css",
+    "file": "assets/app-kLRYOvAy.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-Dju95Flo.js",
+    "file": "assets/app-CwSXTiGR.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

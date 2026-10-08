@@ -833,33 +833,33 @@
     </div>
 
     <!-- Modal Preview Keseluruhan -->
-    <div x-show="showPreviewModal" x-cloak class="fixed inset-0 z-[140] flex items-center justify-center p-4 md:p-8 bg-black/40 backdrop-blur-md" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+    <div x-show="showPreviewModal" x-cloak class="fixed inset-0 z-[140] flex items-center justify-center p-2 sm:p-4 md:p-8 bg-black/60 backdrop-blur-md" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
         
-        <div class="relative w-full max-w-4xl h-full max-h-[95vh] flex flex-col rounded-[32px] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-200 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)]">
+        <div class="relative w-full max-w-4xl h-full max-h-[96vh] sm:max-h-[92vh] flex flex-col rounded-2xl sm:rounded-[32px] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-200 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)]">
             
             <!-- Subtle Pattern / Texture -->
             <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: radial-gradient(circle at 2px 2px, black 1px, transparent 0); background-size: 24px 24px;"></div>
 
             <!-- Header -->
-            <div class="relative z-10 p-6 md:px-10 md:py-8 flex items-start justify-between border-b border-gray-200/50 bg-white/40 backdrop-blur-xl">
+            <div class="relative z-10 px-4 py-3 sm:px-8 sm:py-5 md:px-10 md:py-6 flex items-center justify-between border-b border-gray-200/50 bg-white/60 backdrop-blur-xl">
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter leading-none mb-1">Pratinjau Desain</h2>
+                    <h2 class="text-lg sm:text-2xl md:text-3xl font-black text-gray-900 tracking-tighter leading-none">Pratinjau Desain</h2>
                 </div>
                 
-                <button @click="showPreviewModal = false" class="p-2.5 bg-white/60 hover:bg-white text-gray-600 hover:text-gray-900 rounded-full shadow-sm hover:shadow-md transition-all duration-300 group">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-90 transition-transform duration-300"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <button @click="showPreviewModal = false" class="p-2 sm:p-2.5 bg-white/80 hover:bg-white text-gray-600 hover:text-gray-900 rounded-full shadow-sm hover:shadow-md transition-all duration-300 group">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-90 transition-transform duration-300"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
 
             <!-- Dynamic Composite Preview Layout -->
-            <div class="relative z-10 flex-1 overflow-hidden p-4 md:p-8">
-                <div class="w-full h-full flex items-center justify-center bg-white border border-white/60 rounded-[24px] shadow-sm overflow-hidden relative group">
+            <div class="relative z-10 flex-1 min-h-0 overflow-hidden p-2 sm:p-4 md:p-6 flex items-center justify-center">
+                <div class="w-full h-full flex items-center justify-center bg-white border border-white/60 rounded-xl sm:rounded-[24px] shadow-sm overflow-hidden relative group p-2">
                     <template x-if="previewModalImage">
-                        <img :src="previewModalImage" alt="Studio Preview" class="w-full h-full object-contain rounded-[24px] max-h-[60vh]">
+                        <img :src="previewModalImage" alt="Studio Preview" class="max-w-full max-h-full object-contain rounded-lg sm:rounded-[20px]">
                     </template>
                     <template x-if="!previewModalImage">
                         <div class="text-gray-400 text-sm text-center flex flex-col items-center gap-3">
-                            <div class="p-4 bg-gray-100 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>
+                            <div class="p-3 sm:p-4 bg-gray-100 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 sm:w-8 sm:h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>
                             <span class="uppercase tracking-widest text-[10px] font-bold">Belum ada desain untuk di-preview</span>
                         </div>
                     </template>
@@ -867,34 +867,36 @@
             </div>
 
             <!-- Footer Actions -->
-            <div class="relative z-10 px-6 md:px-10 py-6 border-t border-gray-200/50 bg-white/40 backdrop-blur-xl flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div class="relative z-10 p-3 sm:px-8 sm:py-5 md:px-10 md:py-6 border-t border-gray-200/50 bg-white/60 backdrop-blur-xl flex flex-col sm:flex-row gap-2.5 sm:gap-4 justify-between items-center">
                 
-                <div class="flex gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
-                    <button @click="togglePreviewLayer('jersey_front')" :class="previewVisibility.jersey_front ? 'bg-brand-50 border-brand-500 text-brand-700' : 'bg-gray-50 border-gray-200 text-gray-400'" class="px-3 md:px-4 py-2 rounded-xl border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0">
-                        <svg x-show="previewVisibility.jersey_front" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                        <svg x-show="!previewVisibility.jersey_front" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
-                        Depan
+                <!-- Toggle Layer Buttons (Responsive 3 cols grid on mobile, flex on desktop) -->
+                <div class="grid grid-cols-3 gap-1.5 sm:flex sm:gap-2 w-full sm:w-auto">
+                    <button @click="togglePreviewLayer('jersey_front')" :class="previewVisibility.jersey_front ? 'bg-brand-50 border-brand-500 text-brand-700 shadow-sm' : 'bg-gray-50 border-gray-200 text-gray-400'" class="px-2 sm:px-4 py-2 rounded-xl border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1 sm:gap-2 truncate">
+                        <svg x-show="previewVisibility.jersey_front" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg x-show="!previewVisibility.jersey_front" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                        <span>Depan</span>
                     </button>
-                    <button @click="togglePreviewLayer('jersey_back')" :class="previewVisibility.jersey_back ? 'bg-brand-50 border-brand-500 text-brand-700' : 'bg-gray-50 border-gray-200 text-gray-400'" class="px-3 md:px-4 py-2 rounded-xl border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0">
-                        <svg x-show="previewVisibility.jersey_back" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                        <svg x-show="!previewVisibility.jersey_back" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
-                        Belakang
+                    <button @click="togglePreviewLayer('jersey_back')" :class="previewVisibility.jersey_back ? 'bg-brand-50 border-brand-500 text-brand-700 shadow-sm' : 'bg-gray-50 border-gray-200 text-gray-400'" class="px-2 sm:px-4 py-2 rounded-xl border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1 sm:gap-2 truncate">
+                        <svg x-show="previewVisibility.jersey_back" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg x-show="!previewVisibility.jersey_back" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                        <span>Belakang</span>
                     </button>
-                    <button @click="togglePreviewLayer('pants')" :class="previewVisibility.pants ? 'bg-brand-50 border-brand-500 text-brand-700' : 'bg-gray-50 border-gray-200 text-gray-400'" class="px-3 md:px-4 py-2 rounded-xl border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0">
-                        <svg x-show="previewVisibility.pants" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                        <svg x-show="!previewVisibility.pants" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
-                        Celana
+                    <button @click="togglePreviewLayer('pants')" :class="previewVisibility.pants ? 'bg-brand-50 border-brand-500 text-brand-700 shadow-sm' : 'bg-gray-50 border-gray-200 text-gray-400'" class="px-2 sm:px-4 py-2 rounded-xl border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1 sm:gap-2 truncate">
+                        <svg x-show="previewVisibility.pants" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg x-show="!previewVisibility.pants" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                        <span>Celana</span>
                     </button>
                 </div>
 
-                <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-3">
-                    <button @click="exportDesignHD('jpeg')" class="flex-1 sm:flex-none py-3.5 px-8 rounded-full bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 shadow-sm hover:shadow-md transition-all font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        JPG HD
+                <!-- Export Action Buttons (Side by side grid on mobile, row on desktop) -->
+                <div class="grid grid-cols-2 sm:flex gap-2 sm:gap-3 w-full sm:w-auto">
+                    <button @click="exportDesignHD('jpeg')" class="py-2.5 sm:py-3.5 px-3 sm:px-8 rounded-full bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 shadow-sm hover:shadow-md transition-all font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 sm:gap-2 truncate">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>JPG HD</span>
                     </button>
-                    <button @click="exportDesignHD('png')" class="flex-1 sm:flex-none py-3.5 px-8 rounded-full bg-brand-900 hover:bg-brand-800 text-white shadow-lg hover:shadow-brand-900/30 hover:-translate-y-0.5 transition-all font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        PNG HD
+                    <button @click="exportDesignHD('png')" class="py-2.5 sm:py-3.5 px-3 sm:px-8 rounded-full bg-brand-900 hover:bg-brand-800 text-white shadow-lg hover:shadow-brand-900/30 hover:-translate-y-0.5 transition-all font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 sm:gap-2 truncate">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>PNG HD</span>
                     </button>
                 </div>
             </div>
