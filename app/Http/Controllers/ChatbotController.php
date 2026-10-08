@@ -109,11 +109,12 @@ class ChatbotController extends Controller
                           "- T-Shirt Cotton 24s (Rp 80.000), 30s (Rp 60.000) Sablon DTF.\n" .
                           "- Kemeja Drill (Rp 80.000) bahan Verlando CP/Maryland.\n\n" .
                           
-                          "=== FITUR ONLINE CUSTOMIZER 3D ===\n" .
-                          "- Kami memiliki fitur 'Online Customizer' yang super canggih di website ini.\n" .
+                          "=== FITUR KUSTOMISASI DESAIN 3D ===\n" .
+                          "- Kami memiliki 'Fitur Kustomisasi' (desain jersey custom 3D) yang canggih di website ini.\n" .
+                          "- Selalu gunakan istilah bahasa Indonesia seperti 'Fitur Kustomisasi' atau 'Kustomisasi Desain' (jangan menyebutnya 'Online Customizer').\n" .
                           "- Pelanggan bisa mendesain jersey dari nol langsung lewat HP/Laptop (bisa ganti warna lengan, tambah motif kerah, pasang logo, nama, hingga sponsor depan/belakang).\n" .
-                          "- Desain yang dibuat bisa diputar/dilihat dalam bentuk 3D, lalu bisa langsung disimpan dan dipesan (checkout).\n" .
-                          "- Arahkan pelanggan untuk klik tombol 'Customizer' di menu atas atau klik 'Desain Sekarang' di halaman katalog jika mereka ingin mendesain sendiri.\n\n" .
+                          "- Desain yang dibuat bisa diputar/dilihat dalam bentuk 3D secara interaktif, lalu bisa langsung disimpan dan dipesan (checkout).\n" .
+                          "- Arahkan pelanggan untuk klik menu 'Kustomisasi' di menu atas atau klik 'Desain Sekarang' di halaman katalog jika mereka ingin mendesain sendiri.\n\n" .
 
                           "=== UPGRADE & BIAYA TAMBAHAN ===\n" .
                           "- Logo: Rubber (+20rb), Semiwoven (+25rb), Bordir (+30rb).\n" .

@@ -17,7 +17,7 @@
                 <ul class="space-y-4 text-sm font-bold text-gray-600 dark:text-gray-400">
                     <li><a href="{{ route('home') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Beranda</a></li>
                     <li><a href="{{ route('catalog.index') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Katalog</a></li>
-                    <li><a href="{{ route('customizer') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Customizer</a></li>
+                    <li><a href="{{ route('customizer') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Kustomisasi</a></li>
                     <li><a href="{{ route('visi-misi') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Visi & Misi</a></li>
                     <li><a href="{{ route('portfolio') }}" class="hover:text-brand-600 transition-colors uppercase tracking-widest">Portofolio</a></li>
                 </ul>

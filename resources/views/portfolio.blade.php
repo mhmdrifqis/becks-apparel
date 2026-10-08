@@ -87,7 +87,7 @@
                 <h2 class="text-3xl md:text-6xl font-black uppercase tracking-tighter mb-8 italic">Siap Mewujudkan <br/><span class="text-brand-400">Desain Tim Anda?</span></h2>
                 <p class="text-brand-100/70 max-w-xl mx-auto mb-12 text-lg md:text-xl font-medium">Bawa identitas tim Anda ke level berikutnya dengan kualitas apparel kelas dunia.</p>
                 <a href="{{ route('customizer') }}" class="inline-flex px-12 py-6 bg-white text-brand-900 rounded-full font-black text-lg hover:bg-brand-50 hover:scale-110 active:scale-95 transition-all shadow-3xl uppercase tracking-widest italic text-decoration-none">
-                    Buka Online Customizer
+                    Mulai Kustomisasi Desain
                 </a>
             </div>
         </div>
