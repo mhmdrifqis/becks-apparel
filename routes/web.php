@@ -44,6 +44,8 @@ Route::middleware('auth')->group(function () {
     // Return Request Route
     Route::post('/pesanan/{order}/return', [App\Http\Controllers\ReturnRequestController::class, 'store'])->name('customer.orders.return');
     
+    Route::post('/pesanan/{order}/confirm-received', [App\Http\Controllers\OrderController::class, 'confirmReceived'])->name('customer.orders.confirm-received');
+    
     // Review Route
     Route::post('/pesanan/{order}/review', [App\Http\Controllers\ReviewController::class, 'store'])->name('customer.orders.review');
     
@@ -129,5 +131,5 @@ Route::get('/chatbot/poll', [\App\Http\Controllers\ChatbotController::class, 'po
 
 require __DIR__.'/auth.php';
 
-// Webhook for Midtrans (No Authentication Required)
+// Webhook for Paywuz Payment Gateway (No Authentication Required)
 Route::post('/payment/callback', [App\Http\Controllers\PaymentController::class, 'callback'])->name('payment.callback');

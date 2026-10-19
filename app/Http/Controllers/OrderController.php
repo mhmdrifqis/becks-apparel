@@ -286,4 +286,42 @@ class OrderController extends Controller
 
         return redirect()->route('customer.orders.show', $order->order_number)->with('success', 'Pesanan berhasil diperbarui.');
     }
+
+    /**
+     * Mark an order as received and completed by the customer.
+     */
+    public function confirmReceived(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Akses tidak sah.');
+        }
+
+        if ($order->status !== 'shipped') {
+            return redirect()->back()->with('error', 'Pesanan hanya dapat diselesaikan jika sudah dalam status dikirim.');
+        }
+
+        if ($order->payment_status !== 'paid') {
+            return redirect()->back()->with('error', 'Pesanan belum dapat diselesaikan karena pembayaran belum lunas. Silakan lakukan pelunasan terlebih dahulu.');
+        }
+
+        $order->update(['status' => 'completed']);
+
+        // Kirim notifikasi ke Admin / Management via Filament
+        try {
+            $admins = \App\Models\User::role(['Admin', 'Management/Owner'])->get();
+            if ($admins->isNotEmpty()) {
+                \Filament\Notifications\Notification::make()
+                    ->title('Pesanan Selesai / Diterima!')
+                    ->body('Pesanan #' . $order->order_number . ' telah dikonfirmasi diterima oleh pelanggan (' . ($order->recipient_name ?? $order->user->name) . ').')
+                    ->success()
+                    ->sendToDatabase($admins);
+            }
+        } catch (\Exception $e) {
+            // Safe fallback jika roles/notifications belum terkonfigurasi
+        }
+
+        return redirect()->route('customer.orders.show', $order->order_number)
+            ->with('success', 'Terima kasih! Pesanan telah selesai dan Anda konfirmasi diterima. Silakan beri ulasan produk.');
+    }
 }
+

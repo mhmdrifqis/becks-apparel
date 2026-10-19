@@ -12,14 +12,19 @@ class PaywuzService
 
     public function __construct()
     {
+        $this->baseUrl = 'https://api.paywuz.id/v1';
         $apiSetting = \App\Models\ApiSetting::first();
         if ($apiSetting) {
-            $isSandbox = $apiSetting->paywuz_environment === 'sandbox';
-            $this->apiKey = $isSandbox ? $apiSetting->paywuz_sandbox_api_key : $apiSetting->paywuz_production_api_key;
-            $this->baseUrl = 'https://api.paywuz.id/v1'; // Paywuz uses the same endpoint, distinguished by API Key (e.g. pk_sand_)
+            $isSandbox = ($apiSetting->paywuz_environment ?? 'sandbox') === 'sandbox';
+            $key = $isSandbox ? $apiSetting->paywuz_sandbox_api_key : $apiSetting->paywuz_production_api_key;
+            if (empty($key)) {
+                $key = $isSandbox ? config('services.paywuz.sandbox_api_key') : config('services.paywuz.production_api_key');
+            }
+            $this->apiKey = $key ?: config('services.paywuz.api_key', '');
         } else {
-            $this->apiKey = config('services.paywuz.api_key', '');
-            $this->baseUrl = 'https://api.paywuz.id/v1'; 
+            $isProduction = config('services.paywuz.is_production', false);
+            $key = $isProduction ? config('services.paywuz.production_api_key') : config('services.paywuz.sandbox_api_key');
+            $this->apiKey = $key ?: config('services.paywuz.api_key', '');
         }
     }
 

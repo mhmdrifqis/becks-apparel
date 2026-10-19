@@ -67,6 +67,26 @@
                     } finally {
                         this.trackingLoading = false;
                     }
+                },
+                confirmOrderReceived(orderId) {
+                    Swal.fire({
+                        title: 'Konfirmasi Penerimaan',
+                        text: 'Apakah barang pesanan sudah Anda terima dalam kondisi baik? Setelah dikonfirmasi, status pesanan akan menjadi selesai.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#059669',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Ya, Sudah Diterima',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const form = document.getElementById('confirm-received-' + orderId);
+                            if (form) {
+                                form.submit();
+                            }
+                        }
+                    });
                 }
             }">
                 <!-- Shopee Style Status Tabs -->
@@ -202,6 +222,15 @@
                                     @endif
                                     @if($order->payment_status === 'unpaid' && $order->status !== 'cancelled')
                                         <a href="{{ route('customer.orders.show', $order->order_number) }}" class="px-8 py-3 bg-brand-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-800 transition-all shadow-xl shadow-brand-900/20 active:scale-95 text-center">Bayar Sekarang</a>
+                                    @endif
+                                    @if($order->status === 'shipped')
+                                        <form id="confirm-received-{{ $order->id }}" action="{{ route('customer.orders.confirm-received', $order->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="button" @click="confirmOrderReceived({{ $order->id }})" class="px-6 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-md flex items-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                                Pesanan Diterima
+                                            </button>
+                                        </form>
                                     @endif
                                     <a href="{{ route('customer.orders.show', $order->order_number) }}" class="px-8 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Detail Pesanan</a>
                                     @if($order->status === 'completed')

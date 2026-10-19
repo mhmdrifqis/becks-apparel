@@ -33,6 +33,8 @@ return [
 
     'paywuz' => [
         'api_key' => env('PAYWUZ_API_KEY'),
+        'sandbox_api_key' => env('PAYWUZ_SANDBOX_API_KEY'),
+        'production_api_key' => env('PAYWUZ_PRODUCTION_API_KEY'),
         'is_production' => env('PAYWUZ_IS_PRODUCTION', false),
     ],
 

@@ -168,12 +168,14 @@ class ApiSetting extends Model
             $dirty = false;
 
             // Hydrate empty fields from env/config so nothing is lost
-            if (empty($setting->paywuz_sandbox_api_key) && env('PAYWUZ_API_KEY')) {
-                $setting->paywuz_sandbox_api_key = env('PAYWUZ_API_KEY');
+            $envSandboxKey = env('PAYWUZ_SANDBOX_API_KEY') ?: env('PAYWUZ_API_KEY');
+            if (empty($setting->paywuz_sandbox_api_key) && $envSandboxKey) {
+                $setting->paywuz_sandbox_api_key = $envSandboxKey;
                 $dirty = true;
             }
-            if (empty($setting->paywuz_production_api_key) && env('PAYWUZ_API_KEY')) {
-                $setting->paywuz_production_api_key = env('PAYWUZ_API_KEY');
+            $envProductionKey = env('PAYWUZ_PRODUCTION_API_KEY') ?: env('PAYWUZ_API_KEY');
+            if (empty($setting->paywuz_production_api_key) && $envProductionKey) {
+                $setting->paywuz_production_api_key = $envProductionKey;
                 $dirty = true;
             }
             if (empty($setting->rajaongkir_api_key) && env('RAJAONGKIR_API_KEY')) {

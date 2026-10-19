@@ -448,9 +448,28 @@
                              </div>
                              @if($order->tracking_number)
                              <button type="button" @click="fetchTracking()" class="w-full py-3 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-800 transition-all shadow-lg shadow-brand-900/20 active:scale-95 flex items-center justify-center gap-2">
-                                
                                  Lacak Resi Pengiriman
                              </button>
+                             @endif
+
+                             @if($order->status === 'shipped')
+                             <form id="confirm-received-form" action="{{ route('customer.orders.confirm-received', $order->id) }}" method="POST" class="mt-3">
+                                 @csrf
+                                 <button type="button" @click="confirmReceived()" class="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 active:scale-95 flex items-center justify-center gap-2">
+                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                     Konfirmasi Pesanan Diterima
+                                 </button>
+                             </form>
+                             @elseif($order->status === 'completed')
+                             <div class="mt-3 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2.5">
+                                 <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                 </div>
+                                 <div>
+                                     <p class="text-[10px] font-black uppercase tracking-widest text-emerald-900">Pesanan Selesai</p>
+                                     <p class="text-[9px] font-bold text-emerald-700">Barang telah Anda terima dengan baik.</p>
+                                 </div>
+                             </div>
                              @endif
                         </div>
                         <div class="mt-8 pt-8 border-t border-slate-50">
@@ -524,6 +543,11 @@
                     
                     <button @click="pay('{{ $order->payment_status === 'partial' ? 'rest' : 'full' }}')" class="h-12 px-6 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-brand-900/20 active:scale-95 transition-all">
                         {{ $order->payment_status === 'partial' ? 'Bayar Pelunasan' : 'Bayar Lunas' }}
+                    </button>
+                @elseif($order->status === 'shipped')
+                    <button type="button" @click="confirmReceived()" class="h-12 px-6 bg-emerald-600 text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        Terima Barang
                     </button>
                 @elseif($order->status !== 'cancelled')
                     <a href="https://wa.me/628123456789" target="_blank" class="h-12 px-8 bg-brand-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2">
@@ -727,7 +751,28 @@
                     this.trackingLoading = false;
                 }
             },
-            
+
+            confirmReceived() {
+                Swal.fire({
+                    title: 'Konfirmasi Penerimaan',
+                    text: 'Apakah barang pesanan sudah Anda terima dalam kondisi baik? Setelah dikonfirmasi, status pesanan akan menjadi selesai.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#059669',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Ya, Sudah Diterima',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('confirm-received-form');
+                        if (form) {
+                            form.submit();
+                        }
+                    }
+                });
+            },
+
             async pay(type) {
                 // Show loading state
                 Swal.fire({

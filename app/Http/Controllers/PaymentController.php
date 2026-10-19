@@ -87,33 +87,54 @@ class PaymentController extends Controller
             $data = $request->all();
             Log::info('Paywuz Webhook Received', $data);
 
-            $transactionStatus = $data['status'] ?? 'pending';
-            $transactionId = $data['transactionId'] ?? null;
-            $referenceId = $data['referenceId'] ?? ''; 
-            $grossAmount = $data['amount'] ?? 0;
+            $transactionStatus = strtolower($data['status'] ?? $data['transaction_status'] ?? $data['paymentStatus'] ?? 'pending');
+            $transactionId = $data['transactionId'] ?? $data['transaction_id'] ?? $data['id'] ?? null;
+            $orderId = $data['orderId'] ?? $data['order_id'] ?? $data['merchantOrderId'] ?? null;
+            $referenceId = $data['referenceId'] ?? $data['reference_id'] ?? ''; 
+            $grossAmount = (float) ($data['amount'] ?? $data['gross_amount'] ?? 0);
 
-            if (!$transactionId) {
-                return response()->json(['message' => 'Missing transaction ID'], 400);
+            // Flexible order lookup: by payment_gateway_id, orderId, or parsed order_number
+            $order = null;
+
+            if ($transactionId) {
+                $order = Order::where('payment_gateway_id', $transactionId)->first();
             }
 
-            $order = Order::where('payment_gateway_id', $transactionId)->first();
+            if (!$order && $orderId) {
+                $order = Order::where('payment_gateway_id', $orderId)->first();
+            }
+
+            // Fallback: Parse BCK-YYYYMMDD-XXXXX from orderId, referenceId, or transactionId
             if (!$order) {
+                $combinedId = ($orderId ?: '') . ' ' . ($referenceId ?: '') . ' ' . ($transactionId ?: '');
+                if (preg_match('/BCK-\d{8}-[A-Za-z0-9]+/i', $combinedId, $matches)) {
+                    $order = Order::where('order_number', $matches[0])->first();
+                }
+            }
+
+            if (!$order) {
+                Log::warning('Paywuz Callback: Order not found for webhook payload', $data);
                 return response()->json(['message' => 'Order not found'], 404);
             }
 
-            $isPaid = false;
-            $paymentType = 'full'; // Default fallback
-            if (str_contains($referenceId, '-dp-')) $paymentType = 'dp';
-            if (str_contains($referenceId, '-rest-')) $paymentType = 'rest';
+            // Detect payment type from reference/orderId (full, dp, rest)
+            $combinedIdentifiers = strtolower(($orderId ?: '') . '-' . ($referenceId ?: '') . '-' . ($transactionId ?: ''));
+            $paymentType = 'full';
+            if (str_contains($combinedIdentifiers, '-dp-')) {
+                $paymentType = 'dp';
+            } elseif (str_contains($combinedIdentifiers, '-rest-')) {
+                $paymentType = 'rest';
+            }
 
             DB::beginTransaction();
-            
-            if (in_array($transactionStatus, ['success', 'settlement', 'paid'])) {
+
+            $isPaid = false;
+            if (in_array($transactionStatus, ['success', 'settlement', 'paid', 'completed'])) {
                 if ($paymentType === 'dp') {
                     $order->payment_status = 'partial';
-                    $order->deposit_amount = $grossAmount;
+                    $order->deposit_amount = $grossAmount > 0 ? $grossAmount : ($order->total_amount / 2);
                     if (in_array($order->status, ['unpaid', 'pending'])) {
-                        $order->status = 'production';
+                        $order->status = 'paid';
                         $isPaid = true;
                     }
                 } elseif ($paymentType === 'rest') {
@@ -128,19 +149,34 @@ class PaymentController extends Controller
                     }
                 }
 
+                // Update payment_gateway_id if Paywuz returned a transactionId
+                if ($transactionId && $order->payment_gateway_id !== $transactionId) {
+                    $order->payment_gateway_id = $transactionId;
+                }
+
                 if ($isPaid && $order->user) {
-                    $order->user->notify(new \App\Notifications\PaymentSuccessNotification($order));
+                    try {
+                        $order->user->notify(new \App\Notifications\PaymentSuccessNotification($order));
+                    } catch (\Exception $ne) {
+                        Log::warning('Failed sending payment notification: ' . $ne->getMessage());
+                    }
                 }
             }
 
             $order->save();
             DB::commit();
 
-            return response()->json(['message' => 'Callback processed']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Callback processed successfully',
+                'order_number' => $order->order_number,
+                'status' => $order->status,
+                'payment_status' => $order->payment_status
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Paywuz Callback Error: ' . $e->getMessage());
-            return response()->json(['message' => 'Server Error'], 500);
+            return response()->json(['message' => 'Server Error: ' . $e->getMessage()], 500);
         }
     }
 
