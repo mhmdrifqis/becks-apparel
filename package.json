@@ -3,7 +3,8 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "nlp": "python server_nlp.py"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",
