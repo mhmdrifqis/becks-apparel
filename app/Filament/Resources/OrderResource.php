@@ -206,19 +206,47 @@ class OrderResource extends Resource
                                               }
                                           }
                                           
-                                          $html = '<div style="display:flex;flex-wrap:wrap;gap:12px">';
+                                          if (empty($files)) {
+                                              return '<span class="text-sm text-gray-400 italic">Tidak ada file desain.</span>';
+                                          }
+                                          
+                                          $html = '<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start">';
+                                          $fallbackSvg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%239ca3af" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/><line x1="4" y1="4" x2="20" y2="20" stroke="%23ef4444" stroke-width="2"/></svg>';
+
                                           foreach($files as $i => $file) {
-                                              $url = e(\Illuminate\Support\Facades\Storage::url($file));
+                                              $cleanPath = ltrim(str_replace(['public/', 'storage/'], '', $file), '/');
+                                              $url = e(\Illuminate\Support\Facades\Storage::disk('public')->url($cleanPath));
                                               $filename = e(basename($file));
                                               $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+
+                                              $isVideo = in_array($extension, ['mp4', 'mov', 'avi', 'webm'], true);
+                                              $isVector = in_array($extension, ['cdr', 'ai', 'psd', 'eps', 'svg', 'pdf'], true);
+
+                                              if ($isVideo) {
+                                                  $preview = '<div style="display:flex;width:100px;height:100px;align-items:center;justify-content:center;border-radius:8px;background:#111827;color:#fff;font-size:11px;font-weight:700">VIDEO</div>';
+                                              } elseif ($isVector) {
+                                                  $preview = '<div style="display:flex;flex-direction:column;width:100px;height:100px;align-items:center;justify-content:center;border-radius:8px;background:#f8fafc;border:1px dashed #cbd5e1;color:#64748b;font-size:10px;font-weight:700;gap:4px">
+                                                      <span style="font-size:16px;text-transform:uppercase;color:#ea580c">.' . e($extension) . '</span>
+                                                      <span>File Desain</span>
+                                                  </div>';
+                                              } else {
+                                                  $preview = '<div style="position:relative;width:100px;height:100px;background:#f1f5f9;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center">
+                                                      <img src="' . $url . '" 
+                                                           alt="Desain ' . ($i + 1) . '" 
+                                                           loading="lazy" 
+                                                           onerror="this.onerror=null; this.src=\'' . $fallbackSvg . '\'; this.title=\'Gambar tidak dapat dimuat (404)\';" 
+                                                           style="width:100%;height:100%;object-fit:cover;display:block">
+                                                  </div>';
+                                              }
                                               
-                                              $preview = in_array($extension, ['mp4', 'mov', 'avi', 'webm'], true) 
-                                                  ? '<div style="display:flex;width:100px;height:100px;align-items:center;justify-content:center;border-radius:8px;background:#111827;color:#fff;font-size:11px">Video</div>' 
-                                                  : '<img src="' . $url . '" alt="Desain ' . ($i + 1) . '" style="display:block;width:100px;height:100px;object-fit:cover;border-radius:8px">';
-                                                  
-                                              $html .= '<div style="width:124px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;padding:8px">
-                                                  <a href="' . $url . '" target="_blank" rel="noopener" title="Buka ukuran asli">' . $preview . '</a>
-                                                  <a href="' . $url . '" download="Desain_Becks_'.$i.'.jpg" style="display:block;text-align:center;margin-top:6px;font-size:10px;font-weight:600;color:#4b5563">Unduh</a>
+                                              $html .= '<div style="width:118px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;padding:8px;box-shadow:0 1px 2px rgba(0,0,0,0.05);display:flex;flex-direction:column;align-items:center">
+                                                  <a href="' . $url . '" target="_blank" rel="noopener noreferrer" title="Buka ukuran asli" style="display:block">
+                                                      ' . $preview . '
+                                                  </a>
+                                                  <div style="width:100%;margin-top:6px;padding-top:4px;border-top:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;font-size:10px">
+                                                      <a href="' . $url . '" target="_blank" rel="noopener noreferrer" style="color:#2563eb;font-weight:600;text-decoration:none">Buka</a>
+                                                      <a href="' . $url . '" download="' . $filename . '" style="color:#059669;font-weight:600;text-decoration:none">Unduh</a>
+                                                  </div>
                                               </div>';
                                           }
                                           $html .= '</div>';

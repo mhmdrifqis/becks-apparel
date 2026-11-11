@@ -1,0 +1,779 @@
+{
+  "info": {
+    "_postman_id": "becks-apparel-collection-v2-1",
+    "name": "Becks Apparel API & Web Endpoints",
+    "description": "Koleksi Postman terstruktur untuk automated testing dan manual API exploration proyek Becks Apparel e-commerce.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register Step 1 (Send OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Testing User\",\n  \"email\": \"testuser@example.com\",\n  \"phone\": \"081298765432\",\n  \"password\": \"Password123!\",\n  \"password_confirmation\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/register-otp",
+              "host": ["{{base_url}}"],
+              "path": ["register-otp"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Step 2 (Verify OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/register-verify-otp",
+              "host": ["{{base_url}}"],
+              "path": ["register-verify-otp"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 302\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+                  "});",
+                  "let xsrfCookie = pm.cookies.get('XSRF-TOKEN');",
+                  "if (xsrfCookie) {",
+                  "    pm.environment.set('xsrf_token', decodeURIComponent(xsrfCookie));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"testuser@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Customer Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "text/html,application/xhtml+xml" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customer/profile",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "X-XSRF-TOKEN", "value": "{{xsrf_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": ["{{base_url}}"],
+              "path": ["logout"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Produk & Katalog",
+      "item": [
+        {
+          "name": "Get Product Catalog (Katalog)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "text/html" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/katalog",
+              "host": ["{{base_url}}"],
+              "path": ["katalog"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filter Katalog by Kategori",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/katalog?category=jersey&search=garuda",
+              "host": ["{{base_url}}"],
+              "path": ["katalog"],
+              "query": [
+                { "key": "category", "value": "jersey" },
+                { "key": "search", "value": "garuda" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Detail Produk by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/katalog/paket-c-full-printing",
+              "host": ["{{base_url}}"],
+              "path": ["katalog", "paket-c-full-printing"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Keranjang Belanja (Cart)",
+      "item": [
+        {
+          "name": "Get Cart Items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "text/html" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cart",
+              "host": ["{{base_url}}"],
+              "path": ["cart"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"material_id\": 1,\n  \"quantity\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/cart/add/paket-c-full-printing",
+              "host": ["{{base_url}}"],
+              "path": ["cart", "add", "paket-c-full-printing"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Cart Item Quantity",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/cart/{{cart_item_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["cart", "{{cart_item_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Cart Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cart/{{cart_item_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["cart", "{{cart_item_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Alamat Tersimpan (Addresses)",
+      "item": [
+        {
+          "name": "Get Addresses",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "text/html" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customer/addresses",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "addresses"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Address",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Rumah Baru\",\n  \"recipient_name\": \"Budi Santoso\",\n  \"phone\": \"081234567890\",\n  \"full_address\": \"Jl. Sudirman No 45 RT 01 RW 02\",\n  \"province_id\": 3,\n  \"province_name\": \"Banten\",\n  \"city_id\": 456,\n  \"city_name\": \"Tangerang\",\n  \"postal_code\": \"15111\",\n  \"is_primary\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/customer/addresses",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "addresses"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Set Primary Address",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customer/addresses/1/primary",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "addresses", "1", "primary"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Pengiriman & Ongkos Kirim (Shipping)",
+      "item": [
+        {
+          "name": "Get Provinces",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is an array of provinces\", function () {",
+                  "    let jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/shipping/provinces",
+              "host": ["{{base_url}}"],
+              "path": ["shipping", "provinces"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cities by Province ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is an array of cities\", function () {",
+                  "    let jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/shipping/cities/3",
+              "host": ["{{base_url}}"],
+              "path": ["shipping", "cities", "3"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calculate Cost Manual",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": 456,\n  \"weight\": 1000,\n  \"courier\": \"jne\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/shipping/cost",
+              "host": ["{{base_url}}"],
+              "path": ["shipping", "cost"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Auto Calculate Ongkir",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": 456,\n  \"weight\": 1000,\n  \"postal_code\": \"15111\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/shipping/auto-calculate",
+              "host": ["{{base_url}}"],
+              "path": ["shipping", "auto-calculate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Track Resi Pesanan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 400\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/shipping/track/1",
+              "host": ["{{base_url}}"],
+              "path": ["shipping", "track", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Checkout & Pesanan",
+      "item": [
+        {
+          "name": "Process Checkout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 302 or 200\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipient_name\": \"Budi Santoso\",\n  \"recipient_phone\": \"081234567890\",\n  \"shipping_address\": \"Jl. Merdeka No 1, Tangerang\",\n  \"shipping_cost\": 20000,\n  \"shipping_service\": \"REG\",\n  \"courier_name\": \"JNE\",\n  \"notes\": \"Baju sablon nomor punggung emas\",\n  \"roster\": {\n    \"1\": [\n      {\"name\": \"Budi\", \"number\": \"10\", \"size\": \"L\", \"upgrades\": []}\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/checkout/process",
+              "host": ["{{base_url}}"],
+              "path": ["checkout", "process"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Customer Orders List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "text/html" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customer/orders",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "orders"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show Order Invoice",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "text/html" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customer/orders/{{order_number}}",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "orders", "{{order_number}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customer/orders/1/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "orders", "1", "cancel"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm Received",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customer/orders/1/confirm-received",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "orders", "1", "confirm-received"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Custom Design (Fabric.js)",
+      "item": [
+        {
+          "name": "Get Customizer Page",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/customizer",
+              "host": ["{{base_url}}"],
+              "path": ["customizer"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Save Design",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Design saved successfully\", function () {",
+                  "    let json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jersey Desain API Postman\",\n  \"design_json\": \"{\\\"model\\\":\\\"v-neck\\\",\\\"colors\\\":{\\\"body\\\":\\\"#1a1a1a\\\"}}\",\n  \"preview_image\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/customer/designs",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "designs"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Design",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jersey Desain Rev 2\",\n  \"design_json\": \"{\\\"model\\\":\\\"v-neck\\\",\\\"colors\\\":{\\\"body\\\":\\\"#ff0000\\\"}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/customer/designs/{{design_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "designs", "{{design_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Design",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customer/designs/{{design_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "designs", "{{design_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8. Chatbot AI (Gemini NLP & Live Chat)",
+      "item": [
+        {
+          "name": "Send Message to Chatbot",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response has message body\", function () {",
+                  "    let json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Berapa lama proses pengerjaan jersey printing?\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chatbot/handle",
+              "host": ["{{base_url}}"],
+              "path": ["chatbot", "handle"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Poll Live Chat Messages",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/chatbot/poll?last_id=0",
+              "host": ["{{base_url}}"],
+              "path": ["chatbot", "poll"],
+              "query": [
+                { "key": "last_id", "value": "0" }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

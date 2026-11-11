@@ -11,19 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_addresses', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('label')->nullable();
-            $table->string('nama_penerima');
-            $table->string('no_telepon');
-            $table->text('alamat_lengkap');
-            $table->string('kota');
-            $table->string('provinsi');
-            $table->string('kode_pos');
-            $table->boolean('is_default')->default(false);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('user_addresses')) {
+            Schema::create('user_addresses', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+                $table->string('label')->nullable();
+                $table->string('nama_penerima');
+                $table->string('no_telepon');
+                $table->text('alamat_lengkap');
+                $table->string('kota');
+                $table->string('provinsi');
+                $table->string('kode_pos');
+                $table->boolean('is_default')->default(false);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

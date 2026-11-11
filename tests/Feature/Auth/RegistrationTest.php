@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -16,16 +17,21 @@ class RegistrationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_new_users_can_register(): void
+    public function test_new_users_can_initiate_registration_and_receive_otp(): void
     {
+        Http::fake([
+            'https://api.fonnte.com/send' => Http::response(['status' => true], 200),
+        ]);
+
         $response = $this->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'phone' => '081234567890',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('register.otp.show'));
+        $this->assertEquals('081234567890', session('pending_reg_phone'));
     }
 }

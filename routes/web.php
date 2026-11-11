@@ -106,6 +106,17 @@ Route::get('/media/{path}', function ($path) {
     return response()->file($fullPath, ['Content-Type' => $mimeType]);
 })->where('path', '.*')->name('media.file');
 
+// Fallback route jika web server tidak melayani /storage via symlink
+Route::get('/storage/{path}', function ($path) {
+    $fullPath = storage_path('app/public/' . $path);
+    if (!file_exists($fullPath)) {
+        abort(404);
+    }
+    
+    $mimeType = \Illuminate\Support\Facades\File::mimeType($fullPath);
+    return response()->file($fullPath, ['Content-Type' => $mimeType]);
+})->where('path', '.*')->name('storage.file');
+
 // Temporary route to clear cache
 Route::get('/clear-cache', function() {
     $configCache = base_path('bootstrap/cache/config.php');
