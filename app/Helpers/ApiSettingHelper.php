@@ -17,7 +17,7 @@ class ApiSettingHelper
             $setting = \Illuminate\Support\Facades\Cache::remember('api_settings_global', 3600, function () {
                 try {
                     return ApiSetting::instance();
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     return null;
                 }
             });
@@ -107,7 +107,7 @@ class ApiSettingHelper
             }
             config(['services.smtp.is_active' => (bool) ($setting->smtp_is_active ?? true)]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::warning("ApiSettingHelper: Failed to load dynamic API settings - " . $e->getMessage());
         }
     }
