@@ -51,11 +51,11 @@ class ChatbotController extends Controller
      */
     protected function handleLocalNlp(Request $request, string $userId)
     {
-        $nlpUrl = config('services.chatbot.url', env('FASTAPI_CHATBOT_URL', 'http://127.0.0.1:8000/chatbot'));
+        $nlpUrl = env('FASTAPI_CHATBOT_URL') ?: config('services.chatbot.url', 'http://127.0.0.1:8000/chatbot');
         $timeout = (int) config('services.chatbot.timeout', 10);
 
         try {
-            $response = Http::timeout($timeout)->post($nlpUrl, [
+            $response = Http::connectTimeout(3)->timeout($timeout)->post($nlpUrl, [
                 'message' => $request->message,
                 'user_id' => $userId,
                 'history' => $request->input('history', []),
