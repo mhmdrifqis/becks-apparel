@@ -22,7 +22,7 @@ class ChatbotController extends Controller
         $activeChat = LiveChat::where('user_id', $userId)->where('status', 'active')->first();
 
         if ($activeChat) {
-            // Jika ada sesi admin aktif, SIMPAN pesan ke database, JANGAN kirim ke FastAPI
+            // Jika ada sesi admin aktif, SIMPAN pesan ke database, JANGAN kirim ke AI/NLP
             LiveChatMessage::create([
                 'live_chat_id' => $activeChat->id,
                 'sender' => 'user',
@@ -35,7 +35,87 @@ class ChatbotController extends Controller
             ]);
         }
 
-        // 2. Jika tidak ada sesi aktif, kirim ke Gemini API
+        // 2. Tentukan driver chatbot: local NLP atau Gemini AI
+        // Di localhost atau jika CHATBOT_DRIVER=nlp, gunakan service NLP buatan sendiri
+        $driver = env('CHATBOT_DRIVER', app()->environment('local') ? 'nlp' : 'gemini');
+
+        if ($driver === 'nlp') {
+            return $this->handleLocalNlp($request, $userId);
+        }
+
+        return $this->handleGemini($request, $userId);
+    }
+
+    /**
+     * Handle chat menggunakan Service NLP lokal buatan sendiri (FastAPI / Python)
+     */
+    protected function handleLocalNlp(Request $request, string $userId)
+    {
+        $nlpUrl = config('services.chatbot.url', env('FASTAPI_CHATBOT_URL', 'http://127.0.0.1:8000/chatbot'));
+        $timeout = (int) config('services.chatbot.timeout', 10);
+
+        try {
+            $response = Http::timeout($timeout)->post($nlpUrl, [
+                'message' => $request->message,
+                'user_id' => $userId,
+                'history' => $request->input('history', []),
+            ]);
+
+            if (!$response->successful()) {
+                throw new \Exception('NLP service HTTP ' . $response->status());
+            }
+
+            $data = $response->json();
+            $replyText = '';
+
+            if (is_array($data)) {
+                $replyText = $data['message'] ?? $data['response'] ?? $data['reply'] ?? $data['text'] ?? $data['answer'] ?? '';
+            } elseif (is_string($data)) {
+                $replyText = $data;
+            }
+
+            // Bersihkan format asterisk / bold agar menjadi teks biasa yang rapi
+            $replyText = preg_replace('/^\s*\*\s+/m', '• ', (string) $replyText);
+            $replyText = str_replace(['**', '*'], '', $replyText);
+
+            // Cek apakah ada trigger [HANDOVER] atau status handover dari NLP
+            $isHandover = (isset($data['status']) && $data['status'] === 'handover')
+                || (isset($data['handover']) && $data['handover'] === true)
+                || str_contains(strtoupper($replyText), '[HANDOVER]');
+
+            if ($isHandover) {
+                LiveChat::create([
+                    'user_id' => $userId,
+                    'user_name' => auth()->check() ? auth()->user()->name : 'Guest',
+                    'status' => 'active'
+                ]);
+
+                return response()->json([
+                    'status' => 'handover',
+                    'message' => 'Saya akan segera menghubungkan Kakak dengan tim CS Becks Apparel ya! Mohon tunggu sebentar...',
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => trim($replyText),
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error('Local NLP Chatbot Error: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Service NLP Chatbot lokal (' . $nlpUrl . ') belum aktif. Silakan jalankan server NLP buatan Anda terlebih dahulu.',
+            ], 503);
+        }
+    }
+
+    /**
+     * Handle chat menggunakan Google Gemini AI (Default untuk deployment produksi)
+     */
+    protected function handleGemini(Request $request, string $userId)
+    {
         $apiKey = config('services.gemini.key');
 
         if (empty($apiKey)) {

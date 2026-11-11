@@ -143,4 +143,80 @@ class ChatbotTest extends TestCase
             'message' => 'Maaf Kak, asisten Becks saat ini sedang mengalami gangguan teknis. Silakan coba beberapa saat lagi.',
         ]);
     }
+
+    public function test_chatbot_merespons_dengan_service_nlp_lokal(): void
+    {
+        config(['services.chatbot.url' => 'http://127.0.0.1:8000/chatbot']);
+        putenv('CHATBOT_DRIVER=nlp');
+
+        Http::fake([
+            'http://127.0.0.1:8000/chatbot' => Http::response([
+                'status' => 'success',
+                'message' => 'Halo dari NLP lokal!',
+            ], 200),
+        ]);
+
+        $response = $this->postJson(route('chatbot.handle'), [
+            'message' => 'Halo NLP',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'status' => 'success',
+            'message' => 'Halo dari NLP lokal!',
+        ]);
+
+        putenv('CHATBOT_DRIVER');
+    }
+
+    public function test_chatbot_nlp_lokal_memicu_handover(): void
+    {
+        $user = User::factory()->create();
+        config(['services.chatbot.url' => 'http://127.0.0.1:8000/chatbot']);
+        putenv('CHATBOT_DRIVER=nlp');
+
+        Http::fake([
+            'http://127.0.0.1:8000/chatbot' => Http::response([
+                'status' => 'handover',
+                'message' => '[HANDOVER]',
+            ], 200),
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('chatbot.handle'), [
+            'message' => 'Hubungkan saya dengan admin',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'status' => 'handover',
+        ]);
+
+        $this->assertDatabaseHas('live_chats', [
+            'user_id' => (string) $user->id,
+            'status' => 'active',
+        ]);
+
+        putenv('CHATBOT_DRIVER');
+    }
+
+    public function test_chatbot_nlp_lokal_menangani_service_offline(): void
+    {
+        config(['services.chatbot.url' => 'http://127.0.0.1:8000/chatbot']);
+        putenv('CHATBOT_DRIVER=nlp');
+
+        Http::fake([
+            'http://127.0.0.1:8000/chatbot' => Http::response(null, 500),
+        ]);
+
+        $response = $this->postJson(route('chatbot.handle'), [
+            'message' => 'Halo bot',
+        ]);
+
+        $response->assertStatus(503);
+        $response->assertJson([
+            'status' => 'error',
+        ]);
+
+        putenv('CHATBOT_DRIVER');
+    }
 }
