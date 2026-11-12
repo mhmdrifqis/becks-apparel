@@ -33,21 +33,67 @@ class PaymentController extends Controller
 
         $merchantOrderId = $order->order_number . '-' . $paymentType . '-' . time();
 
+        // Ambil data pembeli dengan fallback aman
+        $customerName = substr(trim($order->recipient_name ?: ($order->user->name ?? 'Pelanggan Becks')), 0, 100);
+        if (empty($customerName)) {
+            $customerName = 'Pelanggan Becks';
+        }
+
+        $customerEmail = trim($order->user->email ?? 'customer@becksapparel.com');
+        if (empty($customerEmail)) {
+            $customerEmail = 'customer@becksapparel.com';
+        }
+
+        $rawPhone = $order->recipient_phone ?: ($order->user->phone ?? '081234567890');
+        $customerPhone = \App\Helpers\PhoneHelper::normalize($rawPhone) ?: '081234567890';
+
+        $isProduction = config('services.paywuz.is_production', env('PAYWUZ_IS_PRODUCTION', false));
+
+        // Tentukan metode pembayaran:
+        // Di sandbox, Paywuz membatasi QRIS maksimal Rp 99.000. Jika lebih, gunakan VA secara otomatis.
+        $paymentMethod = $request->input('method', $request->input('payment_method'));
+        if (!$paymentMethod) {
+            if (!$isProduction && (int) $grossAmount > 99000) {
+                $paymentMethod = 'VA';
+            } else {
+                $paymentMethod = 'QRIS';
+            }
+        }
+
+        $metadata = [
+            'customerName' => $customerName,
+            'phone' => $customerPhone,
+            'email' => $customerEmail,
+            'orderNumber' => $order->order_number,
+            'orderId' => $merchantOrderId,
+        ];
+
         $payload = [
             'amount' => (int) $grossAmount,
             'orderId' => $merchantOrderId,
-            'customerName' => $order->user->name,
-            'customerEmail' => $order->user->email,
-            'customerPhone' => $order->user->phone ?? '080000000000',
-            'paymentMethod' => 'QRIS', // Default sementara
+            'customerName' => $customerName,
+            'customerEmail' => $customerEmail,
+            'customerPhone' => $customerPhone,
+            'paymentMethod' => $paymentMethod,
             'redirectUrl' => route('customer.orders.show', $order->order_number),
+            'metadata' => $metadata,
         ];
 
         try {
-            $paymentResponse = $this->paywuzService->createTransaction($payload);
+            try {
+                $paymentResponse = $this->paywuzService->createTransaction($payload);
+            } catch (\Exception $e) {
+                // Jika di sandbox QRIS melebihi limit Rp 99.000, otomatis fallback ke VA (Virtual Account)
+                if ($payload['paymentMethod'] === 'QRIS' && str_contains(strtolower($e->getMessage()), 'maximum amount for qris')) {
+                    $payload['paymentMethod'] = 'VA';
+                    $paymentResponse = $this->paywuzService->createTransaction($payload);
+                } else {
+                    throw $e;
+                }
+            }
 
-            // Gunakan merchantOrderId untuk pengecekan status ke depannya
-            $transactionId = $merchantOrderId;
+            // Gunakan transaction ID dari Paywuz atau fallback ke merchantOrderId
+            $transactionId = $paymentResponse['data']['id'] ?? $merchantOrderId;
             $checkoutUrl = $paymentResponse['data']['paymentUrl'] ?? null;
 
             $order->update([
@@ -104,11 +150,23 @@ class PaymentController extends Controller
                 $order = Order::where('payment_gateway_id', $orderId)->first();
             }
 
-            // Fallback: Parse BCK-YYYYMMDD-XXXXX from orderId, referenceId, or transactionId
+            // Fallback: Parse BCK-... from orderId, referenceId, transactionId, or metadata
+            if (!$order) {
+                $metadataOrderNumber = $data['metadata']['orderNumber'] ?? $data['metadata']['order_number'] ?? null;
+                if ($metadataOrderNumber) {
+                    $order = Order::where('order_number', $metadataOrderNumber)->first();
+                }
+            }
+
             if (!$order) {
                 $combinedId = ($orderId ?: '') . ' ' . ($referenceId ?: '') . ' ' . ($transactionId ?: '');
-                if (preg_match('/BCK-\d{8}-[A-Za-z0-9]+/i', $combinedId, $matches)) {
-                    $order = Order::where('order_number', $matches[0])->first();
+                if (preg_match('/BCK-[A-Za-z0-9\-]+/i', $combinedId, $matches)) {
+                    // Coba cari order_number persis atau prefix sebelum -full/-dp/-rest
+                    $matchedNumber = $matches[0];
+                    $cleanNumber = preg_replace('/-(full|dp|rest)(-\d+)?$/i', '', $matchedNumber);
+                    $order = Order::where('order_number', $matchedNumber)
+                        ->orWhere('order_number', $cleanNumber)
+                        ->first();
                 }
             }
 
